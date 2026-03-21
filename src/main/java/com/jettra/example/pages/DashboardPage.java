@@ -26,7 +26,7 @@ public class DashboardPage extends Page {
         dashboard = new Dashboard();
 
         Top top = new Top();
-        top.setContent("<h2>Jettra Global Dashboard</h2><div>Welcome, Admin</div>");
+        top.setContent("<h2>Jettra Global Dashboard</h2><div style='display:flex; align-items:center; gap:20px;'><span>Welcome, Admin</span><button class='j-btn' style='width:auto; padding:8px 15px; font-size:12px;' onclick='window.location.reload()'>Cerrar Sesión</button></div>");
         dashboard.setTop(top);
 
         Left left = new Left();
