@@ -69,7 +69,7 @@ public abstract class DashboardBasePage extends Page implements HttpHandler {
         
         io.jettra.wui.components.Div rightSection = new io.jettra.wui.components.Div();
         rightSection.addClass("j-top-right");
-        rightSection.setStyle("display", "flex").setStyle("align-items", "center").setStyle("gap", "12px").setStyle("overflow", "visible");
+        rightSection.setStyle("display", "flex").setStyle("align-items", "center").setStyle("gap", "8px").setStyle("flex-wrap", "nowrap").setStyle("overflow", "visible");
         
         // Obtener valores por defecto de la configuración
         String defaultConfigLang = com.jettra.server.config.JettraConfig.getProperty("app.language");
@@ -116,7 +116,7 @@ public abstract class DashboardBasePage extends Page implements HttpHandler {
         // CheckBox para animaciones
         io.jettra.wui.components.Div animDiv = new io.jettra.wui.components.Div();
         animDiv.addClass("hide-mobile");
-        animDiv.setStyle("display", "flex").setStyle("align-items", "center").setStyle("gap", "5px").setStyle("margin-left", "5px");
+        animDiv.setStyle("display", "flex").setStyle("align-items", "center").setStyle("gap", "3px");
         io.jettra.wui.components.Span animLabel = new io.jettra.wui.components.Span("Anim");
         animLabel.setStyle("font-size", "0.8rem");
         CheckBox animCB = new CheckBox("anim-toggle", "animated", "true");

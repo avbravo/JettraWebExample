@@ -64,7 +64,7 @@ public class PersonaPage extends DashboardBasePage {
             ".action-btn { padding: 5px 10px; margin-right: 5px; cursor: pointer; border: none; background: rgba(0,255,255,0.2); color: #fff; border-radius:3px; } " +
             ".action-btn:hover { background: rgba(0,255,255,0.4); } " +
             ".modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); display:flex; justify-content:center; align-items:center;} " +
-            ".modal-content { background-color: #1a202c; padding: 20px; border: 1px solid #0ff; width: 400px; border-radius: 8px; box-shadow: 0 0 20px rgba(0,255,255,0.2); color: #fff;} " +
+            ".modal-content { background-color: #1a202c; padding: 20px; border: 1px solid #0ff; width: 400px; max-width: 90%; border-radius: 8px; box-shadow: 0 0 20px rgba(0,255,255,0.2); color: #fff;} " +
             ".form-group { margin-bottom: 15px; } " +
             ".form-group label { display: block; margin-bottom: 5px; color: #0ff; } " +
             ".form-group input { width: 100%; padding: 8px; background: rgba(0,0,0,0.5); border: 1px solid rgba(0,255,255,0.3); color: #fff; border-radius: 4px; } " +
@@ -80,14 +80,9 @@ public class PersonaPage extends DashboardBasePage {
         mainContent.setProperty("id", "center-content");
         mainContent.setStyle("padding", "20px");
 
-        // Lang Switcher (Inside center now since Top is shared)
-        Div langSwitcher = new Div();
-        langSwitcher.setStyle("margin-bottom", "15px").setStyle("text-align", "right").addClass("no-print");
-        langSwitcher.add(new Link("?lang=es", "ES")).add(new Span(" | ")).add(new Link("?lang=en", "EN"));
-        mainContent.add(langSwitcher);
 
         Div actionContainer = new Div();
-        actionContainer.setStyle("display", "flex").setStyle("justify-content", "space-between").setStyle("margin-bottom", "20px");
+        actionContainer.setStyle("display", "flex").setStyle("justify-content", "space-between").setStyle("flex-wrap", "wrap").setStyle("gap", "10px").setStyle("margin-bottom", "20px");
         actionContainer.addClass("no-print");
 
         Button addBtn = new Button(msg.getProperty("btn.add"));
@@ -286,7 +281,11 @@ public class PersonaPage extends DashboardBasePage {
                 msg.getProperty("btn.confirm.delete")
         ));
 
-        mainContent.add(actionContainer).add(table).add(pager).add(modalContainer);
+        Div tableWrapper = new Div();
+        tableWrapper.addClass("j-table-container");
+        tableWrapper.add(table);
+
+        mainContent.add(actionContainer).add(tableWrapper).add(pager).add(modalContainer);
         center.add(customStyles).add(mainContent).add(pageScript);
     }
 
