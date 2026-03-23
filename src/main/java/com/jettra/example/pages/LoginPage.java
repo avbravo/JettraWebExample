@@ -71,24 +71,17 @@ public class LoginPage extends Page implements HttpHandler {
             String user = params.get("username");
             String pass = params.get("password");
 
-            if ("admin".equals(user) && "admin".equals(pass)) {
+            if (("admin".equals(user) && "admin".equals(pass)) || ("avbravo".equals(user) && "avbravo".equals(pass))) {
+                exchange.getResponseHeaders().set("Set-Cookie", "username=" + user + "; Path=/");
+                exchange.getResponseHeaders().set("Location", "/dashboard");
+                exchange.sendResponseHeaders(302, -1);
+            } else if ("demo".equals(user) && "demo".equals(pass)) {
                 exchange.getResponseHeaders().set("Set-Cookie", "username=" + user + "; Path=/");
                 exchange.getResponseHeaders().set("Location", "/dashboard");
                 exchange.sendResponseHeaders(302, -1);
             } else {
-                              
-
-                 if ("demo".equals(user) && "demo".equals(pass)) {
-                     exchange.getResponseHeaders().set("Set-Cookie", "username=" + user + "; Path=/");
-                     exchange.getResponseHeaders().set("Location", "/dashboard");
-                      exchange.sendResponseHeaders(302, -1);
-                 }else{
-                 exchange.getResponseHeaders().set("Location", "/?error=invalid_credentials");
+                exchange.getResponseHeaders().set("Location", "/?error=invalid_credentials");
                 exchange.sendResponseHeaders(302, -1);
-            }
-               
-               
-               
             }
         } else if ("GET".equals(exchange.getRequestMethod())) {
             this.children.clear(); // Reset before re-init
