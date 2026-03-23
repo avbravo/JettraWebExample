@@ -3,13 +3,9 @@ package com.jettra.example.pages;
 import com.jettra.example.model.Persona;
 import com.jettra.example.repository.PersonaRepository;
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
-import io.jettra.wui.complex.Dashboard;
+import java.io.IOException;
 import io.jettra.wui.complex.Center;
-import io.jettra.wui.complex.Top;
-import io.jettra.wui.complex.Left;
 import io.jettra.wui.complex.Table;
-import io.jettra.wui.complex.Footer;
 import io.jettra.wui.components.Button;
 import io.jettra.wui.components.Div;
 import io.jettra.wui.components.Form;
@@ -21,13 +17,11 @@ import io.jettra.wui.components.Script;
 import io.jettra.wui.components.Span;
 import io.jettra.wui.components.Style;
 import io.jettra.wui.components.TextBox;
-import io.jettra.wui.core.Page;
 import io.jettra.wui.core.UIComponent;
 import com.jettra.server.JettraServer;
 
 import java.io.InputStreamReader;
 import java.net.URLDecoder;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -35,11 +29,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-public class PersonaPage extends Page implements HttpHandler {
+public class PersonaPage extends DashboardBasePage {
 
-    private Dashboard dashboard;
     private final Properties msg = new Properties();
     private String lang = "es";
+    private int pageNumber = 1;
 
     public PersonaPage() {
         super("Persona CRUD");
@@ -59,72 +53,10 @@ public class PersonaPage extends Page implements HttpHandler {
         }
     }
 
-    private void initUI(String username, String langParam, int pageNumber) {
-        if (langParam != null && (langParam.equals("es") || langParam.equals("en"))) {
-            this.lang = langParam;
-        }
+    @Override
+    protected void initCenter(Center center, String username) {
         loadMessages(this.lang);
 
-        dashboard = new Dashboard();
-
-        Top top = new Top();
-        Div topContainer = new Div();
-        topContainer.setStyle("display", "flex").setStyle("justify-content", "space-between").setStyle("align-items", "center").setStyle("width", "100%");
-        
-        Header topTitle = new Header(2, msg.getProperty("title.persona", "Persona"));
-        
-        Div topActions = new Div();
-        topActions.setStyle("display", "flex").setStyle("gap", "10px").setStyle("align-items", "center");
-        
-        topActions.add(new Link("?lang=es", "ES"));
-        topActions.add(new Span(" | "));
-        topActions.add(new Link("?lang=en", "EN"));
-        topActions.add(new Span(" | " + username));
-        
-        Button logoutBtn = new Button("Cerrar Sesión");
-        logoutBtn.setProperty("onclick", "window.location.href='" + JettraServer.resolvePath("/logout") + "'");
-        logoutBtn.setStyle("padding", "5px 10px").setStyle("font-size", "12px");
-        topActions.add(logoutBtn);
-        
-        topContainer.add(topTitle).add(topActions);
-        top.add(topContainer);
-        dashboard.setTop(top);
-
-        Left left = new Left();
-        Div menuContainer = new Div();
-        menuContainer.setStyle("padding", "15px").setStyle("font-family", "sans-serif");
-        
-        Header menuTitle = new Header(3, "Menu");
-        menuTitle.setStyle("color", "#0ff").setStyle("margin-bottom", "10px").setStyle("font-weight", "600");
-        
-        UIComponent hr = new UIComponent("hr") {};
-        hr.setStyle("border", "1px solid rgba(0, 255, 255, 0.2)").setStyle("margin-bottom", "10px");
-        
-        String menuClass = "display:flex; align-items:center; padding:10px; margin-bottom:8px; background:rgba(20,30,50,0.5); color:#fff; cursor:pointer; text-decoration:none; font-size:14px; transition:all 0.3s; box-shadow:0 2px 5px rgba(0,0,0,0.2);";
-        UIComponent dashMenu = new Div() {};
-        dashMenu.setContent("Dashboard");
-        dashMenu.setProperty("style", menuClass);
-        dashMenu.setProperty("onmouseover", "this.style.background='rgba(0,255,255,0.1)'");
-        dashMenu.setProperty("onmouseout", "this.style.background='rgba(20,30,50,0.5)'");
-        dashMenu.setProperty("onclick", "window.location.href='" + JettraServer.resolvePath("/dashboard") + "'");
-        
-        menuContainer.add(menuTitle).add(hr).add(dashMenu);
-
-        if ("admin".equals(username) || "avbravo".equals(username)) {
-            UIComponent personaMenu = new Div() {};
-            personaMenu.setContent("Persona");
-            personaMenu.setProperty("style", menuClass);
-            personaMenu.setProperty("onmouseover", "this.style.background='rgba(0,255,255,0.1)'");
-            personaMenu.setProperty("onmouseout", "this.style.background='rgba(20,30,50,0.5)'");
-            personaMenu.setProperty("onclick", "window.location.href='" + JettraServer.resolvePath("/persona") + "'");
-            menuContainer.add(personaMenu);
-        }
-
-        left.add(menuContainer);
-        dashboard.setLeft(left);
-
-        Center center = new Center();
-        
         Style customStyles = new Style(
             ".crud-table { width: 100%; border-collapse: collapse; margin-top: 20px; color: #fff; } " +
             ".crud-table th, .crud-table td { padding: 12px; border: 1px solid rgba(0,255,255,0.3); text-align: left; } " +
@@ -148,6 +80,12 @@ public class PersonaPage extends Page implements HttpHandler {
         mainContent.setProperty("id", "center-content");
         mainContent.setStyle("padding", "20px");
 
+        // Lang Switcher (Inside center now since Top is shared)
+        Div langSwitcher = new Div();
+        langSwitcher.setStyle("margin-bottom", "15px").setStyle("text-align", "right").addClass("no-print");
+        langSwitcher.add(new Link("?lang=es", "ES")).add(new Span(" | ")).add(new Link("?lang=en", "EN"));
+        mainContent.add(langSwitcher);
+
         Div actionContainer = new Div();
         actionContainer.setStyle("display", "flex").setStyle("justify-content", "space-between").setStyle("margin-bottom", "20px");
         actionContainer.addClass("no-print");
@@ -166,10 +104,10 @@ public class PersonaPage extends Page implements HttpHandler {
         int pageSize = 5;
         int totalPages = (int) Math.ceil((double)all.size() / pageSize);
         if (totalPages == 0) totalPages = 1;
-        if (pageNumber > totalPages) pageNumber = totalPages;
-        if (pageNumber < 1) pageNumber = 1;
+        if (this.pageNumber > totalPages) this.pageNumber = totalPages;
+        if (this.pageNumber < 1) this.pageNumber = 1;
 
-        int fromIndex = (pageNumber - 1) * pageSize;
+        int fromIndex = (this.pageNumber - 1) * pageSize;
         int toIndex = Math.min(fromIndex + pageSize, all.size());
         List<Persona> paginated = all.subList(fromIndex, toIndex);
 
@@ -219,22 +157,22 @@ public class PersonaPage extends Page implements HttpHandler {
         pager.setStyle("margin-top", "20px").setStyle("display", "flex").setStyle("justify-content", "center").setStyle("gap", "10px");
         pager.addClass("no-print");
         
-        if (pageNumber > 1) {
-            Link prev = new Link("?lang=" + lang + "&page=" + (pageNumber - 1), msg.getProperty("pager.prev"));
+        if (this.pageNumber > 1) {
+            Link prev = new Link("?lang=" + lang + "&page=" + (this.pageNumber - 1), msg.getProperty("pager.prev"));
             prev.addClass("j-btn");
             pager.add(prev);
         }
-        Span pageInfo = new Span("Page " + pageNumber + " of " + totalPages);
+        Span pageInfo = new Span("Page " + this.pageNumber + " of " + totalPages);
         pageInfo.setStyle("padding", "10px");
         pager.add(pageInfo);
         
-        if (pageNumber < totalPages) {
-            Link next = new Link("?lang=" + lang + "&page=" + (pageNumber + 1), msg.getProperty("pager.next"));
+        if (this.pageNumber < totalPages) {
+            Link next = new Link("?lang=" + lang + "&page=" + (this.pageNumber + 1), msg.getProperty("pager.next"));
             next.addClass("j-btn");
             pager.add(next);
         }
 
-        // Modal Form using UI Components
+        // Modal Form 
         Div modalContainer = new Div();
         modalContainer.setProperty("id", "crudModal");
         modalContainer.setStyle("display", "none").addClass("modal");
@@ -348,22 +286,8 @@ public class PersonaPage extends Page implements HttpHandler {
                 msg.getProperty("btn.confirm.delete")
         ));
 
-        mainContent.add(actionContainer);
-        mainContent.add(table);
-        mainContent.add(pager);
-        mainContent.add(modalContainer);
-        
-        center.add(customStyles);
-        center.add(mainContent);
-        center.add(pageScript);
-
-        dashboard.setCenter(center);
-        
-        Footer footer = new Footer();
-        footer.setContent("<p>JettraStack © 2026. Data connection secure.</p>");
-        dashboard.setFooter(footer);
-        
-        add(dashboard);
+        mainContent.add(actionContainer).add(table).add(pager).add(modalContainer);
+        center.add(customStyles).add(mainContent).add(pageScript);
     }
 
     private String escapeHtml(String input) {
@@ -373,22 +297,8 @@ public class PersonaPage extends Page implements HttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        String loggedUser = "Guest";
-        String cookies = exchange.getRequestHeaders().getFirst("Cookie");
-        if (cookies != null) {
-            for (String cookie : cookies.split(";")) {
-                cookie = cookie.trim();
-                if (cookie.startsWith("username=") && cookie.length() > "username=".length()) {
-                    loggedUser = cookie.substring("username=".length());
-                }
-            }
-        }
-        if ("Guest".equals(loggedUser) || loggedUser.isEmpty()) {
-            exchange.getResponseHeaders().set("Location", JettraServer.resolvePath("/"));
-            exchange.sendResponseHeaders(302, -1);
-            exchange.getResponseBody().close();
-            return;
-        }
+        String loggedUser = getLoggedUser(exchange);
+        if (!checkAuth(exchange, loggedUser)) return;
 
         if (!"admin".equals(loggedUser) && !"avbravo".equals(loggedUser)) {
             exchange.getResponseHeaders().set("Location", JettraServer.resolvePath("/dashboard"));
@@ -398,20 +308,17 @@ public class PersonaPage extends Page implements HttpHandler {
         }
 
         String method = exchange.getRequestMethod();
-
         String query = exchange.getRequestURI().getQuery();
-        String langParam = "es"; 
-        int pageNumber = 1;
-
+        
         if (query != null) {
             String[] params = query.split("&");
             for (String param : params) {
                 String[] pair = param.split("=");
                 if (pair.length == 2) {
-                    if (pair[0].equals("lang")) langParam = pair[1];
+                    if (pair[0].equals("lang")) this.lang = pair[1];
                     if (pair[0].equals("page")) {
                         try {
-                            pageNumber = Integer.parseInt(pair[1]);
+                            this.pageNumber = Integer.parseInt(pair[1]);
                         } catch(NumberFormatException e) {
                         }
                     }
@@ -431,7 +338,7 @@ public class PersonaPage extends Page implements HttpHandler {
             String action = formParams.get("action");
             String personaId = formParams.get("personaId");
             String submittedLang = formParams.get("lang");
-            if (submittedLang != null) langParam = submittedLang;
+            if (submittedLang != null) this.lang = submittedLang;
             
             if ("save".equals(action)) {
                 String nombre = formParams.get("nombre");
@@ -445,14 +352,14 @@ public class PersonaPage extends Page implements HttpHandler {
                 }
             }
             
-            exchange.getResponseHeaders().set("Location", JettraServer.resolvePath("/persona?lang=" + langParam + "&page=" + pageNumber));
+            exchange.getResponseHeaders().set("Location", JettraServer.resolvePath("/persona?lang=" + this.lang + "&page=" + this.pageNumber));
             exchange.sendResponseHeaders(302, -1);
             exchange.getResponseBody().close();
             return;
         }
 
         this.children.clear();
-        initUI(loggedUser, langParam, pageNumber);
+        initLayout(loggedUser);
         
         String html = this.render();
         byte[] bytes = html.getBytes(StandardCharsets.UTF_8);
