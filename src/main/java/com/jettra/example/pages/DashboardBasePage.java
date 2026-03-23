@@ -64,12 +64,12 @@ public abstract class DashboardBasePage extends Page implements HttpHandler {
            .setStyle("overflow", "visible");
 
         io.jettra.wui.components.Header title = new io.jettra.wui.components.Header(2, "Jettra Global Dashboard");
-        title.setStyle("margin", "0").setStyle("font-size", "1.2rem");
+        title.setStyle("margin", "0").setStyle("font-size", "1.1rem");
         top.add(title);
         
         io.jettra.wui.components.Div rightSection = new io.jettra.wui.components.Div();
         rightSection.addClass("j-top-right");
-        rightSection.setStyle("display", "flex").setStyle("align-items", "center").setStyle("gap", "8px").setStyle("flex-wrap", "nowrap").setStyle("overflow", "visible");
+        rightSection.setStyle("display", "flex").setStyle("align-items", "center").setStyle("gap", "6px").setStyle("flex-wrap", "nowrap").setStyle("overflow", "visible");
         
         // Obtener valores por defecto de la configuración
         String defaultConfigLang = com.jettra.server.config.JettraConfig.getProperty("app.language");
