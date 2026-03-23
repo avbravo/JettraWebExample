@@ -9,6 +9,7 @@ import io.jettra.wui.complex.Center;
 import io.jettra.wui.complex.Top;
 import io.jettra.wui.complex.Left;
 import io.jettra.wui.complex.Table;
+import io.jettra.wui.complex.Footer;
 import io.jettra.wui.components.Button;
 import io.jettra.wui.components.Div;
 import io.jettra.wui.components.Form;
@@ -357,6 +358,10 @@ public class PersonaPage extends Page implements HttpHandler {
         center.add(pageScript);
 
         dashboard.setCenter(center);
+        
+        Footer footer = new Footer();
+        footer.setContent("<p>JettraStack © 2026. Data connection secure.</p>");
+        dashboard.setFooter(footer);
         
         add(dashboard);
     }
