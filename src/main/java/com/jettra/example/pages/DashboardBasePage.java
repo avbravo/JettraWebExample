@@ -9,6 +9,7 @@ import io.jettra.wui.complex.Footer;
 import io.jettra.wui.complex.Left;
 import io.jettra.wui.complex.Top;
 import io.jettra.wui.components.SelectOneIcon;
+import io.jettra.wui.components.CheckBox;
 import io.jettra.wui.core.Page;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -25,12 +26,12 @@ public abstract class DashboardBasePage extends Page implements HttpHandler {
         super(title);
     }
 
-    public void initLayout(String username) {
+    public void initLayout(String username, java.util.Map<String, String> params) {
         dashboard = new Dashboard();
 
         // 1. Setup Top
         top = new Top();
-        setupTop(top, username);
+        setupTop(top, username, params);
         dashboard.setTop(top);
 
         // 2. Setup Left (Menu)
@@ -54,7 +55,7 @@ public abstract class DashboardBasePage extends Page implements HttpHandler {
         setupAdditionalComponents();
     }
 
-    protected void setupTop(Top top, String username) {
+    protected void setupTop(Top top, String username, java.util.Map<String, String> params) {
         top.setStyle("display", "flex")
            .setStyle("justify-content", "space-between")
            .setStyle("align-items", "center")
@@ -69,24 +70,64 @@ public abstract class DashboardBasePage extends Page implements HttpHandler {
         io.jettra.wui.components.Div rightSection = new io.jettra.wui.components.Div();
         rightSection.setStyle("display", "flex").setStyle("align-items", "center").setStyle("gap", "12px").setStyle("overflow", "visible");
         
+        // Obtener valores por defecto de la configuración
+        String defaultConfigLang = com.jettra.server.config.JettraConfig.getProperty("app.language");
+        if (defaultConfigLang == null) defaultConfigLang = "en";
+        
+        String defaultConfigTheme = com.jettra.server.config.JettraConfig.getProperty("app.theme");
+        if (defaultConfigTheme == null) defaultConfigTheme = "3d";
+
         // Selector de Idioma (sin texto en trigger)
-        SelectOneIcon langSelect = new SelectOneIcon("lang");
+        SelectOneIcon langSelect = new SelectOneIcon("lang","");
         langSelect.setShowLabelInTrigger(false);
-        langSelect.addOption("en", "English", "🇺🇸");
-        langSelect.addOption("es", "Español", "🇪🇸");
+        langSelect.addOption("en", "", "🇺🇸");
+        langSelect.addOption("es", "", "🇪🇸");
+        
+        // Establecer selección inicial basada en config (o URL si existe)
+        String currentLang = params.getOrDefault("lang", defaultConfigLang);
+        if ("es".equals(currentLang)) {
+            langSelect.setSelectedValue("es", "", "🇪🇸");
+        } else {
+            langSelect.setSelectedValue("en", "", "🇺🇸");
+        }
         rightSection.add(langSelect);
         
         // Selector de Tema (sin texto en trigger)
-        SelectOneIcon themeSelect = new SelectOneIcon("theme");
+        SelectOneIcon themeSelect = new SelectOneIcon("theme","");
         themeSelect.setShowLabelInTrigger(false);
-        themeSelect.addOption("futuristic", "Futuristic", "🚀");
-        themeSelect.addOption("dark", "Dark", "🌙");
-        themeSelect.addOption("white", "White", "☀️");
+        themeSelect.addOption("3d", "", "🚀");
+        themeSelect.addOption("dark", "", "🌙");
+        themeSelect.addOption("white", "", "☀️");
+        
+        // Establecer selección inicial basada en config
+        // Nota: En el cliente el JS priorizará localStorage para personlización por usuario
+        String themeVal = defaultConfigTheme.toLowerCase();
+        themeSelect.setSelectedValue(themeVal, "", 
+            themeVal.equals("3d") ? "🚀" : (themeVal.equals("dark") ? "🌙" : "☀️"));
+            
         rightSection.add(themeSelect);
         
         io.jettra.wui.components.Span welcome = new io.jettra.wui.components.Span("Welcome, " + username);
         welcome.setStyle("font-size", "0.9rem").setStyle("white-space", "nowrap");
         rightSection.add(welcome);
+        
+        // CheckBox para animaciones
+        io.jettra.wui.components.Div animDiv = new io.jettra.wui.components.Div();
+        animDiv.setStyle("display", "flex").setStyle("align-items", "center").setStyle("gap", "5px").setStyle("margin-left", "5px");
+        io.jettra.wui.components.Span animLabel = new io.jettra.wui.components.Span("Anim");
+        animLabel.setStyle("font-size", "0.8rem");
+        CheckBox animCB = new CheckBox("anim-toggle", "animated", "true");
+        animCB.setProperty("onclick", "jettraAnimated = this.checked; localStorage.setItem('jettra-animated', this.checked);");
+        
+        // Estado inicial desde config (si localStorage está vacío, JettraTheme usará este default o true)
+        String animatedValue = com.jettra.server.config.JettraConfig.getProperty("app.animated");
+        if (animatedValue != null && animatedValue.equalsIgnoreCase("false")) {
+            // Notificar al JS que el default es false si localStorage no tiene nada
+            add(new io.jettra.wui.components.Script("if(localStorage.getItem('jettra-animated') === null) jettraAnimated = false;"));
+        }
+        
+        animDiv.add(animLabel).add(animCB);
+        rightSection.add(animDiv);
         
         // Botón de Logout con icono
         io.jettra.wui.components.Button logoutBtn = new io.jettra.wui.components.Button("");
@@ -175,7 +216,22 @@ public abstract class DashboardBasePage extends Page implements HttpHandler {
         if (!checkAuth(exchange, loggedUser)) return;
 
         this.children.clear();
-        initLayout(loggedUser);
+        
+        // Parse query params
+        java.util.Map<String, String> queryParams = new java.util.LinkedHashMap<>();
+        String query = exchange.getRequestURI().getQuery();
+        if (query != null) {
+            for (String param : query.split("&")) {
+                String[] pair = param.split("=");
+                if (pair.length > 1) {
+                    queryParams.put(pair[0], pair[1]);
+                } else {
+                    queryParams.put(pair[0], "");
+                }
+            }
+        }
+        
+        initLayout(loggedUser, queryParams);
         
         String html = this.render();
         byte[] bytes = html.getBytes(StandardCharsets.UTF_8);

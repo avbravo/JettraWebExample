@@ -309,19 +309,23 @@ public class PersonaPage extends DashboardBasePage {
 
         String method = exchange.getRequestMethod();
         String query = exchange.getRequestURI().getQuery();
+        Map<String, String> queryParams = new HashMap<>();
         
         if (query != null) {
-            String[] params = query.split("&");
-            for (String param : params) {
-                String[] pair = param.split("=");
+            String[] pairs = query.split("&");
+            for (String pairStr : pairs) {
+                String[] pair = pairStr.split("=");
                 if (pair.length == 2) {
+                    queryParams.put(pair[0], pair[1]);
                     if (pair[0].equals("lang")) this.lang = pair[1];
                     if (pair[0].equals("page")) {
                         try {
-                            this.pageNumber = Integer.parseInt(pair[1]);
+                            this.pageNumber = Integer.parseInt(pair[pair.length - 1]);
                         } catch(NumberFormatException e) {
                         }
                     }
+                } else if (pair.length == 1) {
+                    queryParams.put(pair[0], "");
                 }
             }
         }
@@ -359,7 +363,7 @@ public class PersonaPage extends DashboardBasePage {
         }
 
         this.children.clear();
-        initLayout(loggedUser);
+        initLayout(loggedUser, queryParams);
         
         String html = this.render();
         byte[] bytes = html.getBytes(StandardCharsets.UTF_8);
