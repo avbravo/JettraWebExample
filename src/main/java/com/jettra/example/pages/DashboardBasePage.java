@@ -8,6 +8,7 @@ import io.jettra.wui.complex.Dashboard;
 import io.jettra.wui.complex.Footer;
 import io.jettra.wui.complex.Left;
 import io.jettra.wui.complex.Top;
+import io.jettra.wui.components.SelectOneIcon;
 import io.jettra.wui.core.Page;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -54,7 +55,54 @@ public abstract class DashboardBasePage extends Page implements HttpHandler {
     }
 
     protected void setupTop(Top top, String username) {
-        top.setContent("<h2>Jettra Global Dashboard</h2><div style='display:flex; align-items:center; gap:20px;'><span>Welcome, " + username + "</span><button class='j-btn' style='width:auto; padding:8px 15px; font-size:12px;' onclick='window.location.href=\"" + JettraServer.resolvePath("/logout") + "\"'>Cerrar Sesión</button></div>");
+        top.setStyle("display", "flex")
+           .setStyle("justify-content", "space-between")
+           .setStyle("align-items", "center")
+           .setStyle("width", "100%")
+           .setStyle("box-sizing", "border-box")
+           .setStyle("overflow", "visible");
+
+        io.jettra.wui.components.Header title = new io.jettra.wui.components.Header(2, "Jettra Global Dashboard");
+        title.setStyle("margin", "0").setStyle("font-size", "1.2rem");
+        top.add(title);
+        
+        io.jettra.wui.components.Div rightSection = new io.jettra.wui.components.Div();
+        rightSection.setStyle("display", "flex").setStyle("align-items", "center").setStyle("gap", "12px").setStyle("overflow", "visible");
+        
+        // Selector de Idioma (sin texto en trigger)
+        SelectOneIcon langSelect = new SelectOneIcon("lang");
+        langSelect.setShowLabelInTrigger(false);
+        langSelect.addOption("en", "English", "🇺🇸");
+        langSelect.addOption("es", "Español", "🇪🇸");
+        rightSection.add(langSelect);
+        
+        // Selector de Tema (sin texto en trigger)
+        SelectOneIcon themeSelect = new SelectOneIcon("theme");
+        themeSelect.setShowLabelInTrigger(false);
+        themeSelect.addOption("futuristic", "Futuristic", "🚀");
+        themeSelect.addOption("dark", "Dark", "🌙");
+        themeSelect.addOption("white", "White", "☀️");
+        rightSection.add(themeSelect);
+        
+        io.jettra.wui.components.Span welcome = new io.jettra.wui.components.Span("Welcome, " + username);
+        welcome.setStyle("font-size", "0.9rem").setStyle("white-space", "nowrap");
+        rightSection.add(welcome);
+        
+        // Botón de Logout con icono
+        io.jettra.wui.components.Button logoutBtn = new io.jettra.wui.components.Button("");
+        logoutBtn.setContent("<svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'></path><polyline points='16 17 21 12 16 7'></polyline><line x1='21' y1='12' x2='9' y2='12'></line></svg>");
+        logoutBtn.addClass("j-btn")
+                 .setStyle("width", "35px")
+                 .setStyle("height", "35px")
+                 .setStyle("padding", "0")
+                 .setStyle("display", "flex")
+                 .setStyle("align-items", "center")
+                 .setStyle("justify-content", "center")
+                 .setProperty("title", "Logout");
+        logoutBtn.setProperty("onclick", "window.location.href='" + JettraServer.resolvePath("/logout") + "'");
+        rightSection.add(logoutBtn);
+
+        top.add(rightSection);
     }
 
     protected void setupLeft(Left left, String username) {
