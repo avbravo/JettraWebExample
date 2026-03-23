@@ -68,6 +68,7 @@ public abstract class DashboardBasePage extends Page implements HttpHandler {
         top.add(title);
         
         io.jettra.wui.components.Div rightSection = new io.jettra.wui.components.Div();
+        rightSection.addClass("j-top-right");
         rightSection.setStyle("display", "flex").setStyle("align-items", "center").setStyle("gap", "12px").setStyle("overflow", "visible");
         
         // Obtener valores por defecto de la configuración
@@ -108,11 +109,13 @@ public abstract class DashboardBasePage extends Page implements HttpHandler {
         rightSection.add(themeSelect);
         
         io.jettra.wui.components.Span welcome = new io.jettra.wui.components.Span("Welcome, " + username);
+        welcome.addClass("hide-mobile");
         welcome.setStyle("font-size", "0.9rem").setStyle("white-space", "nowrap");
         rightSection.add(welcome);
         
         // CheckBox para animaciones
         io.jettra.wui.components.Div animDiv = new io.jettra.wui.components.Div();
+        animDiv.addClass("hide-mobile");
         animDiv.setStyle("display", "flex").setStyle("align-items", "center").setStyle("gap", "5px").setStyle("margin-left", "5px");
         io.jettra.wui.components.Span animLabel = new io.jettra.wui.components.Span("Anim");
         animLabel.setStyle("font-size", "0.8rem");
