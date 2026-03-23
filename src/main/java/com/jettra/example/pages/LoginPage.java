@@ -10,6 +10,7 @@ import java.util.Map;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
+import com.jettra.server.JettraServer;
 import io.jettra.wui.components.Login;
 import io.jettra.wui.core.Page;
 import io.jettra.wui.core.annotations.Init;
@@ -24,7 +25,7 @@ public class LoginPage extends Page implements HttpHandler {
 
     @Init
     public void initUI() {
-        loginForm = new Login("/login");
+        loginForm = new Login(JettraServer.resolvePath("/login"));
 
         // Styling the login form generically with 3D futuristic aesthetics
     //    loginForm.setProperty("style", "margin: 10% auto; padding: 30px; width: 350px; " +
@@ -55,15 +56,15 @@ public class LoginPage extends Page implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String path = exchange.getRequestURI().getPath();
-        if ("/logout".equals(path)) {
-            exchange.getResponseHeaders().set("Set-Cookie", "username=; Path=/; Max-Age=0");
-            exchange.getResponseHeaders().set("Location", "/");
+        if (JettraServer.resolvePath("/logout").equals(path)) {
+            exchange.getResponseHeaders().set("Set-Cookie", "username=; Path=" + JettraServer.getContextPath() + "; Max-Age=0");
+            exchange.getResponseHeaders().set("Location", JettraServer.resolvePath("/"));
             exchange.sendResponseHeaders(302, -1);
             exchange.getResponseBody().close();
             return;
         }
 
-        if ("POST".equals(exchange.getRequestMethod()) && "/login".equals(path)) {
+        if ("POST".equals(exchange.getRequestMethod()) && JettraServer.resolvePath("/login").equals(path)) {
             InputStream is = exchange.getRequestBody();
             String body = new String(is.readAllBytes(), StandardCharsets.UTF_8);
             Map<String, String> params = parseQuery(body);
@@ -72,20 +73,20 @@ public class LoginPage extends Page implements HttpHandler {
             String pass = params.get("password");
 
             if (("admin".equals(user) && "admin".equals(pass)) || ("avbravo".equals(user) && "avbravo".equals(pass))) {
-                exchange.getResponseHeaders().set("Set-Cookie", "username=" + user + "; Path=/");
-                exchange.getResponseHeaders().set("Location", "/dashboard");
+                exchange.getResponseHeaders().set("Set-Cookie", "username=" + user + "; Path=" + JettraServer.getContextPath());
+                exchange.getResponseHeaders().set("Location", JettraServer.resolvePath("/dashboard"));
                 exchange.sendResponseHeaders(302, -1);
             } else if ("demo".equals(user) && "demo".equals(pass)) {
-                exchange.getResponseHeaders().set("Set-Cookie", "username=" + user + "; Path=/");
-                exchange.getResponseHeaders().set("Location", "/dashboard");
+                exchange.getResponseHeaders().set("Set-Cookie", "username=" + user + "; Path=" + JettraServer.getContextPath());
+                exchange.getResponseHeaders().set("Location", JettraServer.resolvePath("/dashboard"));
                 exchange.sendResponseHeaders(302, -1);
             } else {
-                exchange.getResponseHeaders().set("Location", "/?error=invalid_credentials");
+                exchange.getResponseHeaders().set("Location", JettraServer.resolvePath("/?error=invalid_credentials"));
                 exchange.sendResponseHeaders(302, -1);
             }
         } else if ("GET".equals(exchange.getRequestMethod())) {
             this.children.clear(); // Reset before re-init
-            exchange.getResponseHeaders().set("Set-Cookie", "username=; Path=/; Max-Age=0");
+            exchange.getResponseHeaders().set("Set-Cookie", "username=; Path=" + JettraServer.getContextPath() + "; Max-Age=0");
             initUI();
             
             String query = exchange.getRequestURI().getQuery();

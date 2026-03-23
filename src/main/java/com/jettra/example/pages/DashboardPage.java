@@ -11,6 +11,7 @@ import io.jettra.wui.complex.Left;
 import io.jettra.wui.core.Page;
 import io.jettra.wui.complex.Top;
 import io.jettra.wui.core.annotations.Init;
+import com.jettra.server.JettraServer;
 
 public class DashboardPage extends Page implements HttpHandler {
 
@@ -29,7 +30,7 @@ public class DashboardPage extends Page implements HttpHandler {
         dashboard = new Dashboard();
 
         Top top = new Top();
-        top.setContent("<h2>Jettra Global Dashboard</h2><div style='display:flex; align-items:center; gap:20px;'><span>Welcome, " + username + "</span><button class='j-btn' style='width:auto; padding:8px 15px; font-size:12px;' onclick='window.location.href=\"/logout\"'>Cerrar Sesión</button></div>");
+        top.setContent("<h2>Jettra Global Dashboard</h2><div style='display:flex; align-items:center; gap:20px;'><span>Welcome, " + username + "</span><button class='j-btn' style='width:auto; padding:8px 15px; font-size:12px;' onclick='window.location.href=\"" + JettraServer.resolvePath("/logout") + "\"'>Cerrar Sesión</button></div>");
         dashboard.setTop(top);
 
         Left left = new Left();
@@ -65,13 +66,13 @@ public class DashboardPage extends Page implements HttpHandler {
                 .append("<span>Access Matrix</span></div>");
 
         if ("admin".equals(username) || "avbravo".equals(username)) {
-            menuHtml.append("<div style='").append(menuClass).append("' ").append(hoverEvents).append(" onclick='window.location.href=\"/persona\"'>")
+            menuHtml.append("<div style='").append(menuClass).append("' ").append(hoverEvents).append(" onclick='window.location.href=\"" + JettraServer.resolvePath("/persona") + "\"'>")
                     .append("<svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' style='margin-right:12px;'><path d='M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'></path><circle cx='9' cy='7' r='4'></circle><path d='M23 21v-2a4 4 0 0 0-3-3.87'></path><path d='M16 3.13a4 4 0 0 1 0 7.75'></path></svg>")
                     .append("<span>Persona</span></div>");
         }
 
 
-        menuHtml.append("<div style='").append(menuClass).append("' ").append(hoverEvents).append(" onclick='window.location.href=\"/logout\"'>")
+        menuHtml.append("<div style='").append(menuClass).append("' ").append(hoverEvents).append(" onclick='window.location.href=\"" + JettraServer.resolvePath("/logout") + "\"'>")
                 .append("<svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' style='margin-right:12px;'><path d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'></path><polyline points='16 17 21 12 16 7'></polyline><line x1='21' y1='12' x2='9' y2='12'></line></svg>")
                 .append("<span>Logout</span></div>");
 
@@ -110,7 +111,7 @@ public class DashboardPage extends Page implements HttpHandler {
         }
 
         if ("Guest".equals(loggedUser) || loggedUser.isEmpty()) {
-            exchange.getResponseHeaders().set("Location", "/");
+            exchange.getResponseHeaders().set("Location", JettraServer.resolvePath("/"));
             exchange.sendResponseHeaders(302, -1);
             exchange.getResponseBody().close();
             return;

@@ -22,6 +22,7 @@ import io.jettra.wui.components.Style;
 import io.jettra.wui.components.TextBox;
 import io.jettra.wui.core.Page;
 import io.jettra.wui.core.UIComponent;
+import com.jettra.server.JettraServer;
 
 import java.io.InputStreamReader;
 import java.net.URLDecoder;
@@ -80,7 +81,7 @@ public class PersonaPage extends Page implements HttpHandler {
         topActions.add(new Span(" | " + username));
         
         Button logoutBtn = new Button("Cerrar Sesión");
-        logoutBtn.setProperty("onclick", "window.location.href='/logout'");
+        logoutBtn.setProperty("onclick", "window.location.href='" + JettraServer.resolvePath("/logout") + "'");
         logoutBtn.setStyle("padding", "5px 10px").setStyle("font-size", "12px");
         topActions.add(logoutBtn);
         
@@ -104,7 +105,7 @@ public class PersonaPage extends Page implements HttpHandler {
         dashMenu.setProperty("style", menuClass);
         dashMenu.setProperty("onmouseover", "this.style.background='rgba(0,255,255,0.1)'");
         dashMenu.setProperty("onmouseout", "this.style.background='rgba(20,30,50,0.5)'");
-        dashMenu.setProperty("onclick", "window.location.href='/dashboard'");
+        dashMenu.setProperty("onclick", "window.location.href='" + JettraServer.resolvePath("/dashboard") + "'");
         
         menuContainer.add(menuTitle).add(hr).add(dashMenu);
 
@@ -114,7 +115,7 @@ public class PersonaPage extends Page implements HttpHandler {
             personaMenu.setProperty("style", menuClass);
             personaMenu.setProperty("onmouseover", "this.style.background='rgba(0,255,255,0.1)'");
             personaMenu.setProperty("onmouseout", "this.style.background='rgba(20,30,50,0.5)'");
-            personaMenu.setProperty("onclick", "window.location.href='/persona'");
+            personaMenu.setProperty("onclick", "window.location.href='" + JettraServer.resolvePath("/persona") + "'");
             menuContainer.add(personaMenu);
         }
 
@@ -244,7 +245,7 @@ public class PersonaPage extends Page implements HttpHandler {
         modalTitle.setProperty("id", "modalTitle");
         modalTitle.setStyle("margin-bottom", "15px").setStyle("color", "#0ff");
 
-        Form form = new Form("personaForm", "/persona");
+        Form form = new Form("personaForm", JettraServer.resolvePath("/persona"));
         
         TextBox actionInput = new TextBox("hidden", "action");
         actionInput.setProperty("id", "modalAction").setProperty("value", "save");
@@ -378,14 +379,14 @@ public class PersonaPage extends Page implements HttpHandler {
             }
         }
         if ("Guest".equals(loggedUser) || loggedUser.isEmpty()) {
-            exchange.getResponseHeaders().set("Location", "/");
+            exchange.getResponseHeaders().set("Location", JettraServer.resolvePath("/"));
             exchange.sendResponseHeaders(302, -1);
             exchange.getResponseBody().close();
             return;
         }
 
         if (!"admin".equals(loggedUser) && !"avbravo".equals(loggedUser)) {
-            exchange.getResponseHeaders().set("Location", "/dashboard");
+            exchange.getResponseHeaders().set("Location", JettraServer.resolvePath("/dashboard"));
             exchange.sendResponseHeaders(302, -1);
             exchange.getResponseBody().close();
             return;
@@ -439,7 +440,7 @@ public class PersonaPage extends Page implements HttpHandler {
                 }
             }
             
-            exchange.getResponseHeaders().set("Location", "/persona?lang=" + langParam + "&page=" + pageNumber);
+            exchange.getResponseHeaders().set("Location", JettraServer.resolvePath("/persona?lang=" + langParam + "&page=" + pageNumber));
             exchange.sendResponseHeaders(302, -1);
             exchange.getResponseBody().close();
             return;
