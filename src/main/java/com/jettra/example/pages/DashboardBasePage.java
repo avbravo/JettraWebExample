@@ -60,6 +60,7 @@ public abstract class DashboardBasePage extends Page implements HttpHandler {
            .setStyle("justify-content", "space-between")
            .setStyle("align-items", "center")
            .setStyle("width", "100%")
+           .setStyle("padding", "2px 10px")
            .setStyle("box-sizing", "border-box")
            .setStyle("overflow", "visible");
 
@@ -124,10 +125,28 @@ public abstract class DashboardBasePage extends Page implements HttpHandler {
         
         // Estado inicial desde config (si localStorage está vacío, JettraTheme usará este default o true)
         String animatedValue = com.jettra.server.config.JettraConfig.getProperty("app.animated");
-        if (animatedValue != null && animatedValue.equalsIgnoreCase("false")) {
-            // Notificar al JS que el default es false si localStorage no tiene nada
-            add(new io.jettra.wui.components.Script("if(localStorage.getItem('jettra-animated') === null) jettraAnimated = false;"));
+        boolean isAnimatedConfig = animatedValue == null || animatedValue.equalsIgnoreCase("true");
+        if (isAnimatedConfig) {
+            animCB.setProperty("checked", "checked");
         }
+        
+        // Sincronización client-side: priorizar localStorage sobre el render server-side
+        add(new io.jettra.wui.components.Script(
+            "document.addEventListener('DOMContentLoaded', () => {" +
+            "  const savedTheme = localStorage.getItem('jettra-theme');" +
+            "  if (savedTheme) {" +
+            "    const maps = {'3d':'🚀', 'dark':'🌙', 'white':'☀️'};" +
+            "    jettraSelectOption('theme', savedTheme, '', maps[savedTheme] || '🚀');" +
+            "  }" +
+            "  const savedAnim = localStorage.getItem('jettra-animated');" +
+            "  if (savedAnim !== null) {" +
+                "    const isA = savedAnim === 'true';" +
+                "    jettraAnimated = isA;" +
+                "    const acb = document.getElementById('anim-toggle');" +
+                "    if(acb) acb.checked = isA;" +
+            "  }" +
+            "});"
+        ));
         
         animDiv.add(animLabel).add(animCB);
         rightSection.add(animDiv);
