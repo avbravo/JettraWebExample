@@ -21,8 +21,8 @@ public class NavigationPage extends DashboardBasePage {
         codeModal.add(new Header(3, "Java Code Examples").setStyle("margin-top", "0").setStyle("color", "var(--jettra-accent)"));
         Div codeContainer = new Div(); codeContainer.setStyle("background", "rgba(0,0,0,0.4)").setStyle("padding", "15px").setStyle("border-radius", "4px").setStyle("overflow-x", "auto").setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
         
-        String javaCode = "Menu menu = new Menu();\\n" +
-                          "menu.addItem(\"Dashboard\", \"/dashboard\");\\n" +
+        String javaCode = "Menu menu = new Menu();\n" +
+                          "menu.addItem(\"Dashboard\", \"/dashboard\");\n" +
                           "menu.addItem(\"Settings\", \"/settings\");";
                           
         UIComponent pre = new UIComponent("pre") {}; pre.setStyle("margin", "0");

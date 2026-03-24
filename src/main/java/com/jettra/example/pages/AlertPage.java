@@ -48,7 +48,7 @@ public class AlertPage extends DashboardBasePage {
                      .setStyle("border-radius", "4px").setStyle("overflow-x", "auto")
                      .setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
         
-        String javaCode = "Alert alert = new Alert();\\nalert.setType(\"success\");\\nalert.showMessage(\"Success message!\");";
+        String javaCode = "Alert alert = new Alert();\nalert.setType(\"success\");\nalert.showMessage(\"Success message!\");";
                           
         io.jettra.wui.core.UIComponent pre = new io.jettra.wui.core.UIComponent("pre") {};
         pre.setStyle("margin", "0");

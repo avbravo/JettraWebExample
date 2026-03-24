@@ -48,8 +48,8 @@ public class SpanPage extends DashboardBasePage {
                      .setStyle("border-radius", "4px").setStyle("overflow-x", "auto")
                      .setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
         
-        String javaCode = "Span mySpan = new Span(\"Inline Text\");\\n" +
-                          "mySpan.setStyle(\"color\", \"#00ff00\");\\n" +
+        String javaCode = "Span mySpan = new Span(\"Inline Text\");\n" +
+                          "mySpan.setStyle(\"color\", \"#00ff00\");\n" +
                           "paragraph.add(mySpan);";
                           
         io.jettra.wui.core.UIComponent pre = new io.jettra.wui.core.UIComponent("pre") {};

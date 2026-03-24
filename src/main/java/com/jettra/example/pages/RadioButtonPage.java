@@ -48,7 +48,7 @@ public class RadioButtonPage extends DashboardBasePage {
                      .setStyle("border-radius", "4px").setStyle("overflow-x", "auto")
                      .setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
         
-        String javaCode = "RadioButton opt1 = new RadioButton(\"opt1\", \"gender\", \"male\");\\nRadioButton opt2 = new RadioButton(\"opt2\", \"gender\", \"female\");";
+        String javaCode = "RadioButton opt1 = new RadioButton(\"opt1\", \"gender\", \"male\");\nRadioButton opt2 = new RadioButton(\"opt2\", \"gender\", \"female\");";
                           
         io.jettra.wui.core.UIComponent pre = new io.jettra.wui.core.UIComponent("pre") {};
         pre.setStyle("margin", "0");

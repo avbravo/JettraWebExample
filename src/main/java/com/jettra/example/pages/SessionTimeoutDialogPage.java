@@ -48,7 +48,7 @@ public class SessionTimeoutDialogPage extends DashboardBasePage {
                      .setStyle("border-radius", "4px").setStyle("overflow-x", "auto")
                      .setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
         
-        String javaCode = "SessionTimeoutDialog timeout = new SessionTimeoutDialog(5000, 30); // 5s idle time, 30s countdown\\n" +
+        String javaCode = "SessionTimeoutDialog timeout = new SessionTimeoutDialog(5000, 30); // 5s idle time, 30s countdown\n" +
                           "center.add(timeout);";
                           
         io.jettra.wui.core.UIComponent pre = new io.jettra.wui.core.UIComponent("pre") {};

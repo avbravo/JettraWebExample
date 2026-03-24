@@ -48,8 +48,8 @@ public class MenuBarPage extends DashboardBasePage {
                      .setStyle("border-radius", "4px").setStyle("overflow-x", "auto")
                      .setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
         
-        String javaCode = "MenuBar mb = new MenuBar(\"menu\");\\n" +
-                          "mb.add(new MenuItem(\"Home\"));\\n" +
+        String javaCode = "MenuBar mb = new MenuBar(\"menu\");\n" +
+                          "mb.add(new MenuItem(\"Home\"));\n" +
                           "mb.add(new MenuItem(\"About\"));";
                           
         io.jettra.wui.core.UIComponent pre = new io.jettra.wui.core.UIComponent("pre") {};

@@ -47,9 +47,9 @@ public class SeparatorPage extends DashboardBasePage {
                      .setStyle("border-radius", "4px").setStyle("overflow-x", "auto")
                      .setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
         
-        String javaCode = "// Using Div to simulate Separator for rendering inside arbitrary containers\\n" +
-                          "Div sep = new Div();\\n" +
-                          "sep.setStyle(\"height\", \"1px\").setStyle(\"background\", \"var(--jettra-border)\");\\n" +
+        String javaCode = "// Using Div to simulate Separator for rendering inside arbitrary containers\n" +
+                          "Div sep = new Div();\n" +
+                          "sep.setStyle(\"height\", \"1px\").setStyle(\"background\", \"var(--jettra-border)\");\n" +
                           "page.add(sep);";
                           
         io.jettra.wui.core.UIComponent pre = new io.jettra.wui.core.UIComponent("pre") {};

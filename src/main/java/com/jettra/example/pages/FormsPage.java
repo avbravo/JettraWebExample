@@ -45,7 +45,7 @@ public class FormsPage extends DashboardBasePage {
                      .setStyle("border-radius", "4px").setStyle("overflow-x", "auto")
                      .setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
         
-        String javaCode = "Form form = new Form(\"myForm\", \"/submit\");\\n\\n" +
+        String javaCode = "Form form = new Form(\"myForm\", \"/submit\");\n\n" +
                           "// 1. TextBox\n" +
                           "TextBox tb = new TextBox(\"text\", \"username\").setPlaceholder(\"Enter name\");\n\n" +
                           "// 2. SelectOne\n" +

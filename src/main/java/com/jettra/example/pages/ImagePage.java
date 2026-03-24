@@ -48,7 +48,7 @@ public class ImagePage extends DashboardBasePage {
                      .setStyle("border-radius", "4px").setStyle("overflow-x", "auto")
                      .setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
         
-        String javaCode = "Image img = new Image(\"https://picsum.photos/300/200\", \"Demo\");\\nimg.setStyle(\"border-radius\", \"8px\");";
+        String javaCode = "Image img = new Image(\"https://picsum.photos/300/200\", \"Demo\");\nimg.setStyle(\"border-radius\", \"8px\");";
                           
         io.jettra.wui.core.UIComponent pre = new io.jettra.wui.core.UIComponent("pre") {};
         pre.setStyle("margin", "0");

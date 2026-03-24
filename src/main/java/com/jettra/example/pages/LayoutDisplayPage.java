@@ -23,7 +23,7 @@ public class LayoutDisplayPage extends DashboardBasePage {
         
         String javaCode = "Div div = new Div(); // Basic container\n" +
                           "Center center = new Center(); // Page content container\n" +
-                          "Div hr = new Div(); hr.setStyle(\"border-bottom\", \"1px solid var(--jettra-border)\"); // Visual line\\n" +
+                          "Div hr = new Div(); hr.setStyle(\"border-bottom\", \"1px solid var(--jettra-border)\"); // Visual line\n" +
                           "Image img = new Image(\"logo.png\", \"Logo\"); // Standard image element\n";
                           
         UIComponent pre = new UIComponent("pre") {}; pre.setStyle("margin", "0");

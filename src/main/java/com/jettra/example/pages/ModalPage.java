@@ -47,8 +47,8 @@ public class ModalPage extends DashboardBasePage {
                      .setStyle("border-radius", "4px").setStyle("overflow-x", "auto")
                      .setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
         
-        String javaCode = "Modal m = new Modal(\"my-modal\");\\n" +
-                          "m.add(new Header(3, \"Title\"));\\n" +
+        String javaCode = "Modal m = new Modal(\"my-modal\");\n" +
+                          "m.add(new Header(3, \"Title\"));\n" +
                           "m.add(new Paragraph(\"Body content...\"));";
                           
         io.jettra.wui.core.UIComponent pre = new io.jettra.wui.core.UIComponent("pre") {};

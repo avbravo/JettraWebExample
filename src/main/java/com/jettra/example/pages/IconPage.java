@@ -48,7 +48,7 @@ public class IconPage extends DashboardBasePage {
                      .setStyle("border-radius", "4px").setStyle("overflow-x", "auto")
                      .setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
         
-        String javaCode = "Span icon1 = new Span(\"⭐\");\\nSpan icon2 = new Span(\"❤️\");";
+        String javaCode = "Span icon1 = new Span(\"⭐\");\nSpan icon2 = new Span(\"❤️\");";
                           
         io.jettra.wui.core.UIComponent pre = new io.jettra.wui.core.UIComponent("pre") {};
         pre.setStyle("margin", "0");

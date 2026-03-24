@@ -49,9 +49,9 @@ public class MenuPage extends DashboardBasePage {
                      .setStyle("border-radius", "4px").setStyle("overflow-x", "auto")
                      .setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
         
-        String javaCode = "Menu sideMenu = new Menu();\\n" +
-                          "sideMenu.addItem(\"Home\", \"/\");\\n" +
-                          "sideMenu.addItem(\"Settings\", \"/settings\");\\n" +
+        String javaCode = "Menu sideMenu = new Menu();\n" +
+                          "sideMenu.addItem(\"Home\", \"/\");\n" +
+                          "sideMenu.addItem(\"Settings\", \"/settings\");\n" +
                           "page.add(sideMenu);";
                           
         io.jettra.wui.core.UIComponent pre = new io.jettra.wui.core.UIComponent("pre") {};

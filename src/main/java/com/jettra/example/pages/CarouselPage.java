@@ -48,8 +48,8 @@ public class CarouselPage extends DashboardBasePage {
                      .setStyle("border-radius", "4px").setStyle("overflow-x", "auto")
                      .setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
         
-        String javaCode = "Carousel carousel = new Carousel(\"my-carousel\");\\n" +
-                          "carousel.addSlide(new Image(\"https://picsum.photos/400/200\", \"Slide 1\"));\\n" +
+        String javaCode = "Carousel carousel = new Carousel(\"my-carousel\");\n" +
+                          "carousel.addSlide(new Image(\"https://picsum.photos/400/200\", \"Slide 1\"));\n" +
                           "carousel.addSlide(new Image(\"https://picsum.photos/400/200\", \"Slide 2\"));";
                           
         io.jettra.wui.core.UIComponent pre = new io.jettra.wui.core.UIComponent("pre") {};

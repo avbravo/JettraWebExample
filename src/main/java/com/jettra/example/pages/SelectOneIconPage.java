@@ -48,8 +48,8 @@ public class SelectOneIconPage extends DashboardBasePage {
                      .setStyle("border-radius", "4px").setStyle("overflow-x", "auto")
                      .setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
         
-        String javaCode = "SelectOneIcon select = new SelectOneIcon(\"mySelect\", \"Lang\");\\n" +
-                          "select.addOption(\"EN\", \"English\");\\n" +
+        String javaCode = "SelectOneIcon select = new SelectOneIcon(\"mySelect\", \"Lang\");\n" +
+                          "select.addOption(\"EN\", \"English\");\n" +
                           "select.addOption(\"ES\", \"Spanish\");";
                           
         io.jettra.wui.core.UIComponent pre = new io.jettra.wui.core.UIComponent("pre") {};

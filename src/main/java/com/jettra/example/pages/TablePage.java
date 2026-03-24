@@ -48,7 +48,7 @@ public class TablePage extends DashboardBasePage {
                      .setStyle("border-radius", "4px").setStyle("overflow-x", "auto")
                      .setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
         
-        String javaCode = "Table table = new Table();\\ntable.addHeaderRow(\"ID\", \"Name\", \"Role\");\\ntable.addRow(new Span(\"1\"), new Span(\"Alice\"), new Span(\"Admin\"));\\ntable.addRow(new Span(\"2\"), new Span(\"Bob\"), new Span(\"User\"));";
+        String javaCode = "Table table = new Table();\ntable.addHeaderRow(\"ID\", \"Name\", \"Role\");\ntable.addRow(new Span(\"1\"), new Span(\"Alice\"), new Span(\"Admin\"));\ntable.addRow(new Span(\"2\"), new Span(\"Bob\"), new Span(\"User\"));";
                           
         io.jettra.wui.core.UIComponent pre = new io.jettra.wui.core.UIComponent("pre") {};
         pre.setStyle("margin", "0");
