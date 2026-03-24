@@ -8,9 +8,12 @@ import io.jettra.wui.complex.Dashboard;
 import io.jettra.wui.complex.Footer;
 import io.jettra.wui.complex.Left;
 import io.jettra.wui.complex.Top;
+import io.jettra.wui.complex.Avatar;
+import io.jettra.wui.components.Div;
 import io.jettra.wui.components.SelectOneIcon;
 import io.jettra.wui.components.CheckBox;
 import io.jettra.wui.core.Page;
+import io.jettra.wui.core.UIComponent;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
@@ -115,10 +118,28 @@ public abstract class DashboardBasePage extends Page implements HttpHandler {
             
         rightSection.add(themeSelect);
         
-        io.jettra.wui.components.Span welcome = new io.jettra.wui.components.Span("Welcome, " + username);
-        welcome.addClass("hide-mobile");
-        welcome.setStyle("font-size", "0.9rem").setStyle("white-space", "nowrap");
-        rightSection.add(welcome);
+        // Avatar Menu en lugar de Welcome
+        Div userWrapper = new Div();
+        userWrapper.addClass("j-avatar-wrapper");
+        userWrapper.setProperty("onclick", "toggleAvatarMenu()");
+        
+        String initials = getInitials(username);
+        Avatar userAvatar = Avatar.label(initials, "var(--jettra-accent)")
+                .setShape(Avatar.Shape.CIRCLE)
+                .setSize(Avatar.Size.MD);
+        userWrapper.add(userAvatar);
+        
+        Div dropdown = new Div();
+        dropdown.setProperty("id", "user-avatar-dropdown");
+        dropdown.addClass("j-avatar-dropdown");
+        
+        UIComponent logoutLink = new UIComponent("a") {};
+        logoutLink.setProperty("href", JettraServer.resolvePath("/logout"));
+        logoutLink.setContent("<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'></path><polyline points='16 17 21 12 16 7'></polyline><line x1='21' y1='12' x2='9' y2='12'></line></svg> <span>Logout</span>");
+        dropdown.add(logoutLink);
+        
+        userWrapper.add(dropdown);
+        rightSection.add(userWrapper);
         
         // CheckBox para animaciones
         io.jettra.wui.components.Div animDiv = new io.jettra.wui.components.Div();
@@ -142,22 +163,20 @@ public abstract class DashboardBasePage extends Page implements HttpHandler {
         
         animDiv.add(animLabel).add(animCB);
         rightSection.add(animDiv);
-        
-        // Botón de Logout con icono
-        io.jettra.wui.components.Button logoutBtn = new io.jettra.wui.components.Button("");
-        logoutBtn.setContent("<svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'></path><polyline points='16 17 21 12 16 7'></polyline><line x1='21' y1='12' x2='9' y2='12'></line></svg>");
-        logoutBtn.addClass("j-btn")
-                 .setStyle("width", "35px")
-                 .setStyle("height", "35px")
-                 .setStyle("padding", "0")
-                 .setStyle("display", "flex")
-                 .setStyle("align-items", "center")
-                 .setStyle("justify-content", "center")
-                 .setProperty("title", "Logout");
-        logoutBtn.setProperty("onclick", "window.location.href='" + JettraServer.resolvePath("/logout") + "'");
-        rightSection.add(logoutBtn);
 
         top.add(rightSection);
+    }
+
+    private String getInitials(String name) {
+        if (name == null || name.isEmpty()) return "U";
+        String[] parts = name.split("[^a-zA-Z0-9]+");
+        StringBuilder init = new StringBuilder();
+        for (int i = 0; i < Math.min(parts.length, 2); i++) {
+            if (parts[i].length() > 0) {
+                init.append(parts[i].substring(0, 1).toUpperCase());
+            }
+        }
+        return init.length() > 0 ? init.toString() : "U";
     }
 
     protected void setupLeft(Left left, String username) {
