@@ -1,0 +1,101 @@
+package com.jettra.example.pages;
+
+import io.jettra.wui.complex.Center;
+import io.jettra.wui.components.Div;
+import io.jettra.wui.components.Header;
+import io.jettra.wui.components.Paragraph;
+import io.jettra.wui.complex.Table;
+import io.jettra.wui.components.Button;
+
+public class TablePage extends DashboardBasePage {
+
+    public TablePage() {
+        super("Table Showcase");
+    }
+
+    @Override
+    protected void initCenter(Center center, String username) {
+        Div container = new Div();
+        container.setStyle("padding", "30px");
+        
+        Div headerRow = new Div();
+        headerRow.setStyle("display", "flex").setStyle("justify-content", "space-between").setStyle("align-items", "center").setStyle("margin-bottom", "15px");
+        
+        Header h1 = new Header(1, "Table Component Showcase");
+        h1.setStyle("margin", "0");
+        headerRow.add(h1);
+        
+        Button codeBtn = new Button("Code");
+        codeBtn.addClass("j-btn");
+        codeBtn.setStyle("border-color", "var(--jettra-accent)").setStyle("color", "var(--jettra-accent)");
+        codeBtn.setProperty("onclick", "document.getElementById('table-code-modal').style.display = 'block'");
+        headerRow.add(codeBtn);
+        
+        container.add(headerRow);
+        
+        // --- Modal Dialog for Java Code ---
+        io.jettra.wui.complex.Modal codeModal = new io.jettra.wui.complex.Modal("table-code-modal");
+        codeModal.setStyle("display", "none").setStyle("background", "var(--jettra-glass)")
+                 .setStyle("backdrop-filter", "blur(10px)")
+                 .setStyle("padding", "20px").setStyle("border-radius", "8px")
+                 .setStyle("width", "90%").setStyle("max-width", "800px")
+                 .setStyle("border", "1px solid var(--jettra-border)");
+        
+        codeModal.add(new Header(3, "Java Code Examples").setStyle("margin-top", "0").setStyle("color", "var(--jettra-accent)"));
+        
+        Div codeContainer = new Div();
+        codeContainer.setStyle("background", "rgba(0,0,0,0.4)").setStyle("padding", "15px")
+                     .setStyle("border-radius", "4px").setStyle("overflow-x", "auto")
+                     .setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
+        
+        String javaCode = "Table table = new Table();\\ntable.addHeaderRow(\"ID\", \"Name\", \"Role\");\\ntable.addRow(new Span(\"1\"), new Span(\"Alice\"), new Span(\"Admin\"));\\ntable.addRow(new Span(\"2\"), new Span(\"Bob\"), new Span(\"User\"));";
+                          
+        io.jettra.wui.core.UIComponent pre = new io.jettra.wui.core.UIComponent("pre") {};
+        pre.setStyle("margin", "0");
+        io.jettra.wui.core.UIComponent codeTag = new io.jettra.wui.core.UIComponent("code") {};
+        codeTag.setProperty("id", "table-java-code");
+        codeTag.setStyle("color", "#a5d6ff").setStyle("font-family", "monospace").setStyle("font-size", "0.9rem");
+        codeTag.setContent(javaCode.replace("<", "&lt;").replace(">", "&gt;"));
+        
+        pre.add(codeTag);
+        codeContainer.add(pre);
+        codeModal.add(codeContainer);
+        
+        Div modalActions = new Div();
+        modalActions.setStyle("display", "flex").setStyle("justify-content", "flex-end").setStyle("gap", "10px");
+        
+        Button copyBtn = new Button("Copy");
+        copyBtn.addClass("j-btn");
+        copyBtn.setProperty("onclick", "navigator.clipboard.writeText(document.getElementById('table-java-code').innerText).then(() => { this.innerText='Copied!'; setTimeout(() => this.innerText='Copy', 2000); })");
+        
+        Button closeBtn = new Button("Close");
+        closeBtn.addClass("j-btn");
+        closeBtn.setStyle("background", "transparent").setStyle("border-color", "var(--jettra-border)");
+        closeBtn.setProperty("onclick", "document.getElementById('table-code-modal').style.display = 'none'");
+        
+        modalActions.add(closeBtn).add(copyBtn);
+        codeModal.add(modalActions);
+        
+        container.add(codeModal);
+        // --- End Modal Dialog ---
+        
+        Paragraph p = new Paragraph("The Table component for tabular data display.");
+        container.add(p);
+
+        // --- Demo ---
+        container.add(new Header(3, "Demo"));
+        Div row1 = new Div();
+        row1.setStyle("display", "flex").setStyle("gap", "20px").setStyle("margin-bottom", "30px").setStyle("width", "100%");
+        
+        Table table = new Table();
+        table.addHeaderRow("ID", "Name", "Role");
+        table.addRow(new io.jettra.wui.components.Span("1"), new io.jettra.wui.components.Span("Alice"), new io.jettra.wui.components.Span("Admin"));
+        table.addRow(new io.jettra.wui.components.Span("2"), new io.jettra.wui.components.Span("Bob"), new io.jettra.wui.components.Span("User"));
+        
+        row1.add(table);
+        
+        container.add(row1);
+        
+        center.add(container);
+    }
+}

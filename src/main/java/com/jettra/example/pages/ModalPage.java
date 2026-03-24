@@ -1,0 +1,119 @@
+package com.jettra.example.pages;
+
+import io.jettra.wui.complex.Center;
+import io.jettra.wui.components.Div;
+import io.jettra.wui.components.Header;
+import io.jettra.wui.components.Paragraph;
+import io.jettra.wui.components.Button;
+
+public class ModalPage extends DashboardBasePage {
+
+    public ModalPage() {
+        super("Modal Component");
+    }
+
+    @Override
+    protected void initCenter(Center center, String username) {
+        Div container = new Div();
+        container.setStyle("padding", "30px");
+        
+        Div headerRow = new Div();
+        headerRow.setStyle("display", "flex").setStyle("justify-content", "space-between").setStyle("align-items", "center").setStyle("margin-bottom", "15px");
+        
+        Header h1 = new Header(1, "Modal Component Showcase");
+        h1.setStyle("margin", "0");
+        headerRow.add(h1);
+        
+        Button codeBtn = new Button("Code");
+        codeBtn.addClass("j-btn");
+        codeBtn.setStyle("border-color", "var(--jettra-accent)").setStyle("color", "var(--jettra-accent)");
+        codeBtn.setProperty("onclick", "document.getElementById('code-modal-modal').style.display = 'block'");
+        headerRow.add(codeBtn);
+        
+        container.add(headerRow);
+        
+        // --- Code Modal Dialog for Java Code ---
+        io.jettra.wui.complex.Modal codeModal = new io.jettra.wui.complex.Modal("code-modal-modal");
+        codeModal.setStyle("display", "none").setStyle("background", "var(--jettra-glass)")
+                 .setStyle("backdrop-filter", "blur(10px)")
+                 .setStyle("padding", "20px").setStyle("border-radius", "8px")
+                 .setStyle("width", "90%").setStyle("max-width", "800px")
+                 .setStyle("border", "1px solid var(--jettra-border)");
+        
+        codeModal.add(new Header(3, "Java Code Examples").setStyle("margin-top", "0").setStyle("color", "var(--jettra-accent)"));
+        
+        Div codeContainer = new Div();
+        codeContainer.setStyle("background", "rgba(0,0,0,0.4)").setStyle("padding", "15px")
+                     .setStyle("border-radius", "4px").setStyle("overflow-x", "auto")
+                     .setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
+        
+        String javaCode = "Modal m = new Modal(\"my-modal\");\\n" +
+                          "m.add(new Header(3, \"Title\"));\\n" +
+                          "m.add(new Paragraph(\"Body content...\"));";
+                          
+        io.jettra.wui.core.UIComponent pre = new io.jettra.wui.core.UIComponent("pre") {};
+        pre.setStyle("margin", "0");
+        io.jettra.wui.core.UIComponent codeTag = new io.jettra.wui.core.UIComponent("code") {};
+        codeTag.setProperty("id", "java-code-modal");
+        codeTag.setStyle("color", "#a5d6ff").setStyle("font-family", "monospace").setStyle("font-size", "0.9rem");
+        codeTag.setContent(javaCode.replace("<", "&lt;").replace(">", "&gt;"));
+        
+        pre.add(codeTag);
+        codeContainer.add(pre);
+        codeModal.add(codeContainer);
+        
+        Div modalActions = new Div();
+        modalActions.setStyle("display", "flex").setStyle("justify-content", "flex-end").setStyle("gap", "10px");
+        
+        Button copyBtn = new Button("Copy");
+        copyBtn.addClass("j-btn");
+        copyBtn.setProperty("onclick", "navigator.clipboard.writeText(document.getElementById('java-code-modal').innerText).then(() => { this.innerText='Copied!'; setTimeout(() => this.innerText='Copy', 2000); })");
+        
+        Button closeBtn = new Button("Close");
+        closeBtn.addClass("j-btn");
+        closeBtn.setStyle("background", "transparent").setStyle("border-color", "var(--jettra-border)");
+        closeBtn.setProperty("onclick", "document.getElementById('code-modal-modal').style.display = 'none'");
+        
+        modalActions.add(closeBtn).add(copyBtn);
+        codeModal.add(modalActions);
+        
+        container.add(codeModal);
+        
+        // --- Actual Component Demo ---
+        container.add(new Header(2, "Modal Example").setStyle("margin-top", "30px"));
+        container.add(new Paragraph("A pop-up modal component that overlays the screen.").setStyle("margin-bottom", "20px"));
+        
+        Div row1 = new Div();
+        row1.setStyle("margin-bottom", "30px");
+        
+        Button openBtn = new Button("Open Demo Modal");
+        openBtn.addClass("j-btn j-btn-primary");
+        openBtn.setProperty("onclick", "document.getElementById('demo-modal').style.display = 'block'");
+        
+        io.jettra.wui.complex.Modal demoModal = new io.jettra.wui.complex.Modal("demo-modal");
+        demoModal.setStyle("display", "none").setStyle("background", "var(--jettra-glass)")
+                 .setStyle("backdrop-filter", "blur(10px)").setStyle("padding", "30px")
+                 .setStyle("border-radius", "12px").setStyle("border", "1px solid var(--jettra-border)");
+        
+        demoModal.add(new Header(2, "Demo Warning"));
+        demoModal.add(new Paragraph("Are you sure you want to perform this action?"));
+        
+        Button confirmBtn = new Button("Confirm");
+        confirmBtn.addClass("j-btn j-btn-primary");
+        confirmBtn.setProperty("onclick", "document.getElementById('demo-modal').style.display = 'none'");
+        
+        Button cancelBtn = new Button("Cancel");
+        cancelBtn.addClass("j-btn");
+        cancelBtn.setProperty("onclick", "document.getElementById('demo-modal').style.display = 'none'");
+        
+        Div demoActions = new Div();
+        demoActions.setStyle("display", "flex").setStyle("gap", "10px").setStyle("margin-top", "20px");
+        demoActions.add(cancelBtn).add(confirmBtn);
+        demoModal.add(demoActions);
+        
+        row1.add(openBtn).add(demoModal);
+        container.add(row1);
+        
+        center.add(container);
+    }
+}
