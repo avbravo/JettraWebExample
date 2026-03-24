@@ -64,7 +64,13 @@ public abstract class DashboardBasePage extends Page implements HttpHandler {
            .setStyle("box-sizing", "border-box")
            .setStyle("overflow", "visible");
 
-        io.jettra.wui.components.Header title = new io.jettra.wui.components.Header(2, "Jettra Global Dashboard");
+        String fullTitle = com.jettra.server.config.JettraConfig.getProperty("app.title");
+        String shortTitle = com.jettra.server.config.JettraConfig.getProperty("app.tittleletter");
+        if (fullTitle == null) fullTitle = "Jettra Global Dashboard";
+        if (shortTitle == null) shortTitle = fullTitle.substring(0, 1);
+
+        io.jettra.wui.components.Header title = new io.jettra.wui.components.Header(2, "");
+        title.setContent("<span class='hide-on-low-res'>" + fullTitle + "</span><span class='show-on-low-res'>" + shortTitle + "</span>");
         title.setStyle("margin", "0").setStyle("font-size", "1.1rem");
         top.add(title);
         
@@ -121,7 +127,7 @@ public abstract class DashboardBasePage extends Page implements HttpHandler {
         io.jettra.wui.components.Span animLabel = new io.jettra.wui.components.Span("Anim");
         animLabel.setStyle("font-size", "0.8rem");
         CheckBox animCB = new CheckBox("anim-toggle", "animated", "true");
-        animCB.setProperty("onclick", "jettraAnimated = this.checked; localStorage.setItem('jettra-animated', this.checked);");
+        // Eliminado onclick redundante, JettraTheme maneja el evento change
         
         // Estado inicial desde config (si localStorage está vacío, JettraTheme usará este default o true)
         String animatedValue = com.jettra.server.config.JettraConfig.getProperty("app.animated");
@@ -136,12 +142,12 @@ public abstract class DashboardBasePage extends Page implements HttpHandler {
             "  const savedTheme = localStorage.getItem('jettra-theme');" +
             "  if (savedTheme) {" +
             "    const maps = {'3d':'🚀', 'dark':'🌙', 'white':'☀️'};" +
-            "    jettraSelectOption('theme', savedTheme, '', maps[savedTheme] || '🚀');" +
+            "    if(typeof jettraSelectOption === 'function') jettraSelectOption('theme', savedTheme, '', maps[savedTheme] || '🚀');" +
             "  }" +
             "  const savedAnim = localStorage.getItem('jettra-animated');" +
             "  if (savedAnim !== null) {" +
                 "    const isA = savedAnim === 'true';" +
-                "    jettraAnimated = isA;" +
+                "    window.jettraAnimated = isA;" +
                 "    const acb = document.getElementById('anim-toggle');" +
                 "    if(acb) acb.checked = isA;" +
             "  }" +
