@@ -6,6 +6,7 @@ import com.jettra.server.config.ConfigInjector;
 import com.jettra.example.pages.LoginPage;
 import com.jettra.example.pages.DashboardPage;
 import com.jettra.example.pages.PersonaPage;
+import com.jettra.example.pages.AvatarPage;
 
 public class WebExampleMain {
 
@@ -32,6 +33,7 @@ public class WebExampleMain {
 
         server.addHandler("/dashboard", new DashboardPage());
         server.addHandler("/persona", new PersonaPage());
+        server.addHandler("/avatar", new AvatarPage());
 
         server.start();
     }

@@ -65,7 +65,7 @@ public abstract class DashboardBasePage extends Page implements HttpHandler {
            .setStyle("overflow", "visible");
 
         String fullTitle = com.jettra.server.config.JettraConfig.getProperty("app.title");
-        String shortTitle = com.jettra.server.config.JettraConfig.getProperty("app.tittleletter");
+        String shortTitle = com.jettra.server.config.JettraConfig.getProperty("app.shorttitle");
         if (fullTitle == null) fullTitle = "Jettra Global Dashboard";
         if (shortTitle == null) shortTitle = fullTitle.substring(0, 1);
 
@@ -127,6 +127,7 @@ public abstract class DashboardBasePage extends Page implements HttpHandler {
         io.jettra.wui.components.Span animLabel = new io.jettra.wui.components.Span("Anim");
         animLabel.setStyle("font-size", "0.8rem");
         CheckBox animCB = new CheckBox("anim-toggle", "animated", "true");
+        animCB.setProperty("onchange", "toggleJettraAnimation(this.checked)");
         // Eliminado onclick redundante, JettraTheme maneja el evento change
         
         // Estado inicial desde config (si localStorage está vacío, JettraTheme usará este default o true)
@@ -136,23 +137,8 @@ public abstract class DashboardBasePage extends Page implements HttpHandler {
             animCB.setProperty("checked", "checked");
         }
         
-        // Sincronización client-side: priorizar localStorage sobre el render server-side
-        add(new io.jettra.wui.components.Script(
-            "document.addEventListener('DOMContentLoaded', () => {" +
-            "  const savedTheme = localStorage.getItem('jettra-theme');" +
-            "  if (savedTheme) {" +
-            "    const maps = {'3d':'🚀', 'dark':'🌙', 'white':'☀️'};" +
-            "    if(typeof jettraSelectOption === 'function') jettraSelectOption('theme', savedTheme, '', maps[savedTheme] || '🚀');" +
-            "  }" +
-            "  const savedAnim = localStorage.getItem('jettra-animated');" +
-            "  if (savedAnim !== null) {" +
-                "    const isA = savedAnim === 'true';" +
-                "    window.jettraAnimated = isA;" +
-                "    const acb = document.getElementById('anim-toggle');" +
-                "    if(acb) acb.checked = isA;" +
-            "  }" +
-            "});"
-        ));
+        // JettraTheme handles animation and theme sync via localStorage internally on DOMContentLoaded
+
         
         animDiv.add(animLabel).add(animCB);
         rightSection.add(animDiv);
@@ -193,6 +179,10 @@ public abstract class DashboardBasePage extends Page implements HttpHandler {
             menuHtml.append("<div style='").append(menuClass).append("' ").append(hoverEvents).append(" onclick='window.location.href=\"" + JettraServer.resolvePath("/persona") + "\"'>")
                     .append("<svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' style='margin-right:12px;'><path d='M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'></path><circle cx='9' cy='7' r='4'></circle><path d='M23 21v-2a4 4 0 0 0-3-3.87'></path><path d='M16 3.13a4 4 0 0 1 0 7.75'></path></svg>")
                     .append("<span>Persona CRUD</span></div>");
+            
+            menuHtml.append("<div style='").append(menuClass).append("' ").append(hoverEvents).append(" onclick='window.location.href=\"" + com.jettra.server.JettraServer.resolvePath("/avatar") + "\"'>")
+                    .append("<svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' style='margin-right:12px;'><circle cx='12' cy='12' r='3'></circle><path d='M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z'></path></svg>")
+                    .append("<span>Avatar Showcase</span></div>");
         }
 
         menuHtml.append("<div style='").append(menuClass).append("' ").append(hoverEvents).append(" onclick='window.location.href=\"" + JettraServer.resolvePath("/logout") + "\"'>")
