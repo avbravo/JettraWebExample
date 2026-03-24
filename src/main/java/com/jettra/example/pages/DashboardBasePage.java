@@ -133,36 +133,39 @@ public abstract class DashboardBasePage extends Page implements HttpHandler {
         dropdown.setProperty("id", "user-avatar-dropdown");
         dropdown.addClass("j-avatar-dropdown");
         
+        // Items del menú (Logout + Animación)
         UIComponent logoutLink = new UIComponent("a") {};
         logoutLink.setProperty("href", JettraServer.resolvePath("/logout"));
         logoutLink.setContent("<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'></path><polyline points='16 17 21 12 16 7'></polyline><line x1='21' y1='12' x2='9' y2='12'></line></svg> <span>Logout</span>");
         dropdown.add(logoutLink);
+
+        // CheckBox para animaciones dentro del menú
+        Div animItem = new Div();
+        animItem.addClass("j-avatar-dropdown-item")
+                .setStyle("display", "flex")
+                .setStyle("align-items", "center")
+                .setStyle("gap", "10px")
+                .setStyle("padding", "10px 15px")
+                .setStyle("cursor", "default")
+                .setProperty("onclick", "event.stopPropagation()"); // Evita que el menú se cierre al hacer clic
         
-        userWrapper.add(dropdown);
-        rightSection.add(userWrapper);
+        io.jettra.wui.components.Span animLabel = new io.jettra.wui.components.Span("Animations");
+        animLabel.setStyle("font-size", "0.9rem").setStyle("color", "var(--jettra-text)");
         
-        // CheckBox para animaciones
-        io.jettra.wui.components.Div animDiv = new io.jettra.wui.components.Div();
-        animDiv.addClass("hide-mobile");
-        animDiv.setStyle("display", "flex").setStyle("align-items", "center").setStyle("gap", "3px");
-        io.jettra.wui.components.Span animLabel = new io.jettra.wui.components.Span("Anim");
-        animLabel.setStyle("font-size", "0.8rem");
         CheckBox animCB = new CheckBox("anim-toggle", "animated", "true");
         animCB.setProperty("onchange", "toggleJettraAnimation(this.checked)");
-        // Eliminado onclick redundante, JettraTheme maneja el evento change
         
-        // Estado inicial desde config (si localStorage está vacío, JettraTheme usará este default o true)
         String animatedValue = com.jettra.server.config.JettraConfig.getProperty("app.animated");
         boolean isAnimatedConfig = animatedValue == null || animatedValue.equalsIgnoreCase("true");
         if (isAnimatedConfig) {
             animCB.setProperty("checked", "checked");
         }
         
-        // JettraTheme handles animation and theme sync via localStorage internally on DOMContentLoaded
-
+        animItem.add(animLabel).add(animCB);
+        dropdown.add(animItem);
         
-        animDiv.add(animLabel).add(animCB);
-        rightSection.add(animDiv);
+        userWrapper.add(dropdown);
+        rightSection.add(userWrapper);
 
         top.add(rightSection);
     }
