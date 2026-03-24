@@ -11,7 +11,6 @@ import io.jettra.wui.complex.Top;
 import io.jettra.wui.complex.Avatar;
 import io.jettra.wui.components.Div;
 import io.jettra.wui.components.SelectOneIcon;
-import io.jettra.wui.components.CheckBox;
 import io.jettra.wui.core.Page;
 import io.jettra.wui.core.UIComponent;
 import java.io.IOException;
@@ -101,7 +100,7 @@ public abstract class DashboardBasePage extends Page implements HttpHandler {
         } else {
             langSelect.setSelectedValue("en", "", "🇺🇸");
         }
-        rightSection.add(langSelect);
+        // langSelect se inicializa aquí
         
         // Selector de Tema (sin texto en trigger)
         SelectOneIcon themeSelect = new SelectOneIcon("theme","");
@@ -117,6 +116,7 @@ public abstract class DashboardBasePage extends Page implements HttpHandler {
             themeVal.equals("3d") ? "🚀" : (themeVal.equals("dark") ? "🌙" : "☀️"));
             
         rightSection.add(themeSelect);
+        rightSection.add(langSelect);
         
         // Avatar Menu en lugar de Welcome
         Div userWrapper = new Div();
@@ -145,9 +145,10 @@ public abstract class DashboardBasePage extends Page implements HttpHandler {
                 .setProperty("onclick", "event.stopPropagation()"); // Evita que el menú se cierre al hacer clic
         
         io.jettra.wui.components.Span animLabel = new io.jettra.wui.components.Span("Animations");
-        animLabel.setStyle("font-size", "0.9rem").setStyle("color", "var(--jettra-text)");
+        animLabel.setStyle("font-size", "0.9rem").setStyle("color", "var(--jettra-text)").setStyle("margin-right", "auto");
         
-        CheckBox animCB = new CheckBox("anim-toggle", "animated", "true");
+        io.jettra.wui.components.ToggleSwitch animCB = new io.jettra.wui.components.ToggleSwitch("anim-toggle", "animated", "true");
+        animCB.setLabels("ON", "OFF");
         animCB.setProperty("onchange", "toggleJettraAnimation(this.checked)");
         
         String animatedValue = com.jettra.server.config.JettraConfig.getProperty("app.animated");
@@ -160,7 +161,7 @@ public abstract class DashboardBasePage extends Page implements HttpHandler {
         dropdown.add(animItem);
         
         
-         // Items del menú (Logout + Animación)
+         // Items del menú (Logout)
         UIComponent logoutLink = new UIComponent("a") {};
         logoutLink.setProperty("href", JettraServer.resolvePath("/logout"));
         logoutLink.setContent("<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'></path><polyline points='16 17 21 12 16 7'></polyline><line x1='21' y1='12' x2='9' y2='12'></line></svg> <span>Logout</span>");
