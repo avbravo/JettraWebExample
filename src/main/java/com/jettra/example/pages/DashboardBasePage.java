@@ -133,12 +133,7 @@ public abstract class DashboardBasePage extends Page implements HttpHandler {
         dropdown.setProperty("id", "user-avatar-dropdown");
         dropdown.addClass("j-avatar-dropdown");
         
-        // Items del menú (Logout + Animación)
-        UIComponent logoutLink = new UIComponent("a") {};
-        logoutLink.setProperty("href", JettraServer.resolvePath("/logout"));
-        logoutLink.setContent("<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'></path><polyline points='16 17 21 12 16 7'></polyline><line x1='21' y1='12' x2='9' y2='12'></line></svg> <span>Logout</span>");
-        dropdown.add(logoutLink);
-
+       
         // CheckBox para animaciones dentro del menú
         Div animItem = new Div();
         animItem.addClass("j-avatar-dropdown-item")
@@ -163,6 +158,15 @@ public abstract class DashboardBasePage extends Page implements HttpHandler {
         
         animItem.add(animLabel).add(animCB);
         dropdown.add(animItem);
+        
+        
+         // Items del menú (Logout + Animación)
+        UIComponent logoutLink = new UIComponent("a") {};
+        logoutLink.setProperty("href", JettraServer.resolvePath("/logout"));
+        logoutLink.setContent("<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'></path><polyline points='16 17 21 12 16 7'></polyline><line x1='21' y1='12' x2='9' y2='12'></line></svg> <span>Logout</span>");
+        dropdown.add(logoutLink);
+
+        
         
         userWrapper.add(dropdown);
         rightSection.add(userWrapper);
