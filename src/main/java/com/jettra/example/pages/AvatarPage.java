@@ -21,8 +21,77 @@ public class AvatarPage extends DashboardBasePage {
         Div container = new Div();
         container.setStyle("padding", "30px");
         
+        Div headerRow = new Div();
+        headerRow.setStyle("display", "flex").setStyle("justify-content", "space-between").setStyle("align-items", "center").setStyle("margin-bottom", "15px");
+        
         Header h1 = new Header(1, "Avatar Component Showcase");
-        container.add(h1);
+        h1.setStyle("margin", "0");
+        headerRow.add(h1);
+        
+        io.jettra.wui.components.Button codeBtn = new io.jettra.wui.components.Button("Code");
+        codeBtn.addClass("j-btn");
+        codeBtn.setStyle("border-color", "var(--jettra-accent)").setStyle("color", "var(--jettra-accent)");
+        codeBtn.setProperty("onclick", "document.getElementById('avatar-code-modal').style.display = 'block'");
+        headerRow.add(codeBtn);
+        
+        container.add(headerRow);
+        
+        // --- Modal Dialog for Java Code ---
+        io.jettra.wui.complex.Modal codeModal = new io.jettra.wui.complex.Modal("avatar-code-modal");
+        codeModal.setStyle("display", "none").setStyle("background", "var(--jettra-glass)")
+                 .setStyle("backdrop-filter", "blur(10px)")
+                 .setStyle("padding", "20px").setStyle("border-radius", "8px")
+                 .setStyle("width", "90%").setStyle("max-width", "800px")
+                 .setStyle("border", "1px solid var(--jettra-border)");
+        
+        codeModal.add(new Header(3, "Java Code Examples").setStyle("margin-top", "0").setStyle("color", "var(--jettra-accent)"));
+        
+        Div codeContainer = new Div();
+        codeContainer.setStyle("background", "rgba(0,0,0,0.4)").setStyle("padding", "15px")
+                     .setStyle("border-radius", "4px").setStyle("overflow-x", "auto")
+                     .setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
+        
+        String javaCode = "// 1. Basic Avatar (Image, Label, Icon)\n" +
+                          "Avatar.image(\"https://i.pravatar.cc/150?u=11\", \"User 1\").setSize(Avatar.Size.LG).setShape(Avatar.Shape.CIRCLE);\n" +
+                          "Avatar.label(\"JD\", \"#4f46e5\").setSize(Avatar.Size.LG).setShape(Avatar.Shape.CIRCLE);\n" +
+                          "Avatar.icon(\"<svg>...</svg>\").setSize(Avatar.Size.LG).setShape(Avatar.Shape.CIRCLE);\n\n" +
+                          "// 2. Setting Shapes and Sizes\n" +
+                          "Avatar.image(\"...\", \"User 2\").setShape(Avatar.Shape.ROUNDED).setSize(Avatar.Size.MD);\n\n" +
+                          "// 3. Adding Badges\n" +
+                          "Avatar.image(\"...\", \"Online\").setBadge(\"#22c55e\"); // Green dot\n\n" +
+                          "// 4. Overlapping Avatar Group\n" +
+                          "AvatarGroup group = new AvatarGroup();\n" +
+                          "group.add(Avatar.image(\"https://i.pravatar.cc/150?u=21\", \"U1\").setSize(Avatar.Size.MD).setShape(Avatar.Shape.CIRCLE));\n" +
+                          "group.add(Avatar.label(\"+3\", \"#334155\").setSize(Avatar.Size.MD).setShape(Avatar.Shape.CIRCLE));";
+                          
+        io.jettra.wui.core.UIComponent pre = new io.jettra.wui.core.UIComponent("pre") {};
+        pre.setStyle("margin", "0");
+        io.jettra.wui.core.UIComponent codeTag = new io.jettra.wui.core.UIComponent("code") {};
+        codeTag.setProperty("id", "avatar-java-code");
+        codeTag.setStyle("color", "#a5d6ff").setStyle("font-family", "monospace").setStyle("font-size", "0.9rem");
+        codeTag.setContent(javaCode.replace("<", "&lt;").replace(">", "&gt;"));
+        
+        pre.add(codeTag);
+        codeContainer.add(pre);
+        codeModal.add(codeContainer);
+        
+        Div modalActions = new Div();
+        modalActions.setStyle("display", "flex").setStyle("justify-content", "flex-end").setStyle("gap", "10px");
+        
+        io.jettra.wui.components.Button copyBtn = new io.jettra.wui.components.Button("Copy");
+        copyBtn.addClass("j-btn");
+        copyBtn.setProperty("onclick", "navigator.clipboard.writeText(document.getElementById('avatar-java-code').innerText).then(() => { this.innerText='Copied!'; setTimeout(() => this.innerText='Copy', 2000); })");
+        
+        io.jettra.wui.components.Button closeBtn = new io.jettra.wui.components.Button("Close");
+        closeBtn.addClass("j-btn");
+        closeBtn.setStyle("background", "transparent").setStyle("border-color", "var(--jettra-border)");
+        closeBtn.setProperty("onclick", "document.getElementById('avatar-code-modal').style.display = 'none'");
+        
+        modalActions.add(closeBtn).add(copyBtn);
+        codeModal.add(modalActions);
+        
+        container.add(codeModal);
+        // --- End Modal Dialog ---
         
         Paragraph p = new Paragraph("The Avatar component is used to represent a user or an entity through images, icons, or labels.");
         container.add(p);
