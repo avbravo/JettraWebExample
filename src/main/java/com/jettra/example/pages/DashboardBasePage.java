@@ -15,8 +15,9 @@ import io.jettra.wui.core.Page;
 import io.jettra.wui.core.UIComponent;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
-public abstract class DashboardBasePage extends Page implements HttpHandler {
+public abstract class DashboardBasePage extends Page {
 
     protected Dashboard dashboard;
     protected Top top;
@@ -26,6 +27,31 @@ public abstract class DashboardBasePage extends Page implements HttpHandler {
 
     public DashboardBasePage(String title) {
         super(title);
+    }
+
+    @Override
+    protected void onInit(Map<String, String> params) {
+        String loggedUser = getLoggedUser(currentExchange);
+        // Authentication check
+        if ("Guest".equals(loggedUser) || loggedUser.isEmpty()) {
+            try {
+                redirect(currentExchange, JettraServer.resolvePath("/"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return;
+        }
+
+        this.children.clear();
+        initLayout(loggedUser, params);
+    }
+
+    protected HttpExchange currentExchange;
+
+    @Override
+    public void handle(HttpExchange exchange) throws IOException {
+        this.currentExchange = exchange;
+        super.handle(exchange);
     }
 
     public void initLayout(String username, java.util.Map<String, String> params) {
@@ -270,34 +296,4 @@ public abstract class DashboardBasePage extends Page implements HttpHandler {
         return true;
     }
 
-    @Override
-    public void handle(HttpExchange exchange) throws IOException {
-        String loggedUser = getLoggedUser(exchange);
-        if (!checkAuth(exchange, loggedUser)) return;
-
-        this.children.clear();
-        
-        // Parse query params
-        java.util.Map<String, String> queryParams = new java.util.LinkedHashMap<>();
-        String query = exchange.getRequestURI().getQuery();
-        if (query != null) {
-            for (String param : query.split("&")) {
-                String[] pair = param.split("=");
-                if (pair.length > 1) {
-                    queryParams.put(pair[0], pair[1]);
-                } else {
-                    queryParams.put(pair[0], "");
-                }
-            }
-        }
-        
-        initLayout(loggedUser, queryParams);
-        
-        String html = this.render();
-        byte[] bytes = html.getBytes(StandardCharsets.UTF_8);
-        exchange.getResponseHeaders().set("Content-Type", "text/html; charset=UTF-8");
-        exchange.sendResponseHeaders(200, bytes.length);
-        exchange.getResponseBody().write(bytes);
-        exchange.getResponseBody().close();
-    }
 }
