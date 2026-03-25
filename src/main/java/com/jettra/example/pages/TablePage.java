@@ -4,7 +4,6 @@ import io.jettra.wui.complex.Center;
 import io.jettra.wui.components.Div;
 import io.jettra.wui.components.Header;
 import io.jettra.wui.components.Paragraph;
-import io.jettra.wui.complex.Table;
 import io.jettra.wui.components.Button;
 
 public class TablePage extends DashboardBasePage {
@@ -48,7 +47,10 @@ public class TablePage extends DashboardBasePage {
                      .setStyle("border-radius", "4px").setStyle("overflow-x", "auto")
                      .setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
         
-        String javaCode = "Table table = new Table();\ntable.addHeaderRow(\"ID\", \"Name\", \"Role\");\ntable.addRow(new Span(\"1\"), new Span(\"Alice\"), new Span(\"Admin\"));\ntable.addRow(new Span(\"2\"), new Span(\"Bob\"), new Span(\"User\"));";
+        String javaCode = "Datatable table = new Datatable();\n" +
+                          "table.addHeaderRow(new Row(new TD(\"ID\"), new TD(\"Name\"), new TD(\"Role\")));\n" +
+                          "table.addRow(new Row(new TD(\"1\"), new TD(\"Alice\"), new TD(\"Admin\")));\n" +
+                          "table.addRow(new Row(new TD(\"2\"), new TD(\"Bob\"), new TD(\"User\")));";
                           
         io.jettra.wui.core.UIComponent pre = new io.jettra.wui.core.UIComponent("pre") {};
         pre.setStyle("margin", "0");
@@ -87,10 +89,14 @@ public class TablePage extends DashboardBasePage {
         Div row1 = new Div();
         row1.setStyle("display", "flex").setStyle("gap", "20px").setStyle("margin-bottom", "30px").setStyle("width", "100%");
         
-        Table table = new Table();
-        table.addHeaderRow("ID", "Name", "Role");
-        table.addRow(new io.jettra.wui.components.Span("1"), new io.jettra.wui.components.Span("Alice"), new io.jettra.wui.components.Span("Admin"));
-        table.addRow(new io.jettra.wui.components.Span("2"), new io.jettra.wui.components.Span("Bob"), new io.jettra.wui.components.Span("User"));
+        io.jettra.wui.complex.Datatable table = new io.jettra.wui.complex.Datatable();
+        table.addHeaderRow(new io.jettra.wui.components.Row(new io.jettra.wui.components.TD("ID"), new io.jettra.wui.components.TD("Name"), new io.jettra.wui.components.TD("Role")));
+        table.addRow(new io.jettra.wui.components.Row(new io.jettra.wui.components.TD("1"), new io.jettra.wui.components.TD("Alice"), new io.jettra.wui.components.TD("Admin")));
+        table.addRow(new io.jettra.wui.components.Row(new io.jettra.wui.components.TD("2"), new io.jettra.wui.components.TD("Bob"), new io.jettra.wui.components.TD("User")));
+        table.addRow(new io.jettra.wui.components.Row(new io.jettra.wui.components.TD("3"), new io.jettra.wui.components.TD("Charlie"), new io.jettra.wui.components.TD("Manager")));
+        table.addRow(new io.jettra.wui.components.Row(new io.jettra.wui.components.TD("4"), new io.jettra.wui.components.TD("Dave"), new io.jettra.wui.components.TD("User")));
+        table.addRow(new io.jettra.wui.components.Row(new io.jettra.wui.components.TD("5"), new io.jettra.wui.components.TD("Eve"), new io.jettra.wui.components.TD("User")));
+        table.addRow(new io.jettra.wui.components.Row(new io.jettra.wui.components.TD("6"), new io.jettra.wui.components.TD("Frank"), new io.jettra.wui.components.TD("Admin")));
         
         row1.add(table);
         

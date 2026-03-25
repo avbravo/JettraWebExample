@@ -5,9 +5,7 @@ import com.jettra.example.repository.PaisRepository;
 import com.sun.net.httpserver.HttpExchange;
 import com.jettra.server.JettraServer;
 import io.jettra.wui.complex.Center;
-import io.jettra.wui.complex.Table;
 import io.jettra.wui.components.*;
-import io.jettra.wui.core.UIComponent;
 import io.jettra.wui.core.annotations.InjectViewModel;
 import io.jettra.wui.mvc.JettraMVC;
 
@@ -55,23 +53,18 @@ public class PaisPage extends DashboardBasePage {
         mainContent.add(addLink);
 
         // Table
-        Table table = new Table();
-        table.addClass("crud-table");
+        io.jettra.wui.complex.Datatable table = new io.jettra.wui.complex.Datatable();
         
-        UIComponent headerRow = new UIComponent("tr"){};
-        UIComponent th1 = new UIComponent("th"){}; th1.setContent("Código");
-        UIComponent th2 = new UIComponent("th"){}; th2.setContent("Nombre");
-        UIComponent th3 = new UIComponent("th"){}; th3.setContent("Acciones");
-        headerRow.add(th1).add(th2).add(th3);
-        table.add(headerRow);
+        io.jettra.wui.components.Row headerRow = new io.jettra.wui.components.Row(
+            new io.jettra.wui.components.TD("Código"),
+            new io.jettra.wui.components.TD("Nombre"),
+            new io.jettra.wui.components.TD("Acciones")
+        );
+        table.addHeaderRow(headerRow);
 
         List<Pais> all = PaisRepository.findAll();
         for (Pais p : all) {
-            UIComponent row = new UIComponent("tr"){};
-            UIComponent td1 = new UIComponent("td"){}; td1.setContent(p.getCode());
-            UIComponent td2 = new UIComponent("td"){}; td2.setContent(p.getName());
-            
-            UIComponent actionsTd = new UIComponent("td"){};
+            io.jettra.wui.components.TD actionsTd = new io.jettra.wui.components.TD();
             actionsTd.setStyle("display", "flex").setStyle("gap", "10px").setStyle("align-items", "center");
             
             Button editBtn = new Button("✏️ Editar");
@@ -86,8 +79,14 @@ public class PaisPage extends DashboardBasePage {
             deleteBtn.setProperty("onclick", "window.location.href='" + JettraServer.resolvePath("/pais") + "?action=delete&code=" + p.getCode() + "'");
             
             actionsTd.add(editBtn).add(deleteBtn);
-            row.add(td1).add(td2).add(actionsTd);
-            table.add(row);
+            
+            io.jettra.wui.components.Row row = new io.jettra.wui.components.Row(
+                new io.jettra.wui.components.TD(p.getCode()),
+                new io.jettra.wui.components.TD(p.getName()),
+                actionsTd
+            );
+            
+            table.addRow(row);
         }
         mainContent.add(table);
 
