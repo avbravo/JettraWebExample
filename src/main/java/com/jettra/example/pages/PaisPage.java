@@ -72,13 +72,20 @@ public class PaisPage extends DashboardBasePage {
             UIComponent td2 = new UIComponent("td"){}; td2.setContent(p.getName());
             
             UIComponent actionsTd = new UIComponent("td"){};
-            Link editLnk = new Link(JettraServer.resolvePath("/pais") + "?action=edit&code=" + p.getCode(), "Editar");
-            editLnk.setStyle("margin-right", "10px").setStyle("color", "#0ff");
+            actionsTd.setStyle("display", "flex").setStyle("gap", "10px").setStyle("align-items", "center");
             
-            Link deleteLnk = new Link(JettraServer.resolvePath("/pais") + "?action=delete&code=" + p.getCode(), "Eliminar");
-            deleteLnk.setStyle("color", "#f55");
+            Button editBtn = new Button("✏️ Editar");
+            editBtn.addClass("j-btn");
+            editBtn.setStyle("padding", "5px 10px").setStyle("font-size", "0.9rem");
+            editBtn.setProperty("onclick", "window.location.href='" + JettraServer.resolvePath("/pais") + "?action=edit&code=" + p.getCode() + "'");
             
-            actionsTd.add(editLnk).add(deleteLnk);
+            Button deleteBtn = new Button("🗑️ Eliminar");
+            deleteBtn.addClass("j-btn");
+            deleteBtn.setStyle("padding", "5px 10px").setStyle("font-size", "0.9rem");
+            deleteBtn.setStyle("background", "rgba(255, 0, 0, 0.1)").setStyle("border-color", "rgba(255, 50, 50, 0.6)").setStyle("color", "#ff5555");
+            deleteBtn.setProperty("onclick", "window.location.href='" + JettraServer.resolvePath("/pais") + "?action=delete&code=" + p.getCode() + "'");
+            
+            actionsTd.add(editBtn).add(deleteBtn);
             row.add(td1).add(td2).add(actionsTd);
             table.add(row);
         }
