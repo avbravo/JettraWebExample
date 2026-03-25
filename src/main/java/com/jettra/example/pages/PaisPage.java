@@ -50,7 +50,7 @@ public class PaisPage extends DashboardBasePage {
         mainContent.add(title);
 
         // Simple link or button to trigger a reload with ?action=add
-        Link addLink = new Link("?action=add", "Añadir País");
+        Link addLink = new Link(JettraServer.resolvePath("/pais") + "?action=add", "Añadir País");
         addLink.setStyle("background-color", "#0f5132").setStyle("padding", "10px 20px").setStyle("border-radius", "8px").setStyle("text-decoration", "none").setStyle("color", "#fff");
         mainContent.add(addLink);
 
@@ -72,10 +72,10 @@ public class PaisPage extends DashboardBasePage {
             UIComponent td2 = new UIComponent("td"){}; td2.setContent(p.getName());
             
             UIComponent actionsTd = new UIComponent("td"){};
-            Link editLnk = new Link("?action=edit&code=" + p.getCode(), "Editar");
+            Link editLnk = new Link(JettraServer.resolvePath("/pais") + "?action=edit&code=" + p.getCode(), "Editar");
             editLnk.setStyle("margin-right", "10px").setStyle("color", "#0ff");
             
-            Link deleteLnk = new Link("?action=delete&code=" + p.getCode(), "Eliminar");
+            Link deleteLnk = new Link(JettraServer.resolvePath("/pais") + "?action=delete&code=" + p.getCode(), "Eliminar");
             deleteLnk.setStyle("color", "#f55");
             
             actionsTd.add(editLnk).add(deleteLnk);
@@ -113,7 +113,7 @@ public class PaisPage extends DashboardBasePage {
         Div groupActions = new Div();
         groupActions.addClass("modal-actions");
         
-        Link cancelBtn = new Link("/pais", "Cerrar"); // Simple redirect closes the modal (as it's not open by default)
+        Link cancelBtn = new Link(JettraServer.resolvePath("/pais"), "Cerrar"); // Simple redirect closes the modal (as it's not open by default)
         cancelBtn.setStyle("background", "#555").setStyle("padding", "10px").setStyle("text-decoration", "none").setStyle("color", "#fff").setStyle("border-radius", "6px");
         
         Button submitBtn = new Button("Guardar");
