@@ -25,7 +25,7 @@ public class PaisPage extends DashboardBasePage {
     Pais pais;
 
     public PaisPage() {
-        super("Mantenimiento de Países (MVC + Modals)");
+        super("Mantenimiento de Países (Pure MVC)");
     }
 
     @Override
@@ -34,57 +34,25 @@ public class PaisPage extends DashboardBasePage {
             .crud-table { width: 100%; border-collapse: collapse; margin-top: 20px; color: #fff; }
             .crud-table th, .crud-table td { padding: 12px; border: 1px solid rgba(0,255,255,0.3); text-align: left; }
             .crud-table th { background: rgba(0,255,255,0.1); color: #0ff; }
-            .action-btn { padding: 5px 10px; margin-right: 5px; cursor: pointer; border: none; background: rgba(0,255,255,0.2); color: #fff; border-radius:3px; transition: all 0.3s; }
-            .action-btn:hover { background: rgba(0,255,255,0.4); box-shadow: 0 0 10px var(--jettra-accent); }
             
-            .modal { 
-                display: none; 
-                position: fixed; 
-                z-index: 9999; 
-                left: 0; 
-                top: 0; 
-                width: 100vw; 
-                height: 100vh; 
-                background-color: rgba(0,0,0,0.85); 
-                backdrop-filter: blur(10px); 
-                justify-content: center; 
-                align-items: center;
-                animation: fadeIn 0.3s ease-out;
-            }
-            @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-            .modal-content { 
-                background-color: #0d1117; 
-                padding: 30px; 
-                border: 2px solid #0ff; 
-                width: 450px; 
-                max-width: 90%; 
-                border-radius: 12px; 
-                box-shadow: 0 0 50px rgba(0,255,255,0.4); 
-                color: #fff;
-                transform: scale(0.9);
-                animation: scaleUp 0.3s forwards;
-            }
-            @keyframes scaleUp { from { transform: scale(0.9); } to { transform: scale(1); } }
-            
+            .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); justify-content: center; align-items: center;}
+            .modal-content { background-color: #0d1117; padding: 30px; border: 2px solid #0ff; width: 450px; border-radius: 12px; box-shadow: 0 0 50px rgba(0,255,255,0.4); color: #fff;}
             .form-group { margin-bottom: 20px; }
-            .form-group label { display: block; margin-bottom: 8px; color: #0ff; font-weight: 500; }
-            .form-group input { width: 100%; padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid rgba(0,255,255,0.3); color: #fff; border-radius: 6px; outline: none; }
-            .form-group input:focus { border-color: #0ff; box-shadow: 0 0 10px rgba(0,255,255,0.5); }
+            .form-group label { display: block; margin-bottom: 8px; color: #0ff; }
             .modal-actions { display: flex; justify-content: flex-end; gap: 15px; margin-top: 25px; }
             """);
 
         Div mainContent = new Div();
         mainContent.setStyle("padding", "20px");
 
-        Header title = new Header(2, "Catálogo de Países (MVC)");
+        Header title = new Header(2, "Catálogo de Países (Full MVC)");
         title.setStyle("color", "var(--jettra-accent)").setStyle("margin-bottom", "20px");
         mainContent.add(title);
 
-        Button addBtn = new Button("Añadir País");
-        addBtn.setStyle("background-color", "#0f5132").setStyle("margin-bottom", "20px");
-        addBtn.setProperty("onclick", "addPais()");
-        mainContent.add(addBtn);
+        // Simple link or button to trigger a reload with ?action=add
+        Link addLink = new Link("?action=add", "Añadir País");
+        addLink.setStyle("background-color", "#0f5132").setStyle("padding", "10px 20px").setStyle("border-radius", "8px").setStyle("text-decoration", "none").setStyle("color", "#fff");
+        mainContent.add(addLink);
 
         // Table
         Table table = new Table();
@@ -103,118 +71,62 @@ public class PaisPage extends DashboardBasePage {
             UIComponent td1 = new UIComponent("td"){}; td1.setContent(p.getCode());
             UIComponent td2 = new UIComponent("td"){}; td2.setContent(p.getName());
             
-            UIComponent actions = new UIComponent("td"){};
+            UIComponent actionsTd = new UIComponent("td"){};
+            Link editLnk = new Link("?action=edit&code=" + p.getCode(), "Editar");
+            editLnk.setStyle("margin-right", "10px").setStyle("color", "#0ff");
             
-            Button editBtn = new Button("Editar");
-            editBtn.addClass("action-btn");
-            editBtn.setProperty("onclick", "editPais('%s', '%s')".formatted(p.getCode(), p.getName()));
+            Link deleteLnk = new Link("?action=delete&code=" + p.getCode(), "Eliminar");
+            deleteLnk.setStyle("color", "#f55");
             
-            Button deleteBtn = new Button("Eliminar");
-            deleteBtn.addClass("action-btn");
-            deleteBtn.setStyle("background", "rgba(255,0,0,0.3)");
-            deleteBtn.setProperty("onclick", "deletePais('%s')".formatted(p.getCode()));
-            
-            actions.add(editBtn).add(deleteBtn);
-            row.add(td1).add(td2).add(actions);
+            actionsTd.add(editLnk).add(deleteLnk);
+            row.add(td1).add(td2).add(actionsTd);
             table.add(row);
         }
         mainContent.add(table);
 
-        // --- Modal Container ---
-        Div modalContainer = new Div();
-        modalContainer.setProperty("id", "crudModal").addClass("modal");
+        // --- MODAL (Purely Reactive via ViewModel) ---
+        Div modal = new Div();
+        modal.setProperty("id", "crudModal").addClass("modal");
 
-        Div modalContent = new Div();
-        modalContent.addClass("modal-content");
+        Div content = new Div();
+        content.addClass("modal-content");
         
-        Header modalTitle = new Header(3, "");
+        Header modalTitle = new Header(3, "Operación de País");
         modalTitle.setProperty("id", "modalTitle");
 
         Form form = new Form("paisForm", JettraServer.resolvePath("/pais"));
         
-        TextBox modalActionInput = new TextBox("hidden", "modalAction");
-        modalActionInput.setProperty("id", "modalAction");
+        // Action to save or delete
+        TextBox modalAction = new TextBox("hidden", "modalAction");
+        modalAction.setProperty("id", "modalAction").setProperty("value", "save");
         
-        Div groupCode = new Div();
-        groupCode.addClass("form-group").setProperty("id", "groupCode");
-        groupCode.add(new Label("code", "Código del País"));
-        TextBox inputCode = new TextBox("text", "code");
-        inputCode.setProperty("id", "paisCode").setProperty("required", "true");
-        groupCode.add(inputCode);
+        Div g1 = new Div(); g1.addClass("form-group"); g1.add(new Label("code", "Código del País"));
+        TextBox inputCode = new TextBox("text", "code"); // BINDING: matches pais.code
+        inputCode.setProperty("id", "paisCode").setProperty("required", "true").addClass("j-input");
+        g1.add(inputCode);
 
-        Div groupName = new Div();
-        groupName.addClass("form-group").setProperty("id", "groupName");
-        groupName.add(new Label("name", "Nombre del País"));
-        TextBox inputName = new TextBox("text", "name");
-        inputName.setProperty("id", "paisName").setProperty("required", "true");
-        groupName.add(inputName);
+        Div g2 = new Div(); g2.addClass("form-group"); g2.add(new Label("name", "Nombre del País"));
+        TextBox inputName = new TextBox("text", "name"); // BINDING: matches pais.name
+        inputName.setProperty("id", "paisName").setProperty("required", "true").addClass("j-input");
+        g2.add(inputName);
 
-        Paragraph deleteMsg = new Paragraph("¿Está seguro de que desea eliminar este país?");
-        deleteMsg.setProperty("id", "deleteMsg").setStyle("display", "none").setStyle("color", "#f55").setStyle("margin-bottom", "20px");
-
-        Div formActions = new Div();
-        formActions.addClass("modal-actions");
+        Div groupActions = new Div();
+        groupActions.addClass("modal-actions");
         
-        Button cancelBtn = new Button("Cancelar");
-        cancelBtn.setProperty("type", "button").setStyle("background", "#555").setProperty("onclick", "closeModal()");
+        Link cancelBtn = new Link("/pais", "Cerrar"); // Simple redirect closes the modal (as it's not open by default)
+        cancelBtn.setStyle("background", "#555").setStyle("padding", "10px").setStyle("text-decoration", "none").setStyle("color", "#fff").setStyle("border-radius", "6px");
         
         Button submitBtn = new Button("Guardar");
         submitBtn.setProperty("type", "submit").setProperty("id", "modalSubmitBtn");
 
-        formActions.add(cancelBtn).add(submitBtn);
+        groupActions.add(cancelBtn).add(submitBtn);
 
-        form.add(modalActionInput).add(groupCode).add(groupName).add(deleteMsg).add(formActions);
-        modalContent.add(modalTitle).add(form);
-        modalContainer.add(modalContent);
+        form.add(modalAction).add(g1).add(g2).add(groupActions);
+        content.add(modalTitle).add(form);
+        modal.add(content);
         
-        // Scripts
-        Script pageScript = new Script("""
-            function openModal() { document.getElementById('crudModal').style.display = 'flex'; }
-            function closeModal() { document.getElementById('crudModal').style.display = 'none'; }
-            
-            function addPais() {
-                document.getElementById('modalTitle').innerText = 'Añadir Nuevo País';
-                document.getElementById('modalAction').value = 'save';
-                document.getElementById('paisCode').value = '';
-                document.getElementById('paisCode').readOnly = false;
-                document.getElementById('paisName').value = '';
-                document.getElementById('groupCode').style.display = 'block';
-                document.getElementById('groupName').style.display = 'block';
-                document.getElementById('deleteMsg').style.display = 'none';
-                document.getElementById('modalSubmitBtn').innerText = 'Guardar';
-                document.getElementById('modalSubmitBtn').style.background = '';
-                openModal();
-            }
-            
-            function editPais(code, name) {
-                document.getElementById('modalTitle').innerText = 'Editar País';
-                document.getElementById('modalAction').value = 'save';
-                document.getElementById('paisCode').value = code;
-                document.getElementById('paisCode').readOnly = true;
-                document.getElementById('paisName').value = name;
-                document.getElementById('groupCode').style.display = 'block';
-                document.getElementById('groupName').style.display = 'block';
-                document.getElementById('deleteMsg').style.display = 'none';
-                document.getElementById('modalSubmitBtn').innerText = 'Actualizar';
-                document.getElementById('modalSubmitBtn').style.background = '';
-                openModal();
-            }
-            
-            function deletePais(code) {
-                document.getElementById('modalTitle').innerText = 'Confirmar Eliminación';
-                document.getElementById('modalAction').value = 'delete';
-                document.getElementById('paisCode').value = code;
-                document.getElementById('groupCode').style.display = 'none';
-                document.getElementById('groupName').style.display = 'none';
-                document.getElementById('deleteMsg').style.display = 'block';
-                document.getElementById('modalSubmitBtn').innerText = 'Eliminar';
-                document.getElementById('modalSubmitBtn').style.background = 'rgba(255,0,0,0.6)';
-                openModal();
-            }
-            """);
-
         center.add(customStyles).add(mainContent);
-        this.add(modalContainer).add(pageScript); // Added to page root
+        this.add(modal); // Add directly to Page root for better centering
     }
 
     @Override
@@ -222,32 +134,62 @@ public class PaisPage extends DashboardBasePage {
         String loggedUser = getLoggedUser(exchange);
         if (!checkAuth(exchange, loggedUser)) return;
 
+        Map<String, String> queryParams = parseQueryParams(exchange.getRequestURI().getQuery());
+        String action = queryParams.get("action");
+        String codeParam = queryParams.get("code");
+
+        // --- MVC SYNC: Set data into viewmodel ---
+        if ("edit".equals(action) || "delete".equals(action)) {
+            Pais p = PaisRepository.findByCode(codeParam);
+            if (p != null) {
+                this.pais.setCode(p.getCode());
+                this.pais.setName(p.getName());
+            }
+        }
+
         if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
             Map<String, String> formParams = parseRequestBody(exchange);
             String modalAction = formParams.get("modalAction");
             
             if ("save".equals(modalAction)) {
-                // MVC BINDING: Llenar el objeto 'pais' automáticamente desde el formulario
                 JettraMVC.updateModelFromRequest(this, formParams);
-                
                 if (this.pais.getCode() != null && !this.pais.getCode().isEmpty()) {
                     PaisRepository.save(new Pais(this.pais.getCode(), this.pais.getName()));
                 }
             } else if ("delete".equals(modalAction)) {
-                String code = formParams.get("code");
-                if (code != null && !code.isEmpty()) {
-                    PaisRepository.delete(code);
-                }
+                PaisRepository.delete(formParams.get("code"));
             }
-            
             redirect(exchange, "/pais");
             return;
         }
 
         this.children.clear();
-        initLayout(loggedUser, new HashMap<>());
+        initLayout(loggedUser, queryParams);
         
+        // --- CLIENT-SIDE REACTION: Minimal JS to control visibility ---
+        if (action != null) {
+            String js = "document.getElementById('crudModal').style.display='flex';";
+            if ("edit".equals(action)) js += "document.getElementById('modalTitle').innerText='Editar País';";
+            if ("delete".equals(action)) {
+                js += "document.getElementById('modalTitle').innerText='Eliminar País';";
+                js += "document.getElementById('modalAction').value='delete';";
+                js += "document.getElementById('modalSubmitBtn').innerText='Eliminar!';";
+                js += "document.getElementById('modalSubmitBtn').style.background='rgba(255,0,0,0.6)';";
+            }
+            this.add(new Script(js));
+        }
+
         renderResponse(exchange, this.render());
+    }
+
+    private Map<String, String> parseQueryParams(String query) {
+        Map<String, String> map = new HashMap<>();
+        if (query == null) return map;
+        for (String pair : query.split("&")) {
+            String[] kv = pair.split("=");
+            if (kv.length == 2) map.put(kv[0], kv[1]);
+        }
+        return map;
     }
 
     private Map<String, String> parseRequestBody(HttpExchange exchange) throws IOException {
@@ -268,7 +210,6 @@ public class PaisPage extends DashboardBasePage {
             String[] kv = pair.split("=");
             try {
                 if (kv.length == 2) map.put(URLDecoder.decode(kv[0], "UTF-8"), URLDecoder.decode(kv[1], "UTF-8"));
-                else if (kv.length == 1) map.put(URLDecoder.decode(kv[0], "UTF-8"), "");
             } catch (Exception e) {}
         }
         return map;
