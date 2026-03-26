@@ -6,16 +6,14 @@ import io.jettra.wui.components.*;
 import io.jettra.wui.validations.JettraValidations;
 import io.jettra.wui.complex.Center;
 import io.jettra.wui.core.annotations.InjectViewModel;
+import io.jettra.wui.sync.JettraSyncManager;
+import io.jettra.wui.sync.JettraPageSincronized;
+import io.jettra.wui.sync.SyncType;
+import io.jettra.wui.core.annotations.InjectProperties;
 import com.jettra.server.JettraServer;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import io.jettra.wui.sync.JettraPageSincronized;
-import io.jettra.wui.sync.SyncType;
-import io.jettra.wui.sync.JettraSyncManager;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 @JettraPageSincronized(SyncType.ALL)
@@ -24,7 +22,9 @@ public class PaisPage extends DashboardBasePage {
     @InjectViewModel
     PaisModel pais;
 
-    private final Properties msg = new Properties();
+    @InjectProperties(name = "messages")
+    private Properties msg;
+
     private String lang = "es";
 
     private Div crudModal;
@@ -36,18 +36,6 @@ public class PaisPage extends DashboardBasePage {
         super("Mantenimiento de Países (Pure MVC)");
     }
 
-    private void loadMessages(String language) {
-        msg.clear();
-        String file = "messages_" + language + ".properties";
-        try (InputStream input = getClass().getClassLoader().getResourceAsStream(file)) {
-            if (input != null) {
-                msg.load(new InputStreamReader(input, StandardCharsets.UTF_8));
-            }
-        } catch (Exception ex) {
-            System.err.println("Error loading properties: " + ex.getMessage());
-        }
-    }
-
     @Override
     protected void onInit(Map<String, String> params) {
         String lStr = params.get("lang");
@@ -57,7 +45,6 @@ public class PaisPage extends DashboardBasePage {
 
     @Override
     protected void initCenter(Center center, String username) {
-        loadMessages(this.lang);
         Style customStyles = new Style("""
             .crud-table { width: 100%; border-collapse: collapse; margin-top: 20px; color: #fff; }
             .crud-table th, .crud-table td { padding: 12px; border: 1px solid rgba(0,255,255,0.3); text-align: left; }
@@ -75,7 +62,7 @@ public class PaisPage extends DashboardBasePage {
         Div mainContent = new Div();
         mainContent.setStyle("padding", "20px");
 
-        Header title = new Header(2, msg.getProperty("subtitle.pais", "Catálogo de Países (Pure Java Event-Driven)"));
+        Header title = new Header(2, msg.getProperty("subtitle.pais"));
         title.setStyle("color", "var(--jettra-accent)").setStyle("margin-bottom", "20px");
         mainContent.add(title);
 

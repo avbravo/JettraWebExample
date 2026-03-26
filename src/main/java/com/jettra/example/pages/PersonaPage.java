@@ -4,6 +4,7 @@ import com.jettra.example.model.PersonaModel;
 import com.jettra.example.repository.PersonaRepository;
 import io.jettra.wui.complex.Center;
 import io.jettra.wui.components.*;
+import io.jettra.wui.core.annotations.InjectProperties;
 import io.jettra.wui.core.annotations.InjectViewModel;
 import io.jettra.wui.sync.JettraPageSincronized;
 import io.jettra.wui.sync.SyncType;
@@ -25,7 +26,8 @@ public class PersonaPage extends DashboardBasePage {
     @InjectViewModel
     PersonaModel persona;
 
-    private final Properties msg = new Properties();
+    @InjectProperties(name = "messages")
+    private Properties msg;
     private String lang = "es";
     private int pageNumber = 1;
 
@@ -42,18 +44,7 @@ public class PersonaPage extends DashboardBasePage {
         super("Mantenimiento de Personas (MVC)");
     }
 
-    private void loadMessages(String language) {
-        msg.clear();
-        String file = "messages_" + language + ".properties";
-        try (InputStream input = getClass().getClassLoader().getResourceAsStream(file)) {
-            if (input != null) {
-                msg.load(new InputStreamReader(input, StandardCharsets.UTF_8));
-            }
-        } catch (Exception ex) {
-            System.err.println("Error loading properties: " + ex.getMessage());
-        }
-    }
-
+   
     @Override
     protected void onInit(Map<String, String> params) {
         String pStr = params.get("page");
@@ -68,7 +59,7 @@ public class PersonaPage extends DashboardBasePage {
 
     @Override
     protected void initCenter(Center center, String username) {
-        loadMessages(this.lang);
+  
 
         Style customStyles = new Style("""
             .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); justify-content: center; align-items: center;}
@@ -82,7 +73,7 @@ public class PersonaPage extends DashboardBasePage {
         Div mainContent = new Div();
         mainContent.setStyle("padding", "20px");
 
-        Header title = new Header(2, msg.getProperty("th.name") + " Catalog");
+        Header title = new Header(2, msg.getProperty("subtitle.persona"));
         title.setStyle("color", "var(--jettra-accent)").setStyle("margin-bottom", "20px");
         mainContent.add(title);
 
