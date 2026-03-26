@@ -42,6 +42,13 @@ public class LayoutDisplayPage extends DashboardBasePage {
         row.add(box1).add(box2);
         
         container.add(row);
+        
+        container.add(new Header(2, "TabView Short Demo").setStyle("margin-top", "30px"));
+        io.jettra.wui.complex.TabView miniTv = new io.jettra.wui.complex.TabView("")
+            .addTab("Quick Look", new Paragraph("Layouts can also be tabbed."))
+            .addTab("More", new Paragraph("Check the TabView page for details."));
+        container.add(miniTv);
+
         Div sep = new Div(); sep.setStyle("border-bottom", "1px solid var(--jettra-border)").setStyle("margin", "20px 0").setStyle("width", "100%");
         container.add(sep);
         
