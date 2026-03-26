@@ -215,50 +215,74 @@ public abstract class DashboardBasePage extends Page {
 
     protected void setupLeft(Left left, String username) {
         StringBuilder menuHtml = new StringBuilder();
-        menuHtml.append("<div style='padding:15px; font-family:sans-serif;'>");
-        menuHtml.append("<h3 style='color:#0ff; margin-bottom:10px; font-weight:600; text-transform:uppercase; font-size:14px; letter-spacing:1px;'>Navigation</h3>");
-        menuHtml.append("<hr style='border:1px solid rgba(0, 255, 255, 0.2); margin-bottom:20px;'>");
+        menuHtml.append("<div style='padding:10px; font-family:sans-serif;'>");
         
-        String menuClass = "display:flex; align-items:center; padding:10px 15px; margin-bottom:8px; background:rgba(20,30,50,0.5); border-left:3px solid transparent; border-radius:4px; color:#fff; cursor:pointer; text-decoration:none; font-size:14px; transition:all 0.3s; box-shadow:0 2px 5px rgba(0,0,0,0.2);";
+        String menuClass = "display:flex; align-items:center; padding:8px 12px; margin-bottom:4px; background:rgba(20,30,50,0.5); border-left:3px solid transparent; border-radius:4px; color:#fff; cursor:pointer; text-decoration:none; font-size:13px; transition:all 0.3s;";
         String hoverEvents = "onmouseover=\"this.style.background='rgba(0,255,255,0.1)'; this.style.borderLeftColor='#0ff'\" onmouseout=\"this.style.background='rgba(20,30,50,0.5)'; this.style.borderLeftColor='transparent'\"";
+        String categoryStyle = "color:#0ff; margin:15px 0 8px 0; font-weight:600; text-transform:uppercase; font-size:12px; letter-spacing:1px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; opacity:0.8; transition:opacity 0.2s;";
         
-        // Terminal Access (Link example)
-        menuHtml.append("<div style='").append(menuClass).append("' ").append(hoverEvents).append(" onclick='window.location.href=\"" + JettraServer.resolvePath("/dashboard") + "\"'>")
-                .append("<svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' style='margin-right:12px;'><polyline points='4 17 10 11 4 5'></polyline><line x1='12' y1='19' x2='20' y2='19'></line></svg>")
-                .append("<span>Main Dashboard</span></div>");
+        // --- Navigation ---
+        menuHtml.append("<div style='").append(categoryStyle).append("' onclick='toggleCategory(this)'><span>Navigation</span> <span>▼</span></div>");
+        menuHtml.append("<div class='menu-category-content'>");
+        appendMenuItem(menuHtml, "Main Dashboard", "/dashboard", "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='4 17 10 11 4 5'></polyline><line x1='12' y1='19' x2='20' y2='19'></line></svg>", menuClass, hoverEvents);
+        menuHtml.append("</div>");
 
+        // --- Administration ---
         if ("admin".equals(username) || "avbravo".equals(username)) {
-            menuHtml.append("<div style='margin-top:25px;'><h3 style='color:#0ff; margin-bottom:10px; font-weight:600; text-transform:uppercase; font-size:14px; letter-spacing:1px;'>Administration</h3></div>");
-            menuHtml.append("<div style='").append(menuClass).append("' ").append(hoverEvents).append(" onclick='window.location.href=\"" + JettraServer.resolvePath("/persona") + "\"'>")
-                    .append("<svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' style='margin-right:12px;'><path d='M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'></path><circle cx='9' cy='7' r='4'></circle><path d='M23 21v-2a4 4 0 0 0-3-3.87'></path><path d='M16 3.13a4 4 0 0 1 0 7.75'></path></svg>")
-                    .append("<span>Persona CRUD</span></div>");
-
-            menuHtml.append("<div style='").append(menuClass).append("' ").append(hoverEvents).append(" onclick='window.location.href=\"" + JettraServer.resolvePath("/pais") + "\"'>")
-                    .append("<svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' style='margin-right:12px;'><circle cx='12' cy='12' r='10'></circle><line x1='2' y1='12' x2='22' y2='12'></line><path d='M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z'></path></svg>")
-                    .append("<span>Pais CRUD (MVC)</span></div>");
+            menuHtml.append("<div style='").append(categoryStyle).append("' onclick='toggleCategory(this)'><span>Administration</span> <span>▼</span></div>");
+            menuHtml.append("<div class='menu-category-content'>");
+            appendMenuItem(menuHtml, "Persona CRUD", "/persona", "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'></path><circle cx='9' cy='7' r='4'></circle></svg>", menuClass, hoverEvents);
+            appendMenuItem(menuHtml, "Pais CRUD (MVC)", "/pais", "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'></circle><line x1='2' y1='12' x2='22' y2='12'></line></svg>", menuClass, hoverEvents);
+            menuHtml.append("</div>");
         }
 
-        // --- COMPONENTS SHOWCASE ---
-        menuHtml.append("<div style='margin-top:25px;'><h3 style='color:#0ff; margin-bottom:10px; font-weight:600; text-transform:uppercase; font-size:14px; letter-spacing:1px;'>Components Showcase</h3></div>");
+        // --- Categories and Components ---
+        String compIcon = "<svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' style='opacity:0.7;'><path d='M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z'></path></svg>";
         
-        String[] components = {"Alert", "Avatar", "AvatarGroup", "Button", "Carousel", "CheckBox", "Clock", "Div", "Form", "Grid", "Header", "Icon", "Image", "Label", "Link", "LoginAdvanced", "Menu", "MenuBar", "Modal", "Notification", "Paragraph", "RadioButton", "SelectOne", "SelectOneIcon", "Separator", "SessionTimeout", "Span", "Spinner", "Table", "TabView", "TextBox", "ToggleSwitch"};
-        String compIcon = "<svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' style='margin-right:12px;'><path d='M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z'></path><polyline points='3.27 6.96 12 12.01 20.73 6.96'></polyline><line x1='12' y1='22.08' x2='12' y2='12'></line></svg>";
-        
-        for(String comp : components) {
-            menuHtml.append("<div style='").append(menuClass).append("' ").append(hoverEvents).append(" onclick='window.location.href=\"" + com.jettra.server.JettraServer.resolvePath("/" + comp.toLowerCase()) + "\"'>")
-                    .append(compIcon)
-                    .append("<span>").append(comp).append("</span></div>");
-        }
-        
-        menuHtml.append("<div style='margin-top:25px;'></div>");
-        // --- END COMPONENTS SHOWCASE ---
+        addCategory(menuHtml, "Typography", new String[]{"Header", "Paragraph", "Span", "Label", "Separator"}, menuClass, hoverEvents, categoryStyle, compIcon);
+        addCategory(menuHtml, "Forms", new String[]{"Button", "CheckBox", "Form", "RadioButton", "SelectOne", "SelectOneIcon", "Spinner", "TextBox", "ToggleSwitch"}, menuClass, hoverEvents, categoryStyle, compIcon);
+        addCategory(menuHtml, "Navigation", new String[]{"Link", "Menu", "MenuBar"}, menuClass, hoverEvents, categoryStyle, compIcon);
+        addCategory(menuHtml, "Feedback", new String[]{"Alert", "Modal", "Notification", "SessionTimeout"}, menuClass, hoverEvents, categoryStyle, compIcon);
+        addCategory(menuHtml, "Layout", new String[]{"Avatar", "AvatarGroup", "Carousel", "Div", "Grid", "Image", "LoginAdvanced", "Table", "TabView"}, menuClass, hoverEvents, categoryStyle, compIcon);
 
-        menuHtml.append("<div style='").append(menuClass).append("' ").append(hoverEvents).append(" onclick='window.location.href=\"" + JettraServer.resolvePath("/logout") + "\"'>")
-                .append("<svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' style='margin-right:12px;'><path d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'></path><polyline points='16 17 21 12 16 7'></polyline><line x1='21' y1='12' x2='9' y2='12'></line></svg>")
-                .append("<span>Logout</span></div>");
+        // Logout
+        menuHtml.append("<div style='margin-top:20px;'></div>");
+        appendMenuItem(menuHtml, "Logout", "/logout", "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'></path><polyline points='16 17 21 12 16 7'></polyline></svg>", menuClass, hoverEvents);
 
+        // Toggle Script
+        menuHtml.append("<script>\n")
+                .append("  function toggleCategory(el) {\n")
+                .append("    const content = el.nextElementSibling;\n")
+                .append("    const arrow = el.querySelector('span:last-child');\n")
+                .append("    if (content.style.display === 'none') {\n")
+                .append("      content.style.display = 'block';\n")
+                .append("      arrow.innerHTML = '▼';\n")
+                .append("      el.style.opacity = '1';\n")
+                .append("    } else {\n")
+                .append("      content.style.display = 'none';\n")
+                .append("      arrow.innerHTML = '▶';\n")
+                .append("      el.style.opacity = '0.6';\n")
+                .append("    }\n")
+                .append("  }\n")
+                .append("</script>");
+        
         menuHtml.append("</div>");
         left.setContent(menuHtml.toString());
+    }
+
+    private void addCategory(StringBuilder html, String name, String[] comps, String menuClass, String hoverEvents, String categoryStyle, String icon) {
+        html.append("<div style='").append(categoryStyle).append("' onclick='toggleCategory(this)'><span>").append(name).append("</span> <span>▼</span></div>");
+        html.append("<div class='menu-category-content' style='display:none;'>");
+        for (String comp : comps) {
+            appendMenuItem(html, comp, "/" + comp.toLowerCase(), icon, menuClass, hoverEvents);
+        }
+        html.append("</div>");
+    }
+
+    private void appendMenuItem(StringBuilder html, String text, String path, String icon, String menuClass, String hoverEvents) {
+        html.append("<div style='").append(menuClass).append("' ").append(hoverEvents).append(" onclick='window.location.href=\"" + JettraServer.resolvePath(path) + "\"'>")
+            .append("<div style='margin-right:10px;'>").append(icon).append("</div>")
+            .append("<span>").append(text).append("</span></div>");
     }
 
     protected void setupFooter(Footer footer) {

@@ -10,7 +10,11 @@ import com.jettra.server.JettraServer;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import io.jettra.wui.sync.JettraPageSincronized;
+import io.jettra.wui.sync.SyncType;
+import io.jettra.wui.sync.JettraSyncManager;
 
+@JettraPageSincronized(SyncType.ALL)
 public class PaisPage extends DashboardBasePage {
 
     @InjectViewModel
@@ -172,11 +176,13 @@ public class PaisPage extends DashboardBasePage {
         if ("save".equals(action)) {
             if (code != null && !code.trim().isEmpty()) {
                 PaisRepository.save(new PaisModel(code, name));
+                JettraSyncManager.notifyChange("PaisModel", SyncType.UPDATE, getLoggedUser(currentExchange));
                 changed = true;
             }
         } else if ("delete".equals(action)) {
             if (code != null && !code.trim().isEmpty()) {
                 PaisRepository.delete(code);
+                JettraSyncManager.notifyChange("PaisModel", SyncType.DELETE, getLoggedUser(currentExchange));
                 changed = true;
             }
         }
