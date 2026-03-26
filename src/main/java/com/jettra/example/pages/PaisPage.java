@@ -5,7 +5,6 @@ import com.jettra.example.repository.PaisRepository;
 import io.jettra.wui.components.*;
 import io.jettra.wui.complex.Center;
 import io.jettra.wui.core.annotations.InjectViewModel;
-import io.jettra.wui.mvc.JettraMVC;
 import com.jettra.server.JettraServer;
 import java.io.IOException;
 import java.util.List;
@@ -15,6 +14,11 @@ public class PaisPage extends DashboardBasePage {
 
     @InjectViewModel
     Pais pais;
+
+    private Div crudModal;
+    private Header modalTitle;
+    private TextBox modalAction;
+    private Button modalSubmitBtn;
 
     public PaisPage() {
         super("Mantenimiento de Países (Pure MVC)");
@@ -39,9 +43,11 @@ public class PaisPage extends DashboardBasePage {
         Div mainContent = new Div();
         mainContent.setStyle("padding", "20px");
 
-        Header title = new Header(2, "Catálogo de Países (Event-Driven)");
+        Header title = new Header(2, "Catálogo de Países (Pure Java Event-Driven)");
         title.setStyle("color", "var(--jettra-accent)").setStyle("margin-bottom", "20px");
         mainContent.add(title);
+
+        setupModal(); // Initialize components before using them in listeners
 
         Button addBtn = new Button("➕ Añadir País");
         addBtn.setId("addBtn").addClass("j-btn").setStyle("background-color", "#0f5132");
@@ -91,38 +97,35 @@ public class PaisPage extends DashboardBasePage {
         }
         mainContent.add(table);
         center.add(mainContent);
-
-        // Modal
-        setupModal();
     }
 
     private void showModal(String title, String action) {
-        String js = "document.getElementById('crudModal').style.display='flex';";
-        js += "document.getElementById('modalTitle').innerText='" + title + "';";
-        js += "document.getElementById('modalAction').value='" + action + "';";
+        this.crudModal.setStyle("display", "flex");
+        this.modalTitle.setContent(title);
+        this.modalAction.setProperty("value", action);
+        
         if ("delete".equals(action)) {
-            js += "document.getElementById('modalSubmitBtn').innerText='¡Confirmar!';";
-            js += "document.getElementById('modalSubmitBtn').style.background='rgba(255,0,0,0.6)';";
+            this.modalSubmitBtn.setContent("¡Confirmar!");
+            this.modalSubmitBtn.setStyle("background-color", "rgba(255,0,0,0.6)");
         } else {
-            js += "document.getElementById('modalSubmitBtn').innerText='Guardar';";
-            js += "document.getElementById('modalSubmitBtn').style.background='';";
+            this.modalSubmitBtn.setContent("Guardar");
+            this.modalSubmitBtn.setStyle("background-color", "");
         }
-        this.add(new Script(js));
     }
 
     private void setupModal() {
-        Div modal = new Div();
-        modal.setId("crudModal").addClass("modal");
+        this.crudModal = new Div();
+        this.crudModal.setId("crudModal").addClass("modal");
 
-        Div content = new Div();
-        content.addClass("modal-content");
+        Div modalBody = new Div();
+        modalBody.addClass("modal-content");
         
-        Header modalTitle = new Header(3, "Operación");
-        modalTitle.setId("modalTitle");
+        this.modalTitle = new Header(3, "Operación");
+        this.modalTitle.setId("modalTitle");
 
         Form form = new Form("paisForm", JettraServer.resolvePath("/pais"));
-        TextBox modalAction = new TextBox("hidden", "modalAction");
-        modalAction.setId("modalAction");
+        this.modalAction = new TextBox("hidden", "modalAction");
+        this.modalAction.setId("modalAction");
         
         Div g1 = new Div(); g1.addClass("form-group"); g1.add(new Label("code", "Código"));
         TextBox inputCode = new TextBox("text", "code");
@@ -140,33 +143,48 @@ public class PaisPage extends DashboardBasePage {
         Button cancelBtn = new Button("Cancelar");
         cancelBtn.addClass("j-btn").setStyle("background", "#555").setStyle("border", "none");
         cancelBtn.addClickListener(() -> {
-            // Re-rendering without the modal script is enough to close it
+            this.crudModal.setStyle("display", "none");
         });
 
-        Button submitBtn = new Button("Guardar");
-        submitBtn.setId("modalSubmitBtn").addClass("j-btn");
-        submitBtn.setProperty("type", "submit");
+        this.modalSubmitBtn = new Button("Guardar");
+        this.modalSubmitBtn.setId("modalSubmitBtn").addClass("j-btn");
+        this.modalSubmitBtn.setProperty("type", "submit");
 
-        groupActions.add(cancelBtn).add(submitBtn);
-        form.add(modalAction).add(g1).add(g2).add(groupActions);
-        content.add(modalTitle).add(form);
-        modal.add(content);
-        this.add(modal);
+        groupActions.add(cancelBtn).add(this.modalSubmitBtn);
+        form.add(this.modalAction).add(g1).add(g2).add(groupActions);
+        modalBody.add(this.modalTitle).add(form);
+        this.crudModal.add(modalBody);
+        this.add(this.crudModal);
     }
 
     @Override
     protected void onPost(Map<String, String> params) {
-        JettraMVC.updateModelFromRequest(this, params);
-        String modalAction = params.get("modalAction");
-        if ("save".equals(modalAction)) {
-            if (this.pais.getCode() != null && !this.pais.getCode().isEmpty()) {
-                PaisRepository.save(new Pais(this.pais.getCode(), this.pais.getName()));
+        // Logging for diagnostics
+        String action = params.get("modalAction");
+        String code = params.get("code");
+        String name = params.get("name");
+        
+        System.out.println("[PaisPage] POST Action: " + action + " | Code: " + code + " | Name: " + name);
+        
+        boolean changed = false;
+        if ("save".equals(action)) {
+            if (code != null && !code.trim().isEmpty()) {
+                PaisRepository.save(new Pais(code, name));
+                changed = true;
             }
-        } else if ("delete".equals(modalAction)) {
-            PaisRepository.delete(this.pais.getCode());
+        } else if ("delete".equals(action)) {
+            if (code != null && !code.trim().isEmpty()) {
+                PaisRepository.delete(code);
+                changed = true;
+            }
         }
-        try {
-            redirect(currentExchange, JettraServer.resolvePath("/pais"));
-        } catch (IOException e) { e.printStackTrace(); }
+        
+        if (changed) {
+            try {
+                redirect(currentExchange, JettraServer.resolvePath("/pais"));
+            } catch (IOException e) { 
+                System.err.println("Error during redirect: " + e.getMessage());
+            }
+        }
     }
 }
