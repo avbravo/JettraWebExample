@@ -63,6 +63,7 @@ public class WebExampleMain {
         server.addHandler("/menu", new com.jettra.example.pages.MenuPage());
         server.addHandler("/separator", new com.jettra.example.pages.SeparatorPage());
         server.addHandler("/tabview", new com.jettra.example.pages.TabViewPage());
+        server.addHandler("/spinner", new com.jettra.example.pages.SpinnerPage());
         server.addHandler("/pais", new com.jettra.example.pages.PaisPage());
 
         server.start();

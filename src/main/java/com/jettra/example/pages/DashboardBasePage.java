@@ -241,7 +241,7 @@ public abstract class DashboardBasePage extends Page {
         // --- COMPONENTS SHOWCASE ---
         menuHtml.append("<div style='margin-top:25px;'><h3 style='color:#0ff; margin-bottom:10px; font-weight:600; text-transform:uppercase; font-size:14px; letter-spacing:1px;'>Components Showcase</h3></div>");
         
-        String[] components = {"Alert", "Avatar", "AvatarGroup", "Button", "Carousel", "CheckBox", "Clock", "Div", "Form", "Grid", "Header", "Icon", "Image", "Label", "Link", "LoginAdvanced", "Menu", "MenuBar", "Modal", "Notification", "Paragraph", "RadioButton", "SelectOne", "SelectOneIcon", "Separator", "SessionTimeout", "Span", "Table", "TabView", "TextBox", "ToggleSwitch"};
+        String[] components = {"Alert", "Avatar", "AvatarGroup", "Button", "Carousel", "CheckBox", "Clock", "Div", "Form", "Grid", "Header", "Icon", "Image", "Label", "Link", "LoginAdvanced", "Menu", "MenuBar", "Modal", "Notification", "Paragraph", "RadioButton", "SelectOne", "SelectOneIcon", "Separator", "SessionTimeout", "Span", "Spinner", "Table", "TabView", "TextBox", "ToggleSwitch"};
         String compIcon = "<svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' style='margin-right:12px;'><path d='M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z'></path><polyline points='3.27 6.96 12 12.01 20.73 6.96'></polyline><line x1='12' y1='22.08' x2='12' y2='12'></line></svg>";
         
         for(String comp : components) {
