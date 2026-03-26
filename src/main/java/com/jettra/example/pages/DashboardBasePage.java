@@ -233,6 +233,7 @@ public abstract class DashboardBasePage extends Page {
             menuHtml.append("<div class='menu-category-content'>");
             appendMenuItem(menuHtml, "Persona CRUD", "/persona", "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'></path><circle cx='9' cy='7' r='4'></circle></svg>", menuClass, hoverEvents);
             appendMenuItem(menuHtml, "Pais CRUD (MVC)", "/pais", "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'></circle><line x1='2' y1='12' x2='22' y2='12'></line></svg>", menuClass, hoverEvents);
+            appendMenuItem(menuHtml, "Web Designer", "/webdesigner", "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='18' height='18' rx='2' ry='2'></rect><line x1='3' y1='9' x2='21' y2='9'></line><line x1='9' y1='21' x2='9' y2='9'></line></svg>", menuClass, hoverEvents);
             menuHtml.append("</div>");
         }
 

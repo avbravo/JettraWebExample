@@ -60,6 +60,7 @@ public class WebExampleMain {
         server.addHandler("/tabview", com.jettra.example.pages.TabViewPage.class);
         server.addHandler("/spinner", com.jettra.example.pages.SpinnerPage.class);
         server.addHandler("/pais", com.jettra.example.pages.PaisPage.class);
+        server.addHandler("/webdesigner", com.jettra.example.pages.WebDesignerPage.class);
 
         server.start();
     }
