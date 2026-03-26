@@ -228,7 +228,7 @@ public abstract class DashboardBasePage extends Page {
         menuHtml.append("</div>");
 
         // --- Administration ---
-        if ("admin".equals(username) || "avbravo".equals(username)) {
+        if ("admin".equals(username) || "demo".equals(username) || "avbravo".equals(username)) {
             menuHtml.append("<div style='").append(categoryStyle).append("' onclick='toggleCategory(this)'><span>Administration</span> <span>▼</span></div>");
             menuHtml.append("<div class='menu-category-content'>");
             appendMenuItem(menuHtml, "Persona CRUD", "/persona", "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'></path><circle cx='9' cy='7' r='4'></circle></svg>", menuClass, hoverEvents);
@@ -299,11 +299,15 @@ public abstract class DashboardBasePage extends Page {
 
     protected String getLoggedUser(HttpExchange exchange) {
         String cookies = exchange.getRequestHeaders().getFirst("Cookie");
+        System.out.println("[DashboardBasePage] Raw Cookies: " + cookies);
         if (cookies != null) {
             for (String cookie : cookies.split(";")) {
                 cookie = cookie.trim();
+                System.out.println("[DashboardBasePage] Checking cookie: " + cookie);
                 if (cookie.startsWith("username=") && cookie.length() > "username=".length()) {
-                    return cookie.substring("username=".length());
+                    String user = cookie.substring("username=".length());
+                    System.out.println("[DashboardBasePage] Found user: " + user);
+                    return user;
                 }
             }
         }

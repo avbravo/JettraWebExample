@@ -15,7 +15,7 @@ import io.jettra.wui.components.Login;
 import io.jettra.wui.core.Page;
 import io.jettra.wui.core.annotations.Init;
 
-public class LoginPage extends Page implements HttpHandler {
+public class LoginPage extends Page {
 
     private Login loginForm;
 
@@ -72,15 +72,18 @@ public class LoginPage extends Page implements HttpHandler {
             String user = params.get("username");
             String pass = params.get("password");
 
-            if (("admin".equals(user) && "admin".equals(pass)) || ("avbravo".equals(user) && "avbravo".equals(pass))) {
-                exchange.getResponseHeaders().set("Set-Cookie", "username=" + user + "; Path=" + JettraServer.getContextPath());
-                exchange.getResponseHeaders().set("Location", JettraServer.resolvePath("/dashboard"));
-                exchange.sendResponseHeaders(302, -1);
-            } else if ("demo".equals(user) && "demo".equals(pass)) {
-                exchange.getResponseHeaders().set("Set-Cookie", "username=" + user + "; Path=" + JettraServer.getContextPath());
+            if (("admin".equals(user) && "admin".equals(pass)) || 
+                ("demo".equals(user) && "demo".equals(pass)) || 
+                ("avbravo".equals(user) && "avbravo".equals(pass))) {
+                String cPath = JettraServer.getContextPath();
+                if (cPath == null || cPath.isEmpty()) cPath = "/";
+                
+                System.out.println("[LoginPage] Success: user=" + user + " | cookiePath=" + cPath);
+                exchange.getResponseHeaders().set("Set-Cookie", "username=" + user + "; Path=" + cPath);
                 exchange.getResponseHeaders().set("Location", JettraServer.resolvePath("/dashboard"));
                 exchange.sendResponseHeaders(302, -1);
             } else {
+                System.out.println("[LoginPage] Failure: user=" + user);
                 exchange.getResponseHeaders().set("Location", JettraServer.resolvePath("/?error=invalid_credentials"));
                 exchange.sendResponseHeaders(302, -1);
             }
