@@ -1,13 +1,22 @@
 package com.jettra.example.model;
 
-public class Persona {
+import io.jettra.wui.validations.NotNull;
+import io.jettra.wui.validations.Size;
+
+public class PersonaModel {
     private String id;
+    
+    @NotNull
+    @Size(min = 3, max = 100)
     private String nombre;
+    
+    @NotNull
+    @Size(min = 5, max = 200)
     private String direccion;
 
-    public Persona() {}
+    public PersonaModel() {}
 
-    public Persona(String id, String nombre, String direccion) {
+    public PersonaModel(String id, String nombre, String direccion) {
         this.id = id;
         this.nombre = nombre;
         this.direccion = direccion;

@@ -1,28 +1,28 @@
 package com.jettra.example.repository;
 
-import com.jettra.example.model.Pais;
+import com.jettra.example.model.PaisModel;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PaisRepository {
-    private static final List<Pais> paises = new ArrayList<>();
+    private static final List<PaisModel> paises = new ArrayList<>();
 
     static {
-        paises.add(new Pais("PA", "Panamá"));
-        paises.add(new Pais("CR", "Costa Rica"));
-        paises.add(new Pais("US", "Estados Unidos"));
+        paises.add(new PaisModel("PA", "Panamá"));
+        paises.add(new PaisModel("CR", "Costa Rica"));
+        paises.add(new PaisModel("US", "Estados Unidos"));
     }
 
-    public static List<Pais> findAll() {
+    public static List<PaisModel> findAll() {
         return new ArrayList<>(paises);
     }
 
-    public static Pais findByCode(String code) {
+    public static PaisModel findByCode(String code) {
         return paises.stream().filter(p -> p.getCode().equals(code)).findFirst().orElse(null);
     }
 
-    public static void save(Pais pais) {
-        Pais existing = findByCode(pais.getCode());
+    public static void save(PaisModel pais) {
+        PaisModel existing = findByCode(pais.getCode());
         if (existing != null) {
             existing.setName(pais.getName());
         } else {

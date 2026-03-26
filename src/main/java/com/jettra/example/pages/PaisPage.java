@@ -1,8 +1,9 @@
 package com.jettra.example.pages;
 
-import com.jettra.example.model.Pais;
+import com.jettra.example.model.PaisModel;
 import com.jettra.example.repository.PaisRepository;
 import io.jettra.wui.components.*;
+import io.jettra.wui.validations.JettraValidations;
 import io.jettra.wui.complex.Center;
 import io.jettra.wui.core.annotations.InjectViewModel;
 import com.jettra.server.JettraServer;
@@ -13,7 +14,7 @@ import java.util.Map;
 public class PaisPage extends DashboardBasePage {
 
     @InjectViewModel
-    Pais pais;
+    PaisModel pais;
 
     private Div crudModal;
     private Header modalTitle;
@@ -66,8 +67,8 @@ public class PaisPage extends DashboardBasePage {
             new io.jettra.wui.components.TD("Acciones")
         ));
 
-        List<Pais> all = PaisRepository.findAll();
-        for (Pais p : all) {
+        List<PaisModel> all = PaisRepository.findAll();
+        for (PaisModel p : all) {
             io.jettra.wui.components.TD actionsTd = new io.jettra.wui.components.TD();
             actionsTd.setStyle("display", "flex").setStyle("gap", "10px");
             
@@ -129,22 +130,23 @@ public class PaisPage extends DashboardBasePage {
         
         Div g1 = new Div(); g1.addClass("form-group"); g1.add(new Label("code", "Código"));
         TextBox inputCode = new TextBox("text", "code");
-        inputCode.setId("paisCode").setProperty("required", "true").addClass("j-input");
+        inputCode.setId("paisCode").addClass("j-input");
+        JettraValidations.apply(inputCode, PaisModel.class, "code");
         g1.add(inputCode);
 
         Div g2 = new Div(); g2.addClass("form-group"); g2.add(new Label("name", "Nombre"));
         TextBox inputName = new TextBox("text", "name");
-        inputName.setId("paisName").setProperty("required", "true").addClass("j-input");
+        inputName.setId("paisName").addClass("j-input");
+        JettraValidations.apply(inputName, PaisModel.class, "name");
         g2.add(inputName);
 
         Div groupActions = new Div();
         groupActions.addClass("modal-actions");
         
-        Button cancelBtn = new Button("Cancelar");
+        Button cancelBtn = new Button("CERRAR");
+        cancelBtn.setProperty("type", "button");
         cancelBtn.addClass("j-btn").setStyle("background", "#555").setStyle("border", "none");
-        cancelBtn.addClickListener(() -> {
-            this.crudModal.setStyle("display", "none");
-        });
+        cancelBtn.setProperty("onclick", "document.getElementById('crudModal').style.display='none'; return false;");
 
         this.modalSubmitBtn = new Button("Guardar");
         this.modalSubmitBtn.setId("modalSubmitBtn").addClass("j-btn");
@@ -169,7 +171,7 @@ public class PaisPage extends DashboardBasePage {
         boolean changed = false;
         if ("save".equals(action)) {
             if (code != null && !code.trim().isEmpty()) {
-                PaisRepository.save(new Pais(code, name));
+                PaisRepository.save(new PaisModel(code, name));
                 changed = true;
             }
         } else if ("delete".equals(action)) {

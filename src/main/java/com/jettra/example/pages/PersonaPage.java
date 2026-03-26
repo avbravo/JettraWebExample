@@ -1,6 +1,6 @@
 package com.jettra.example.pages;
 
-import com.jettra.example.model.Persona;
+import com.jettra.example.model.PersonaModel;
 import com.jettra.example.repository.PersonaRepository;
 import com.sun.net.httpserver.HttpExchange;
 import java.io.IOException;
@@ -17,6 +17,7 @@ import io.jettra.wui.components.Script;
 import io.jettra.wui.components.Span;
 import io.jettra.wui.components.Style;
 import io.jettra.wui.components.TextBox;
+import io.jettra.wui.validations.JettraValidations;
 import io.jettra.wui.core.UIComponent;
 import com.jettra.server.JettraServer;
 
@@ -95,7 +96,7 @@ public class PersonaPage extends DashboardBasePage {
         actionContainer.add(addBtn).add(printBtn);
 
         // Pagination setup
-        List<Persona> all = PersonaRepository.findAll();
+        List<PersonaModel> all = PersonaRepository.findAll();
         int pageSize = 5;
         int totalPages = (int) Math.ceil((double)all.size() / pageSize);
         if (totalPages == 0) totalPages = 1;
@@ -104,7 +105,7 @@ public class PersonaPage extends DashboardBasePage {
 
         int fromIndex = (this.pageNumber - 1) * pageSize;
         int toIndex = Math.min(fromIndex + pageSize, all.size());
-        List<Persona> paginated = all.subList(fromIndex, toIndex);
+        List<PersonaModel> paginated = all.subList(fromIndex, toIndex);
 
         Table table = new Table();
         table.addClass("crud-table");
@@ -124,7 +125,7 @@ public class PersonaPage extends DashboardBasePage {
         tr.add(th1).add(th2).add(th3);
         table.add(tr);
 
-        for (Persona p : paginated) {
+        for (PersonaModel p : paginated) {
             UIComponent trRow = new UIComponent("tr"){};
             trRow.setStyle("border-bottom", "1px solid var(--jettra-border)");
             
@@ -194,14 +195,16 @@ public class PersonaPage extends DashboardBasePage {
         groupNombre.addClass("form-group").setProperty("id", "formGroupNombre");
         Label lblNombre = new Label("personaNombre", msg.getProperty("lbl.name"));
         TextBox inputNombre = new TextBox("text", "nombre");
-        inputNombre.setProperty("id", "personaNombre").setProperty("required", "true");
+        inputNombre.setProperty("id", "personaNombre");
+        JettraValidations.apply(inputNombre, PersonaModel.class, "nombre");
         groupNombre.add(lblNombre).add(inputNombre);
 
         Div groupDireccion = new Div();
         groupDireccion.addClass("form-group").setProperty("id", "formGroupDireccion");
         Label lblDireccion = new Label("personaDireccion", msg.getProperty("lbl.address"));
         TextBox inputDireccion = new TextBox("text", "direccion");
-        inputDireccion.setProperty("id", "personaDireccion").setProperty("required", "true");
+        inputDireccion.setProperty("id", "personaDireccion");
+        JettraValidations.apply(inputDireccion, PersonaModel.class, "direccion");
         groupDireccion.add(lblDireccion).add(inputDireccion);
 
         Paragraph deleteMsg = new Paragraph(msg.getProperty("msg.confirm.delete"));
@@ -347,7 +350,7 @@ public class PersonaPage extends DashboardBasePage {
                 String nombre = formParams.get("nombre");
                 String direccion = formParams.get("direccion");
                 if (nombre != null && direccion != null) {
-                    PersonaRepository.save(new Persona(personaId, nombre, direccion));
+                    PersonaRepository.save(new PersonaModel(personaId, nombre, direccion));
                 }
             } else if ("delete".equals(action)) {
                 if (personaId != null && !personaId.isEmpty()) {
