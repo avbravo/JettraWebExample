@@ -13,12 +13,19 @@ import java.util.Map;
 import io.jettra.wui.sync.JettraPageSincronized;
 import io.jettra.wui.sync.SyncType;
 import io.jettra.wui.sync.JettraSyncManager;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.Properties;
 
 @JettraPageSincronized(SyncType.ALL)
 public class PaisPage extends DashboardBasePage {
 
     @InjectViewModel
     PaisModel pais;
+
+    private final Properties msg = new Properties();
+    private String lang = "es";
 
     private Div crudModal;
     private Header modalTitle;
@@ -29,8 +36,28 @@ public class PaisPage extends DashboardBasePage {
         super("Mantenimiento de Países (Pure MVC)");
     }
 
+    private void loadMessages(String language) {
+        msg.clear();
+        String file = "messages_" + language + ".properties";
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream(file)) {
+            if (input != null) {
+                msg.load(new InputStreamReader(input, StandardCharsets.UTF_8));
+            }
+        } catch (Exception ex) {
+            System.err.println("Error loading properties: " + ex.getMessage());
+        }
+    }
+
+    @Override
+    protected void onInit(Map<String, String> params) {
+        String lStr = params.get("lang");
+        if (lStr != null) this.lang = lStr;
+        super.onInit(params);
+    }
+
     @Override
     protected void initCenter(Center center, String username) {
+        loadMessages(this.lang);
         Style customStyles = new Style("""
             .crud-table { width: 100%; border-collapse: collapse; margin-top: 20px; color: #fff; }
             .crud-table th, .crud-table td { padding: 12px; border: 1px solid rgba(0,255,255,0.3); text-align: left; }
@@ -48,27 +75,27 @@ public class PaisPage extends DashboardBasePage {
         Div mainContent = new Div();
         mainContent.setStyle("padding", "20px");
 
-        Header title = new Header(2, "Catálogo de Países (Pure Java Event-Driven)");
+        Header title = new Header(2, msg.getProperty("subtitle.pais", "Catálogo de Países (Pure Java Event-Driven)"));
         title.setStyle("color", "var(--jettra-accent)").setStyle("margin-bottom", "20px");
         mainContent.add(title);
 
         setupModal(); // Initialize components before using them in listeners
 
-        Button addBtn = new Button("➕ Añadir País");
+        Button addBtn = new Button("➕ " + msg.getProperty("btn.add.pais", "Añadir País"));
         addBtn.setId("addBtn").addClass("j-btn").setStyle("background-color", "#0f5132");
         addBtn.addClickListener(() -> {
             this.pais.setCode("");
             this.pais.setName("");
-            showModal("Nuevo País", "save");
+            showModal(msg.getProperty("modal.add.pais.title", "Nuevo País"), "save");
         });
         mainContent.add(addBtn);
 
         // Table
         io.jettra.wui.complex.Datatable table = new io.jettra.wui.complex.Datatable();
         table.addHeaderRow(new io.jettra.wui.components.Row(
-            new io.jettra.wui.components.TD("Código"),
-            new io.jettra.wui.components.TD("Nombre"),
-            new io.jettra.wui.components.TD("Acciones")
+            new io.jettra.wui.components.TD(msg.getProperty("th.code", "Código")),
+            new io.jettra.wui.components.TD(msg.getProperty("th.name", "Nombre")),
+            new io.jettra.wui.components.TD(msg.getProperty("th.actions", "Acciones"))
         ));
 
         List<PaisModel> all = PaisRepository.findAll();
@@ -81,7 +108,7 @@ public class PaisPage extends DashboardBasePage {
             editBtn.addClickListener(() -> {
                 this.pais.setCode(p.getCode());
                 this.pais.setName(p.getName());
-                showModal("Editar País", "save");
+                showModal(msg.getProperty("modal.edit.pais.title", "Editar País"), "save");
             });
             
             Button deleteBtn = new Button("🗑️");
@@ -90,7 +117,7 @@ public class PaisPage extends DashboardBasePage {
             deleteBtn.addClickListener(() -> {
                 this.pais.setCode(p.getCode());
                 this.pais.setName(p.getName());
-                showModal("¿Eliminar País?", "delete");
+                showModal(msg.getProperty("modal.delete.pais.title", "¿Eliminar País?"), "delete");
             });
             
             actionsTd.add(editBtn).add(deleteBtn);
@@ -110,10 +137,10 @@ public class PaisPage extends DashboardBasePage {
         this.modalAction.setProperty("value", action);
         
         if ("delete".equals(action)) {
-            this.modalSubmitBtn.setContent("¡Confirmar!");
+            this.modalSubmitBtn.setContent(msg.getProperty("btn.confirm", "¡Confirmar!"));
             this.modalSubmitBtn.setStyle("background-color", "rgba(255,0,0,0.6)");
         } else {
-            this.modalSubmitBtn.setContent("Guardar");
+            this.modalSubmitBtn.setContent(msg.getProperty("btn.save", "Guardar"));
             this.modalSubmitBtn.setStyle("background-color", "");
         }
     }
@@ -125,20 +152,20 @@ public class PaisPage extends DashboardBasePage {
         Div modalBody = new Div();
         modalBody.addClass("modal-content");
         
-        this.modalTitle = new Header(3, "Operación");
+        this.modalTitle = new Header(3, msg.getProperty("modal.operation", "Operación"));
         this.modalTitle.setId("modalTitle");
 
         Form form = new Form("paisForm", JettraServer.resolvePath("/pais"));
         this.modalAction = new TextBox("hidden", "modalAction");
         this.modalAction.setId("modalAction");
         
-        Div g1 = new Div(); g1.addClass("form-group"); g1.add(new Label("code", "Código"));
+        Div g1 = new Div(); g1.addClass("form-group"); g1.add(new Label("code", msg.getProperty("th.code", "Código")));
         TextBox inputCode = new TextBox("text", "code");
         inputCode.setId("paisCode").addClass("j-input");
         JettraValidations.apply(inputCode, PaisModel.class, "code");
         g1.add(inputCode);
 
-        Div g2 = new Div(); g2.addClass("form-group"); g2.add(new Label("name", "Nombre"));
+        Div g2 = new Div(); g2.addClass("form-group"); g2.add(new Label("name", msg.getProperty("th.name", "Nombre")));
         TextBox inputName = new TextBox("text", "name");
         inputName.setId("paisName").addClass("j-input");
         JettraValidations.apply(inputName, PaisModel.class, "name");
@@ -147,12 +174,12 @@ public class PaisPage extends DashboardBasePage {
         Div groupActions = new Div();
         groupActions.addClass("modal-actions");
         
-        Button cancelBtn = new Button("CERRAR");
+        Button cancelBtn = new Button(msg.getProperty("btn.close", "CERRAR"));
         cancelBtn.setProperty("type", "button");
         cancelBtn.addClass("j-btn").setStyle("background", "#555").setStyle("border", "none");
         cancelBtn.setProperty("onclick", "document.getElementById('crudModal').style.display='none'; return false;");
 
-        this.modalSubmitBtn = new Button("Guardar");
+        this.modalSubmitBtn = new Button(msg.getProperty("btn.save", "Guardar"));
         this.modalSubmitBtn.setId("modalSubmitBtn").addClass("j-btn");
         this.modalSubmitBtn.setProperty("type", "submit");
 
@@ -189,7 +216,7 @@ public class PaisPage extends DashboardBasePage {
         
         if (changed) {
             try {
-                redirect(currentExchange, JettraServer.resolvePath("/pais"));
+                redirect(currentExchange, JettraServer.resolvePath("/pais?lang=" + lang));
             } catch (IOException e) { 
                 System.err.println("Error during redirect: " + e.getMessage());
             }
