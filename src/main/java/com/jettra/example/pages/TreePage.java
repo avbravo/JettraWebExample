@@ -132,6 +132,7 @@ public class TreePage extends DashboardBasePage {
               .addItem(new Tree.TreeItem("South Africa"));
         
         world.addItem(america).addItem(europe).addItem(asia).addItem(africa);
+        world.setExpanded(true);
         tree1.add(world);
         container.add(tree1);
 
@@ -141,6 +142,7 @@ public class TreePage extends DashboardBasePage {
         
         Tree.TreeItem randomRoot = new Tree.TreeItem("Generated Geographical Data");
         generateContinentalTree(randomRoot);
+        randomRoot.setExpanded(true);
         tree2.add(randomRoot);
         container.add(tree2);
         
@@ -159,6 +161,7 @@ public class TreePage extends DashboardBasePage {
 
         for (int i = 0; i < continents.length; i++) {
             Tree.TreeItem continent = new Tree.TreeItem(continents[i]);
+            continent.setExpanded(true);
             parent.addItem(continent);
             
             // Randomly select countries
