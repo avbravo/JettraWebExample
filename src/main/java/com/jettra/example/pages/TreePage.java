@@ -8,10 +8,13 @@ import io.jettra.wui.components.Header;
 import io.jettra.wui.components.Paragraph;
 import io.jettra.wui.components.Button;
 
+/**
+ * Showcase page for the Tree component showing countries by continent.
+ */
 public class TreePage extends DashboardBasePage {
 
     public TreePage() {
-        super("Tree Component Showcase");
+        super("Tree Showcase");
     }
 
     @Override
@@ -42,21 +45,25 @@ public class TreePage extends DashboardBasePage {
                  .setStyle("width", "90%").setStyle("max-width", "800px")
                  .setStyle("border", "1px solid var(--jettra-border)");
         
-        codeModal.add(new Header(3, "Tree Implementation Example").setStyle("margin-top", "0").setStyle("color", "var(--jettra-accent)"));
+        codeModal.add(new Header(3, "Java Code Examples").setStyle("margin-top", "0").setStyle("color", "var(--jettra-accent)"));
         
         Div codeContainer = new Div();
         codeContainer.setStyle("background", "rgba(0,0,0,0.4)").setStyle("padding", "15px")
                      .setStyle("border-radius", "4px").setStyle("overflow-x", "auto")
                      .setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
         
-        String javaCode = "Tree myTree = new Tree();\n" +
-                          "Tree.TreeItem root = new Tree.TreeItem(\"Root\");\n\n" +
-                          "Tree.TreeItem folder = new Tree.TreeItem(\"Folder\");\n" +
-                          "folder.addItem(new Tree.TreeItem(\"File 1\"));\n" +
-                          "folder.addItem(new Tree.TreeItem(\"File 2\"));\n\n" +
-                          "root.addItem(folder);\n" +
-                          "myTree.addItem(root);\n" +
-                          "center.add(myTree);";
+        String javaCode = "// 1. Create a Tree\n" +
+                          "Tree tree = new Tree();\n\n" +
+                          "// 2. Create TreeItems\n" +
+                          "Tree.TreeItem root = new Tree.TreeItem(\"World\");\n" +
+                          "Tree.TreeItem continent = new Tree.TreeItem(\"America\");\n" +
+                          "continent.addItem(new Tree.TreeItem(\"USA\"));\n" +
+                          "continent.addItem(new Tree.TreeItem(\"Brazil\"));\n\n" +
+                          "// 3. Assemble the hierarchy\n" +
+                          "root.addItem(continent);\n" +
+                          "tree.add(root);\n\n" +
+                          "// 4. Add to container\n" +
+                          "container.add(tree);";
                            
         io.jettra.wui.core.UIComponent pre = new io.jettra.wui.core.UIComponent("pre") {};
         pre.setStyle("margin", "0");
@@ -89,41 +96,78 @@ public class TreePage extends DashboardBasePage {
 
         container.add(new Paragraph("The Tree component displays hierarchical data in an interactive, expandable tree structure."));
         
-        container.add(new Header(3, "Static Example (File System)"));
+        container.add(new Header(3, "Static Example (Countries by Continent)"));
         Tree tree1 = new Tree();
         tree1.setStyle("background", "rgba(0,0,0,0.2)").setStyle("padding", "20px").setStyle("border-radius", "8px").setStyle("border", "1px solid var(--jettra-border)").setStyle("margin-bottom", "30px");
         
-        Tree.TreeItem root = new Tree.TreeItem("System Root");
-        Tree.TreeItem f1 = new Tree.TreeItem("Documents");
-        f1.addItem(new Tree.TreeItem("reports.pdf")).addItem(new Tree.TreeItem("notes.txt"));
-        Tree.TreeItem f2 = new Tree.TreeItem("Source Code");
-        f2.addItem(new Tree.TreeItem("Main.java")).addItem(new Tree.TreeItem("App.java"));
-        root.addItem(f1).addItem(f2);
-        tree1.add(root);
+        Tree.TreeItem world = new Tree.TreeItem("World");
+        
+        // America
+        Tree.TreeItem america = new Tree.TreeItem("America");
+        america.addItem(new Tree.TreeItem("USA"))
+               .addItem(new Tree.TreeItem("Canada"))
+               .addItem(new Tree.TreeItem("Mexico"))
+               .addItem(new Tree.TreeItem("Brazil"))
+               .addItem(new Tree.TreeItem("Argentina"));
+        
+        // Europe
+        Tree.TreeItem europe = new Tree.TreeItem("Europe");
+        europe.addItem(new Tree.TreeItem("Spain"))
+              .addItem(new Tree.TreeItem("France"))
+              .addItem(new Tree.TreeItem("Germany"))
+              .addItem(new Tree.TreeItem("Italy"))
+              .addItem(new Tree.TreeItem("UK"));
+        
+        // Asia
+        Tree.TreeItem asia = new Tree.TreeItem("Asia");
+        asia.addItem(new Tree.TreeItem("China"))
+            .addItem(new Tree.TreeItem("Japan"))
+            .addItem(new Tree.TreeItem("India"))
+            .addItem(new Tree.TreeItem("South Korea"));
+        
+        // Africa
+        Tree.TreeItem africa = new Tree.TreeItem("Africa");
+        africa.addItem(new Tree.TreeItem("Egypt"))
+              .addItem(new Tree.TreeItem("Nigeria"))
+              .addItem(new Tree.TreeItem("South Africa"));
+        
+        world.addItem(america).addItem(europe).addItem(asia).addItem(africa);
+        tree1.add(world);
         container.add(tree1);
 
         container.add(new Header(3, "Dynamic Random Example"));
         Tree tree2 = new Tree();
         tree2.setStyle("background", "rgba(0,255,255,0.03)").setStyle("padding", "20px").setStyle("border-radius", "8px").setStyle("border", "1px solid rgba(0,255,255,0.2)");
         
-        Tree.TreeItem randomRoot = new Tree.TreeItem("Generated Data Root");
-        generateRandomTree(randomRoot, 1, 3);
+        Tree.TreeItem randomRoot = new Tree.TreeItem("Generated Geographical Data");
+        generateContinentalTree(randomRoot);
         tree2.add(randomRoot);
         container.add(tree2);
         
         center.add(container);
     }
 
-    private void generateRandomTree(Tree.TreeItem parent, int depth, int maxDepth) {
-        if (depth > maxDepth) return;
-        String[] prefixes = {"Alpha", "Beta", "Gamma", "Delta", "Epsilon"};
-        int count = (int) (Math.random() * 3) + 2;
-        for (int i = 0; i < count; i++) {
-            String label = prefixes[(int) (Math.random() * prefixes.length)] + " " + depth + "-" + (i + 1);
-            Tree.TreeItem item = new Tree.TreeItem(label);
-            parent.addItem(item);
-            if (Math.random() > 0.3) {
-                generateRandomTree(item, depth + 1, maxDepth);
+    private void generateContinentalTree(Tree.TreeItem parent) {
+        String[] continents = {"America", "Europe", "Asia", "Africa", "Oceania"};
+        String[][] countries = {
+            {"USA", "Canada", "Mexico", "Brazil", "Argentina", "Chile", "Colombia"},
+            {"Spain", "France", "Germany", "Italy", "UK", "Portugal", "Netherlands"},
+            {"China", "Japan", "India", "South Korea", "Vietnam", "Thailand"},
+            {"Egypt", "Nigeria", "South Africa", "Kenya", "Morocco"},
+            {"Australia", "New Zealand", "Fiji"}
+        };
+
+        for (int i = 0; i < continents.length; i++) {
+            Tree.TreeItem continent = new Tree.TreeItem(continents[i]);
+            parent.addItem(continent);
+            
+            // Randomly select countries
+            int count = (int) (Math.random() * 4) + 2;
+            java.util.List<String> countryList = new java.util.ArrayList<>(java.util.Arrays.asList(countries[i]));
+            java.util.Collections.shuffle(countryList);
+            
+            for (int j = 0; j < Math.min(count, countryList.size()); j++) {
+                continent.addItem(new Tree.TreeItem(countryList.get(j)));
             }
         }
     }
