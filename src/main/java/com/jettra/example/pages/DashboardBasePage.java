@@ -241,7 +241,7 @@ public abstract class DashboardBasePage extends Page {
         String compIcon = "<svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' style='opacity:0.7;'><path d='M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z'></path></svg>";
         
         addCategory(menuHtml, "Typography", new String[]{"Header", "Paragraph", "Span", "Label", "Separator", "Icon", "Typography"}, menuClass, hoverEvents, categoryStyle, compIcon);
-        addCategory(menuHtml, "Forms", new String[]{"Button", "CheckBox", "Form", "Forms", "RadioButton", "SelectOne", "SelectOneIcon", "Spinner", "TextBox", "ToggleSwitch"}, menuClass, hoverEvents, categoryStyle, compIcon);
+        addCategory(menuHtml, "Forms", new String[]{"Button", "CheckBox", "Form", "Forms", "RadioButton", "SelectOne", "SelectOneIcon", "Spinner", "TextBox", "TextArea", "ToggleSwitch"}, menuClass, hoverEvents, categoryStyle, compIcon);
         addCategory(menuHtml, "Navigation", new String[]{"Link", "Menu", "MenuBar", "Navigation"}, menuClass, hoverEvents, categoryStyle, compIcon);
         addCategory(menuHtml, "Feedback", new String[]{"Alert", "Modal", "Notification", "SessionTimeout", "Feedback"}, menuClass, hoverEvents, categoryStyle, compIcon);
         addCategory(menuHtml, "Layout", new String[]{"Avatar", "AvatarGroup", "Carousel", "Clock", "Div", "Divide", "FileUpload", "FolderSelector", "Grid", "Image", "LayoutDisplay", "LoginAdvanced", "Panel", "Table", "TabView", "Tree"}, menuClass, hoverEvents, categoryStyle, compIcon);

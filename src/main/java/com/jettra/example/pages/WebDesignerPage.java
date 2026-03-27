@@ -1,7 +1,11 @@
 package com.jettra.example.pages;
 
 import io.jettra.wui.complex.Center;
+import io.jettra.wui.complex.Modal;
+import io.jettra.wui.complex.Tree;
+import io.jettra.wui.complex.Panel;
 import io.jettra.wui.components.*;
+import io.jettra.wui.components.TextArea;
 import io.jettra.wui.core.annotations.InjectProperties;
 import java.util.Properties;
 
@@ -54,10 +58,25 @@ public class WebDesignerPage extends DashboardBasePage {
         // 2. Canvas
         Div canvasArea = new Div();
         canvasArea.setProperty("id", "canvas-area");
-        canvasArea.setStyle("flex", "1").setStyle("background", "rgba(0,0,0,0.3)").setStyle("border", "2px dashed var(--jettra-accent)").setStyle("border-radius", "8px").setStyle("padding", "20px").setStyle("position", "relative").setStyle("overflow-y", "auto");
+        canvasArea.setStyle("flex", "1").setStyle("background", "rgba(0,0,0,0.3)").setStyle("border", "2px dashed var(--jettra-accent)").setStyle("border-radius", "8px").setStyle("padding", "20px").setStyle("position", "relative").setStyle("overflow-y", "auto").setStyle("display", "flex").setStyle("flex-direction", "column");
         
-        Header canvasPlaceholder = new Header(3, "Visual Design Canvas");
+        Div canvasHeader = new Div();
+        canvasHeader.setStyle("display", "flex").setStyle("justify-content", "space-between").setStyle("align-items", "center").setStyle("margin-bottom", "15px").setStyle("border-bottom", "1px solid rgba(0,255,255,0.1)").setStyle("padding-bottom", "10px");
+        
+        Header canvasTitle = new Header(4, "Visual Design Canvas");
+        canvasTitle.setStyle("color", "var(--jettra-accent)").setStyle("margin", "0");
+        
+        Button crudBtn = new Button("CRUD ⚡");
+        crudBtn.addClass("j-btn-primary");
+        crudBtn.setStyle("font-size", "11px").setStyle("padding", "5px 12px");
+        crudBtn.setProperty("onclick", "generateCRUD()");
+        
+        canvasHeader.add(canvasTitle).add(crudBtn);
+        canvasArea.add(canvasHeader);
+
+        Div canvasPlaceholder = new Div();
         canvasPlaceholder.addClass("canvas-placeholder");
+        canvasPlaceholder.setContent("Start dragging components here to design your page");
         canvasPlaceholder.setStyle("color", "rgba(0,255,255,0.2)").setStyle("text-align", "center").setStyle("margin-top", "100px");
         canvasArea.add(canvasPlaceholder);
 
@@ -106,6 +125,33 @@ public class WebDesignerPage extends DashboardBasePage {
         inspector.add(inspectorHeader).add(propList);
 
         container.add(sidebar).add(canvasArea).add(codeView).add(inspector);
+        
+        // 5. Event Editor Modal
+        Modal eventModal = new Modal("event-editor-modal");
+        eventModal.setStyle("display", "none").setStyle("background", "var(--jettra-glass)").setStyle("backdrop-filter", "blur(15px)").setStyle("padding", "30px").setStyle("border-radius", "12px").setStyle("width", "700px").setStyle("border", "1px solid var(--jettra-accent)");
+        
+        Header modalHeader = new Header(3, "⚡ Event Handler Editor");
+        modalHeader.setStyle("color", "var(--jettra-accent)").setStyle("margin-top", "0");
+        
+        TextArea codeInput = new TextArea("event-code-input", "e -> { \n    // Write your Java code here\n}");
+        codeInput.setStyle("width", "100%").setStyle("height", "300px").setStyle("background", "#000").setStyle("color", "#0ff").setStyle("font-family", "monospace").setStyle("padding", "15px").setStyle("border", "1px solid #333").setStyle("border-radius", "4px");
+        
+        Div modalActions = new Div();
+        modalActions.setStyle("display", "flex").setStyle("justify-content", "flex-end").setStyle("gap", "10px").setStyle("margin-top", "20px");
+        
+        Button cancelBtn = new Button("Cancel");
+        cancelBtn.addClass("j-btn");
+        cancelBtn.setProperty("onclick", "document.getElementById('event-editor-modal').style.display = 'none'");
+        
+        Button saveEventBtn = new Button("Save Handler");
+        saveEventBtn.addClass("j-btn-primary");
+        saveEventBtn.setProperty("onclick", "saveEventHandler()");
+        
+        modalActions.add(cancelBtn).add(saveEventBtn);
+        eventModal.add(modalHeader).add(codeInput).add(modalActions);
+        
+        center.add(eventModal);
+        
         saveForm.add(container);
         center.add(saveForm);
 
@@ -143,7 +189,7 @@ public class WebDesignerPage extends DashboardBasePage {
         // Typography
         addPaletteCategory(palette, "Typography", new String[]{"Header", "Paragraph", "Span", "Label", "Separator"});
         // Forms
-        addPaletteCategory(palette, "Forms", new String[]{"Button", "CheckBox", "Form", "RadioButton", "SelectOne", "SelectOneIcon", "Spinner", "TextBox", "ToggleSwitch"});
+        addPaletteCategory(palette, "Forms", new String[]{"Button", "CheckBox", "Form", "RadioButton", "SelectOne", "SelectOneIcon", "Spinner", "TextBox", "TextArea", "ToggleSwitch"});
         // Navigation
         addPaletteCategory(palette, "Navigation", new String[]{"Link", "Menu", "MenuBar"});
         // Feedback
@@ -179,7 +225,6 @@ public class WebDesignerPage extends DashboardBasePage {
         cat.add(grid);
         palette.add(cat);
     }
-
     private void setupDesignerAssets(Center center) {
         Style style = new Style("""
             .palette-item:hover { background: rgba(0,255,255,0.2) !important; border-color: #0ff !important; color: #fff !important; transform: scale(1.05); }
@@ -188,20 +233,26 @@ public class WebDesignerPage extends DashboardBasePage {
             .canvas-item.selected { border-color: var(--jettra-accent) !important; background: rgba(0,255,255,0.05) !important; box-shadow: 0 0 10px var(--jettra-glow); }
             .canvas-item .delete-tool { position: absolute; top: -8px; right: -8px; background: #ff4444; color: white; width: 18px; height: 18px; border-radius: 50%; display: none; justify-content: center; align-items: center; cursor: pointer; font-size: 10px; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
             .canvas-item:hover .delete-tool { display: flex; }
-            .palette-category { animation: fadeIn 0.5s ease-out; }
             .inspector-row { margin-bottom: 12px; }
             .inspector-label { display: block; font-size: 11px; color: #999; margin-bottom: 4px; }
             .inspector-input { width: 100%; background: #111; border: 1px solid #444; color: #fff; padding: 5px; border-radius: 3px; font-size: 12px; }
             .project-file { padding: 4px 8px; font-size: 12px; color: #ccc; cursor: pointer; border-radius: 3px; display: flex; align-items: center; gap: 8px; }
             .project-file:hover { background: rgba(0,255,255,0.1); color: #fff; }
+            .file-page { color: #f1c40f !important; font-weight: bold; }
+            .file-model { color: #2ecc71 !important; font-weight: bold; }
             .canvas-container { border: 1px dashed #555; padding: 15px; border-radius: 6px; position: relative; min-height: 60px; }
             .view-model-row { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #333; }
+            .btn-event { background: var(--jettra-accent); color: #000; border: none; padding: 4px 8px; border-radius: 3px; font-size: 10px; cursor: pointer; margin-top: 5px; }
             @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         """);
         
         Script script = new Script("""
             let selectedItem = null;
+            let currentModel = null;
+            let modelFields = [];
+            let availableModels = [];
             let viewModelName = "BaseViewModel";
+            let activeEventProperty = null;
 
             function drag(ev) {
                 ev.dataTransfer.setData("type", ev.target.getAttribute("data-type"));
@@ -215,14 +266,8 @@ public class WebDesignerPage extends DashboardBasePage {
             canvas.ondrop = function(ev) {
                 ev.preventDefault();
                 const type = ev.dataTransfer.getData("type");
-                
-                // Nesting support: check if dropped into a container
                 const target = ev.target.closest('.canvas-container');
-                if (target) {
-                    addComponentToCanvas(type, target);
-                } else {
-                    addComponentToCanvas(type, canvas);
-                }
+                addComponentToCanvas(type, target || canvas);
             };
 
             function addComponentToCanvas(type, parent = canvas) {
@@ -232,35 +277,22 @@ public class WebDesignerPage extends DashboardBasePage {
                 const wrapper = document.createElement('div');
                 wrapper.className = 'canvas-item';
                 wrapper.setAttribute('data-type', type);
-                wrapper.setAttribute('data-props', JSON.stringify({text: type, columns: 2}));
+                wrapper.setAttribute('data-props', JSON.stringify({text: type, columns: 2, events: {}, binding: ""}));
                 
-                wrapper.onclick = (e) => {
-                    e.stopPropagation();
-                    selectElement(wrapper);
-                };
-
-                // Context Menu for attributes
-                wrapper.oncontextmenu = (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    selectElement(wrapper);
-                    showInspector();
-                };
+                wrapper.onclick = (e) => { e.stopPropagation(); selectElement(wrapper); };
+                wrapper.oncontextmenu = (e) => { e.preventDefault(); e.stopPropagation(); selectElement(wrapper); showInspector(); };
                 
                 let content = '';
                 switch(type) {
                     case 'Header': content = '<h2>New Header</h2>'; break;
-                    case 'Paragraph': content = '<p style="color:#ccc">Sample paragraph text content...</p>'; break;
-                    case 'Label': content = '<label style="color:#aaa; font-weight:bold">Field Label:</label>'; break;
-                    case 'Separator': content = '<hr style="border:0; border-top:1px solid rgba(0,255,255,0.3); margin:10px 0">'; break;
-                    case 'Divide': content = '<div style="border-top:2px solid var(--jettra-accent); margin:15px 0; opacity:0.5; width:100%; box-shadow:0 0 5px var(--jettra-glow)"></div>'; break;
-                    case 'Button': content = '<button class="j-btn-primary" style="padding:8px 15px; border-radius:4px; background:var(--jettra-accent); color:#000; border:none; cursor:pointer">Interactive Button</button>'; break;
-                    case 'TextBox': content = '<input type="text" placeholder="Type something..." style="padding:10px; background:#111; color:#fff; border:1px solid #444; border-radius:4px; width:100%">'; break;
-                    case 'ToggleSwitch': content = '<div style="display:flex; gap:10px; color:#fff"><span>Off</span><div style="width:40px;height:20px;background:#333;border-radius:10px;position:relative"><div style="width:18px;height:18px;background:#0ff;border-radius:50%;position:absolute;right:1px;top:1px"></div></div><span>On</span></div>'; break;
+                    case 'Paragraph': content = '<p style="color:#ccc">Sample text...</p>'; break;
+                    case 'Divide': content = '<div style="border-top:2px solid var(--jettra-accent); margin:15px 0; opacity:0.5; width:100%"></div>'; break;
+                    case 'Button': content = '<button class="j-btn-primary">Interactive Button</button>'; break;
+                    case 'TextBox': content = '<input type="text" placeholder="TextBox..." style="width:100%; padding:10px; background:#111; color:#fff; border:1px solid #444; border-radius:4px">'; break;
                     case 'Panel': 
+                    case 'Grid':
                         content = '<div class="canvas-container" style="display:grid; grid-template-columns:1fr 1fr; gap:10px"></div>'; 
                         break;
-                    case 'Tree': content = '<div style="color:#0ff; font-size:12px">▶ Tree Root<div style="padding-left:15px; color:#aaa; font-size:11px">▶ Sub Item 1</div></div>'; break;
                     default: content = `<div style="padding:10px; border:1px solid #444; color:#888">${type} Placeholder</div>`;
                 }
 
@@ -276,9 +308,7 @@ public class WebDesignerPage extends DashboardBasePage {
                 updateInspector();
             }
 
-            function showInspector() {
-                document.getElementById('property-inspector').style.display = 'flex';
-            }
+            function showInspector() { document.getElementById('property-inspector').style.display = 'flex'; }
 
             function updateInspector() {
                 if (!selectedItem) return;
@@ -288,9 +318,15 @@ public class WebDesignerPage extends DashboardBasePage {
                 
                 let html = `
                     <div class="view-model-row">
-                        <span class="inspector-label">View Model</span>
-                        <input type="text" class="inspector-input" value="${viewModelName}" onchange="viewModelName=this.value; updateGeneratedCode();">
+                        <span class="inspector-label">Active View Model</span>
+                        <select class="inspector-input" onchange="selectModel(this.value)">
+                            <option value="">None</option>
+                            ${availableModels.map(m => `<option value="${m.name}" ${viewModelName === m.name ? 'selected' : ''}>${m.name}</option>`).join('')}
+                        </select>
                     </div>
+                `;
+
+                html += `
                     <div class="inspector-row">
                         <span class="inspector-label">Component Type</span>
                         <div style="color:var(--jettra-accent); font-weight:bold">${type}</div>
@@ -301,6 +337,18 @@ public class WebDesignerPage extends DashboardBasePage {
                     </div>
                 `;
 
+                if (type === 'TextBox' || type === 'Label') {
+                    html += `
+                        <div class="inspector-row">
+                            <span class="inspector-label">Bind to Model Field</span>
+                            <select class="inspector-input" onchange="updateProp('binding', this.value)">
+                                <option value="">No Binding</option>
+                                ${modelFields.map(f => `<option value="${f}" ${props.binding === f ? 'selected' : ''}>${f}</option>`).join('')}
+                            </select>
+                        </div>
+                    `;
+                }
+
                 if (type === 'Panel' || type === 'Grid') {
                     html += `
                         <div class="inspector-row">
@@ -310,19 +358,67 @@ public class WebDesignerPage extends DashboardBasePage {
                     `;
                 }
 
+                const supportedEvents = ['onClick', 'onChange', 'onAction'];
                 html += `
                     <div class="inspector-row">
                         <span class="inspector-label">Events</span>
-                        <select class="inspector-input" onchange="addEvent(this.value)">
-                            <option value="">Add Event...</option>
-                            <option value="onClick">onClick</option>
-                            <option value="onChange">onChange</option>
-                        </select>
-                        <div id="event-list" style="margin-top:5px; font-size:10px; color:#aaa"></div>
+                        ${supportedEvents.map(ev => `
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px">
+                                <span style="font-size:10px">${ev}</span>
+                                <button class="btn-event" onclick="openEventEditor('${ev}')">Edit Handler</button>
+                            </div>
+                        `).join('')}
                     </div>
                 `;
 
                 inspector.innerHTML = html;
+            }
+
+            function selectModel(name) {
+                viewModelName = name;
+                const model = availableModels.find(m => m.name === name);
+                if (model) {
+                    currentModel = model;
+                    parseModelFields(model.file);
+                } else {
+                    modelFields = [];
+                    updateInspector();
+                    updateGeneratedCode();
+                }
+            }
+
+            function parseModelFields(file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const content = e.target.result;
+                    // Simple Regex to find private fields - use double backslash for Java text blocks
+                    const fieldRegex = /private\\\\s+\\\\w+\\\\s+(\\\\w+);/g;
+                    let match;
+                    modelFields = [];
+                    while ((match = fieldRegex.exec(content)) !== null) {
+                        modelFields.push(match[1]);
+                    }
+                    updateInspector();
+                    updateGeneratedCode();
+                };
+                reader.readAsText(file);
+            }
+
+            function openEventEditor(eventName) {
+                activeEventProperty = eventName;
+                const props = JSON.parse(selectedItem.getAttribute('data-props'));
+                const existingCode = props.events[eventName] || "e -> { \\\\n    // Code for " + eventName + "\\\\n}";
+                document.getElementById('event-code-input').querySelector('textarea').value = existingCode;
+                document.getElementById('event-editor-modal').style.display = 'block';
+            }
+
+            function saveEventHandler() {
+                const code = document.getElementById('event-code-input').querySelector('textarea').value;
+                const props = JSON.parse(selectedItem.getAttribute('data-props'));
+                props.events[activeEventProperty] = code;
+                selectedItem.setAttribute('data-props', JSON.stringify(props));
+                document.getElementById('event-editor-modal').style.display = 'none';
+                updateGeneratedCode();
             }
 
             function updateProp(key, value) {
@@ -331,115 +427,161 @@ public class WebDesignerPage extends DashboardBasePage {
                 props[key] = value;
                 selectedItem.setAttribute('data-props', JSON.stringify(props));
                 
-                // Live Update Canvas
                 const type = selectedItem.getAttribute('data-type');
                 if (key === 'text') {
-                    if (type === 'Header') selectedItem.querySelector('h2').innerText = value;
-                    if (type === 'Paragraph') selectedItem.querySelector('p').innerText = value;
-                    if (type === 'Button') selectedItem.querySelector('button').innerText = value;
-                    if (type === 'Label') selectedItem.querySelector('label').innerText = value + ":";
+                    const el = selectedItem.querySelector('h2, p, button, label');
+                    if (el) el.innerText = value;
                 }
                 if (key === 'columns' && (type === 'Panel' || type === 'Grid')) {
                     selectedItem.querySelector('.canvas-container').style.gridTemplateColumns = `repeat(${value}, 1fr)`;
                 }
-                
-                updateGeneratedCode();
-            }
-
-            function addEvent(name) {
-                if (!name) return;
-                const list = document.getElementById('event-list');
-                const div = document.createElement('div');
-                div.innerHTML = `⚡ ${name} code generated`;
-                list.appendChild(div);
                 updateGeneratedCode();
             }
 
             function loadFiles(input) {
                 const viewer = document.getElementById('explorer-tree-view');
-                viewer.innerHTML = '<div style="color:var(--jettra-accent); font-size:11px">Loading files...</div>';
+                viewer.innerHTML = 'Loading...';
                 
                 const files = input.querySelector('input').files;
-                const root = {};
+                availableModels = [];
+                const tree = {};
 
                 for (let i = 0; i < files.length; i++) {
-                    const path = files[i].webkitRelativePath.split('/');
-                    let current = root;
-                    for (const seg of path) {
-                        if (!current[seg]) current[seg] = {};
-                        current = current[seg];
+                    const f = files[i];
+                    const relPath = f.webkitRelativePath;
+                    if (!relPath.endsWith('.java')) continue;
+
+                    const parts = relPath.split('/');
+                    let curr = tree;
+                    for (let j = 0; j < parts.length; j++) {
+                        const part = parts[j];
+                        if (!curr[part]) curr[part] = { _children: {}, _file: null };
+                        if (j === parts.length - 1) curr[part]._file = f;
+                        curr = curr[part]._children;
+                    }
+
+                    if (f.name.endsWith('Model.java')) {
+                        availableModels.push({ name: f.name.replace('.java',''), file: f });
                     }
                 }
 
-                function buildTreeHtml(node, name, depth = 0) {
-                    const isFile = Object.keys(node).length === 0 || name.endsWith('.java');
-                    if (isFile) {
-                        return `<div class="project-file" style="padding-left:${depth * 15}px" onclick="openFile('${name}')">📄 ${name}</div>`;
-                    }
-                    let html = `<div style="padding-left:${depth * 15}px; color:#fff; font-size:12px; margin:4px 0">📂 <strong>${name}</strong></div>`;
-                    for (const child in node) {
-                        html += buildTreeHtml(node[child], child, depth + 1);
+                function renderTree(node, name, depth = 0) {
+                    const hasJava = Object.keys(node._children).some(k => k.endsWith('.java') || Object.keys(node._children[k]._children).length > 0);
+                    if (!hasJava && !name.endsWith('.java')) return "";
+
+                    let cssClass = "";
+                    if (name.endsWith('Page.java')) cssClass = "file-page";
+                    if (name.endsWith('Model.java')) cssClass = "file-model";
+
+                    let html = `<div class="project-file ${cssClass}" style="padding-left:${depth * 12}px" onclick="${node._file ? `openClass('${name}')` : ''}">${node._file ? '📄' : '📂'} ${name}</div>`;
+                    for (const child in node._children) {
+                        html += renderTree(node._children[child], child, depth + 1);
                     }
                     return html;
                 }
 
-                viewer.innerHTML = buildTreeHtml(root, "Project Root");
+                let finalHtml = "";
+                for (const root in tree) finalHtml += renderTree(tree[root], root);
+                viewer.innerHTML = finalHtml;
+                updateInspector();
             }
 
-            function openFile(name) {
-                alert("Opening " + name + " in designer... (Simulation)");
-                // In a real app, we would fetch the class content and populate the canvas
+            function openClass(name) {
+                if (name.endsWith('Page.java')) {
+                   alert("Opening Page: " + name + ". Clearing canvas for new design.");
+                   canvas.innerHTML = '<div class="canvas-placeholder">Start dragging components here to design ' + name + '</div>';
+                   updateGeneratedCode();
+                } else if (name.endsWith('Model.java')) {
+                   selectModel(name.replace('.java',''));
+                }
+            }
+
+            function generateCRUD() {
+                if (!currentModel) {
+                    alert("Please select a View Model in the Project Explorer first.");
+                    return;
+                }
+                
+                canvas.innerHTML = "";
+                const placeholder = document.querySelector('.canvas-placeholder');
+                if (placeholder) placeholder.remove();
+
+                addComponentToCanvas('Header', canvas);
+                const lastHeader = canvas.lastElementChild;
+                lastHeader.setAttribute('data-props', JSON.stringify({text: currentModel.name + " Management", columns: 2, events: {}, binding: ""}));
+                lastHeader.querySelector('h2').innerText = currentModel.name + " Management";
+
+                addComponentToCanvas('Grid', canvas);
+                const grid = canvas.lastElementChild;
+                const gridContainer = grid.querySelector('.canvas-container');
+                
+                addComponentToCanvas('Button', gridContainer);
+                const addBtn = gridContainer.lastElementChild;
+                addBtn.setAttribute('data-props', JSON.stringify({text: "Add New " + currentModel.name, columns: 2, events: {onClick: "e -> { \\\\n    document.getElementById('" + currentModel.name.toLowerCase() + "-modal').style.display = 'block';\\\\n}"}, binding: ""}));
+                addBtn.querySelector('button').innerText = "Add New " + currentModel.name;
+
+                addComponentToCanvas('Table', canvas);
+                
+                addComponentToCanvas('Modal', canvas);
+                const modal = canvas.lastElementChild;
+                modal.setAttribute('data-props', JSON.stringify({text: "Edit " + currentModel.name, columns: 2, events: {}, binding: ""}));
+                
+                alert("CRUD layout generated for " + currentModel.name + ". Fields detected: " + modelFields.join(", "));
+                updateGeneratedCode();
             }
 
             function updateGeneratedCode() {
                 const canvasItems = document.querySelectorAll('#canvas-area > .canvas-item, .canvas-container > .canvas-item');
-                let code = 'package com.jettra.example.pages;\\n\\n';
-                code += 'import io.jettra.wui.complex.*;\\n';
-                code += 'import io.jettra.wui.components.*;\\n';
-                code += 'import java.util.Map;\\n\\n';
-                code += '/**\\n * Generated by JettraWebDesigner\\n */\\n';
-                code += `public class MyNewPage extends DashboardBasePage {\\n\\n`;
-                code += `    private ${viewModelName} model = ${viewModelName}.getInstance();\\n\\n`;
-                code += '    public MyNewPage() {\\n';
-                code += '        super("Dynamic Page Design");\\n';
-                code += '    }\\n\\n';
-                code += '    @Override\\n';
-                code += '    protected void initCenter(Center center, String username) {\\n';
+                let code = `package com.jettra.example.pages;\n\nimport io.jettra.wui.complex.*;\nimport io.jettra.wui.components.*;\n\n`;
+                code += `public class GeneratedPage extends DashboardBasePage {\n`;
+                code += `    private ${viewModelName} model = ${viewModelName}.getInstance();\n\n`;
+                code += `    protected void initCenter(Center center, String username) {\n`;
                 
-                function processNode(items, containerVar = "center") {
-                   let out = "";
-                   items.forEach(item => {
-                        const type = item.getAttribute('data-type');
-                        const props = JSON.parse(item.getAttribute('data-props'));
-                        const varName = type.toLowerCase() + "_" + Math.floor(Math.random()*1000);
+                function walk(items, container = "center") {
+                    let out = "";
+                    items.forEach(it => {
+                        const type = it.getAttribute('data-type');
+                        const props = JSON.parse(it.getAttribute('data-props'));
+                        const v = type.toLowerCase() + "_" + Math.floor(Math.random()*1000);
                         
                         switch(type) {
-                            case 'Header': out += `        ${containerVar}.add(new Header(2, "${props.text}"));\\n`; break;
-                            case 'Paragraph': out += `        ${containerVar}.add(new Paragraph("${props.text}"));\\n`; break;
-                            case 'Divide': out += `        ${containerVar}.add(new Divide());\\n`; break;
+                            case 'Header': out += `        ${container}.add(new Header(1, "${props.text}"));\n`; break;
+                            case 'Paragraph': out += `        ${container}.add(new Paragraph("${props.text}"));\n`; break;
+                            case 'Divide': out += `        ${container}.add(new Divide());\n`; break;
                             case 'Button': 
-                                out += `        Button ${varName} = new Button("${props.text}");\\n`;
-                                out += `        ${varName}.onAction(e -> { /* logic */ });\\n`;
-                                out += `        ${containerVar}.add(${varName});\\n`;
+                                out += `        Button ${v} = new Button("${props.text}");\n`;
+                                Object.keys(props.events).forEach(ev => {
+                                    // Replace \\\\n with actual \n for the generated code string
+                                    const eventCode = props.events[ev].replace(/\\\\\\\\n/g, '\\n');
+                                    out += `        ${v}.${ev}(${eventCode});\n`;
+                                });
+                                out += `        ${container}.add(${v});\n`;
+                                break;
+                            case 'TextBox':
+                                out += `        TextBox ${v} = new TextBox("${v}", "Enter value");\n`;
+                                if (props.binding) out += `        ${v}.setValue(model.get${props.binding.charAt(0).toUpperCase() + props.binding.slice(1)}());\n`;
+                                out += `        ${container}.add(${v});\n`;
+                                break;
+                            case 'TextArea':
+                                out += `        TextArea ${v} = new TextArea("${v}", "");\n`;
+                                if (props.binding) out += `        ${v}.setValue(model.get${props.binding.charAt(0).toUpperCase() + props.binding.slice(1)}());\n`;
+                                out += `        ${container}.add(${v});\n`;
                                 break;
                             case 'Panel':
-                                out += `        Panel ${varName} = new Panel(${props.columns});\\n`;
-                                const children = item.querySelectorAll(':scope > .canvas-container > .canvas-item');
-                                if (children.length > 0) {
-                                    out += processNode(children, varName);
-                                }
-                                out += `        ${containerVar}.add(${varName});\\n`;
+                            case 'Grid':
+                                out += `        ${type} ${v} = new ${type}(${props.columns});\n`;
+                                const kids = it.querySelectorAll(':scope > .canvas-container > .canvas-item');
+                                if (kids.length > 0) out += walk(kids, v);
+                                out += `        ${container}.add(${v});\n`;
                                 break;
-                            default: out += `        ${containerVar}.add(new ${type}());\\n`;
+                            default: out += `        ${container}.add(new ${type}());\n`;
                         }
-                   });
-                   return out;
+                    });
+                    return out;
                 }
-
-                code += processNode(document.querySelectorAll('#canvas-area > .canvas-item'));
-                code += '    }\\n';
-                code += '}';
-
+                code += walk(document.querySelectorAll('#canvas-area > .canvas-item'));
+                code += `    }\n}`;
+                
                 document.getElementById('generated-code-display').innerText = code;
                 document.getElementById('generated-code-hidden').value = code;
             }
