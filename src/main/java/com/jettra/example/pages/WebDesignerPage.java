@@ -106,7 +106,7 @@ public class WebDesignerPage extends DashboardBasePage {
         // Feedback
         addPaletteCategory(palette, "Feedback", new String[]{"Alert", "Modal", "Notification", "SessionTimeout"});
         // Layout & Display
-        addPaletteCategory(palette, "Layout & Display", new String[]{"Avatar", "AvatarGroup", "Carousel", "Datatable", "Div", "Grid", "Image", "Table", "TabView"});
+        addPaletteCategory(palette, "Layout & Display", new String[]{"Avatar", "AvatarGroup", "Carousel", "Datatable", "Div", "Divide", "FileUpload", "FolderSelector", "Grid", "Image", "Panel", "Table", "TabView", "Tree"});
 
         return palette;
     }
@@ -209,10 +209,15 @@ public class WebDesignerPage extends DashboardBasePage {
                     case 'Carousel': content = '<div style="height:100px; background:#111; border:1px solid #444; border-radius:4px; display:flex; justify-content:center; align-items:center; color:#666">Carousel Slider</div>'; break;
                     case 'Datatable': content = '<table style="width:100%; border-collapse:collapse; color:#fff; font-size:12px"><tr style="background:#222"><th style="padding:8px; border:1px solid #444">ID</th><th style="padding:8px; border:1px solid #444">Name</th></tr><tr><td style="padding:8px; border:1px solid #444">1</td><td style="padding:8px; border:1px solid #444">Admin</td></tr></table>'; break;
                     case 'Div': content = '<div style="height:50px; border:1px solid #555; border-radius:4px; background:rgba(255,255,255,0.02); display:flex; justify-content:center; align-items:center; color:#444">Container Div</div>'; break;
+                    case 'Divide': content = '<div style="border-top:2px solid var(--jettra-accent); margin:15px 0; opacity:0.5; width:100%; box-shadow:0 0 5px var(--jettra-glow)"></div>'; break;
+                    case 'FileUpload': content = '<div style="border:1px dashed #444; padding:10px; border-radius:4px; text-align:center; color:#888">📁 Select File...</div>'; break;
+                    case 'FolderSelector': content = '<div style="border:1px dashed #444; padding:10px; border-radius:4px; text-align:center; color:#888">📂 Select Folder...</div>'; break;
                     case 'Grid': content = '<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px"><div style="border:1px solid #444;height:30px"></div><div style="border:1px solid #444;height:30px"></div></div>'; break;
                     case 'Image': content = '<div style="width:100%; height:80px; background:#111; border:1px solid #444; border-radius:4px; display:flex; flex-direction:column; justify-content:center; align-items:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg><span style="color:#666; font-size:10px; margin-top:5px">Image Placeholder</span></div>'; break;
                     case 'Table': content = '<div style="border:1px solid #444; padding:10px; border-radius:4px; color:#aaa; font-size:11px; text-align:center">Simple Table Structure</div>'; break;
                     case 'TabView': content = '<div style="display:flex; border-bottom:1px solid #444"><div style="padding:5px 10px; border-bottom:2px solid #0ff; color:#0ff">Tab 1</div><div style="padding:5px 10px; color:#666">Tab 2</div></div>'; break;
+                    case 'Panel': content = '<div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; border:1px solid #444; padding:10px; border-radius:4px"><div style="border:1px dashed #666; height:40px">Col 1</div><div style="border:1px dashed #666; height:40px">Col 2</div></div>'; break;
+                    case 'Tree': content = '<div style="color:#0ff; font-size:12px">▶ Tree Root<div style="padding-left:15px; color:#aaa; font-size:11px">▶ Sub Item 1</div></div>'; break;
                 }
 
                 wrapper.innerHTML = content + '<div class="delete-tool" onclick="this.parentElement.remove(); updateGeneratedCode();">×</div>';
@@ -273,10 +278,15 @@ public class WebDesignerPage extends DashboardBasePage {
                         case 'Carousel': code += '        center.add(new Carousel());\\n'; break;
                         case 'Datatable': code += '        center.add(new Datatable());\\n'; break;
                         case 'Div': code += '        center.add(new Div());\\n'; break;
+                        case 'Divide': code += '        center.add(new Divide());\\n'; break;
+                        case 'FileUpload': code += '        center.add(new FileUpload("upload_id").setDestination("/tmp").setFileNamePattern("file_{name}"));\\n'; break;
+                        case 'FolderSelector': code += '        center.add(new FolderSelector("folder_id").setReferenceLocation("/").setReferenceContent("Root"));\\n'; break;
                         case 'Grid': code += '        center.add(new Grid(2));\\n'; break;
                         case 'Image': code += '        center.add(new Image("image.png", "Description"));\\n'; break;
                         case 'Table': code += '        center.add(new Table());\\n'; break;
                         case 'TabView': code += '        center.add(new TabView());\\n'; break;
+                        case 'Panel': code += '        center.add(new Panel(2));\\n'; break;
+                        case 'Tree': code += '        Tree tree = new Tree();\\n        Tree.TreeItem item = new Tree.TreeItem("Root");\\n        item.addItem(new Tree.TreeItem("Child"));\\n        tree.addItem(item);\\n        center.add(tree);\\n'; break;
                     }
                 });
 

@@ -61,6 +61,11 @@ public class WebExampleMain {
         server.addHandler("/spinner", com.jettra.example.pages.SpinnerPage.class);
         server.addHandler("/pais", com.jettra.example.pages.PaisPage.class);
         server.addHandler("/webdesigner", com.jettra.example.pages.WebDesignerPage.class);
+        server.addHandler("/panel", com.jettra.example.pages.PanelPage.class);
+        server.addHandler("/tree", com.jettra.example.pages.TreePage.class);
+        server.addHandler("/divide", com.jettra.example.pages.DividePage.class);
+        server.addHandler("/fileupload", com.jettra.example.pages.FileUploadPage.class);
+        server.addHandler("/folderselector", com.jettra.example.pages.FolderSelectorPage.class);
 
         server.start();
     }
