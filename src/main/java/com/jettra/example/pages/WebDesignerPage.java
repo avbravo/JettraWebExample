@@ -2,11 +2,7 @@ package com.jettra.example.pages;
 
 import io.jettra.wui.complex.Center;
 import io.jettra.wui.complex.Modal;
-import io.jettra.wui.complex.Tree;
-import io.jettra.wui.complex.Panel;
 import io.jettra.wui.components.*;
-import io.jettra.wui.components.TextArea;
-import io.jettra.wui.core.annotations.InjectProperties;
 import java.util.Properties;
 
 /**
@@ -14,8 +10,7 @@ import java.util.Properties;
  */
 public class WebDesignerPage extends DashboardBasePage {
 
-    @InjectProperties(name = "messages")
-    private Properties msg;
+    // Properties field removed as it was unused
 
     public WebDesignerPage() {
         super("Jettra Web Designer");
@@ -135,32 +130,83 @@ public class WebDesignerPage extends DashboardBasePage {
         
         // 5. Event Editor Modal
         Modal eventModal = new Modal("event-editor-modal");
-        eventModal.setStyle("display", "none").setStyle("background", "var(--jettra-glass)").setStyle("backdrop-filter", "blur(15px)").setStyle("padding", "30px").setStyle("border-radius", "12px").setStyle("width", "700px").setStyle("border", "1px solid var(--jettra-accent)");
+        eventModal.setStyle("display", "none").setStyle("background", "linear-gradient(145deg, rgba(25, 40, 60, 0.95), rgba(10, 20, 35, 0.98))")
+                 .setStyle("backdrop-filter", "blur(20px)").setStyle("padding", "30px").setStyle("border-radius", "20px")
+                 .setStyle("width", "700px").setStyle("border", "1px solid rgba(0, 255, 255, 0.3)")
+                 .setStyle("box-shadow", "0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 2px 0 0 rgba(255, 255, 255, 0.1), 0 0 20px rgba(0, 255, 255, 0.2)");
         
         Header modalHeader = new Header(3, "⚡ Event Handler Editor");
-        modalHeader.setStyle("color", "var(--jettra-accent)").setStyle("margin-top", "0");
+        modalHeader.setStyle("color", "var(--jettra-accent)").setStyle("margin-top", "0").setStyle("text-shadow", "0 2px 4px rgba(0,255,255,0.3)");
         
         TextArea codeInput = new TextArea("event-code-input", "e -> { \n    // Write your Java code here\n}");
-        codeInput.setStyle("width", "100%").setStyle("height", "300px").setStyle("background", "#000").setStyle("color", "#0ff").setStyle("font-family", "monospace").setStyle("padding", "15px").setStyle("border", "1px solid #333").setStyle("border-radius", "4px");
+        codeInput.setStyle("width", "100%").setStyle("height", "300px").setStyle("background", "rgba(0,0,0,0.5)").setStyle("color", "#0ff").setStyle("font-family", "monospace").setStyle("padding", "15px").setStyle("border", "1px solid rgba(0,255,255,0.2)").setStyle("border-radius", "10px").setStyle("box-shadow", "inset 0 2px 10px rgba(0,0,0,0.5)");
         
         Div modalActions = new Div();
-        modalActions.setStyle("display", "flex").setStyle("justify-content", "flex-end").setStyle("gap", "10px").setStyle("margin-top", "20px");
+        modalActions.setStyle("display", "flex").setStyle("justify-content", "flex-end").setStyle("gap", "15px").setStyle("margin-top", "25px");
         
         Button cancelBtn = new Button("Cancel");
         cancelBtn.addClass("j-btn");
+        cancelBtn.setStyle("border-radius", "8px").setStyle("background", "rgba(255,255,255,0.05)").setStyle("box-shadow", "0 4px 6px rgba(0,0,0,0.2)");
         cancelBtn.setProperty("type", "button");
         cancelBtn.setProperty("onclick", "document.getElementById('event-editor-modal').style.display = 'none'");
         
         Button saveEventBtn = new Button("Save Handler");
         saveEventBtn.addClass("j-btn-primary");
+        saveEventBtn.setStyle("border-radius", "8px").setStyle("box-shadow", "0 4px 15px rgba(0,255,255,0.3)");
         saveEventBtn.setProperty("onclick", "saveEventHandler()");
         
         modalActions.add(cancelBtn).add(saveEventBtn);
         eventModal.add(modalHeader).add(codeInput).add(modalActions);
         
-        center.add(eventModal);
+        // 6. 3D Confirmation Modal
+        Modal confirmModal = new Modal("confirm-3d-modal");
+        confirmModal.setStyle("display", "none").setStyle("background", "linear-gradient(135deg, #1e293b, #0f172a)")
+                   .setStyle("border", "1px solid rgba(0, 255, 255, 0.4)").setStyle("border-radius", "24px")
+                   .setStyle("padding", "40px").setStyle("width", "450px")
+                   .setStyle("box-shadow", "0 30px 60px -12px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.1)");
         
-        saveForm.add(container);
+        Header confirmTitle = new Header(3, "Confirm Action");
+        confirmTitle.setProperty("id", "confirm-title");
+        confirmTitle.setStyle("color", "var(--jettra-accent)").setStyle("margin-top", "0").setStyle("text-align", "center");
+        
+        Paragraph confirmBody = new Paragraph("");
+        confirmBody.setProperty("id", "confirm-body");
+        confirmBody.setStyle("color", "#cbd5e1").setStyle("text-align", "center").setStyle("font-size", "16px").setStyle("margin", "20px 0");
+        
+        Div confirmActions = new Div();
+        confirmActions.setStyle("display", "flex").setStyle("justify-content", "center").setStyle("gap", "20px").setStyle("margin-top", "30px");
+        
+        Button confirmNo = new Button("No, Cancel");
+        confirmNo.addClass("j-btn");
+        confirmNo.setStyle("width", "140px");
+        confirmNo.setProperty("onclick", "window.close3DConfirm()");
+        
+        Button confirmYes = new Button("Yes, Open");
+        confirmYes.addClass("j-btn-primary");
+        confirmYes.setStyle("width", "140px");
+        confirmYes.setProperty("id", "confirm-yes-btn");
+        
+        confirmActions.add(confirmNo).add(confirmYes);
+        confirmModal.add(confirmTitle).add(confirmBody).add(confirmActions);
+
+        // 7. Model Selection Row
+        Div modelSelectionRow = new Div();
+        modelSelectionRow.setStyle("display", "flex").setStyle("align-items", "center").setStyle("gap", "10px").setStyle("margin-bottom", "15px").setStyle("background", "rgba(0,255,255,0.05)").setStyle("padding", "10px").setStyle("border-radius", "10px").setStyle("border", "1px solid rgba(0,255,255,0.1)");
+        
+        Label modelLabel = new Label("Selected Model:");
+        modelLabel.setStyle("font-size", "12px").setStyle("color", "var(--jettra-accent)");
+        
+        Div modelSelectContainer = new Div();
+        modelSelectContainer.setProperty("id", "model-select-container");
+        modelSelectContainer.setStyle("flex", "1");
+        
+        modelSelectionRow.add(modelLabel).add(modelSelectContainer);
+        
+        // Wrap everything into the main center
+        center.add(eventModal);
+        center.add(confirmModal);
+        
+        saveForm.add(modelSelectionRow).add(container);
         center.add(saveForm);
 
         // Add Designer Scripts and Styles
@@ -242,17 +288,53 @@ public class WebDesignerPage extends DashboardBasePage {
             .canvas-item.selected { border-color: var(--jettra-accent) !important; background: rgba(0,255,255,0.05) !important; box-shadow: 0 0 10px var(--jettra-glow); }
             .canvas-item .delete-tool { position: absolute; top: -8px; right: -8px; background: #ff4444; color: white; width: 18px; height: 18px; border-radius: 50%; display: none; justify-content: center; align-items: center; cursor: pointer; font-size: 10px; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
             .canvas-item:hover .delete-tool { display: flex; }
-            .inspector-row { margin-bottom: 12px; }
-            .inspector-label { display: block; font-size: 11px; color: #999; margin-bottom: 4px; }
-            .inspector-input { width: 100%; background: #111; border: 1px solid #444; color: #fff; padding: 5px; border-radius: 3px; font-size: 12px; }
-            .project-file { padding: 4px 8px; font-size: 12px; color: #ccc; cursor: pointer; border-radius: 3px; display: flex; align-items: center; gap: 8px; }
-            .project-file:hover { background: rgba(0,255,255,0.1); color: #fff; }
-            .file-page { color: #f1c40f !important; font-weight: bold; }
-            .file-model { color: #2ecc71 !important; font-weight: bold; }
-            .canvas-container { border: 1px dashed #555; padding: 15px; border-radius: 6px; position: relative; min-height: 60px; }
-            .view-model-row { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #333; }
-            .btn-event { background: var(--jettra-accent); color: #000; border: none; padding: 4px 8px; border-radius: 3px; font-size: 10px; cursor: pointer; margin-top: 5px; }
-            @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+            .inspector-row { margin-bottom: 15px; background: rgba(255,255,255,0.02); padding: 8px; border-radius: 6px; border-left: 3px solid transparent; transition: all 0.3s; }
+            .inspector-row:hover { border-left-color: var(--jettra-accent); background: rgba(255,255,255,0.05); }
+            .inspector-label { display: block; font-size: 11px; color: #9aa; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+            .inspector-input { width: 100%; background: #0a0f15; border: 1px solid #334155; color: #fff; padding: 8px; border-radius: 6px; font-size: 13px; outline: none; transition: border-color 0.2s; }
+            .inspector-input:focus { border-color: var(--jettra-accent); box-shadow: 0 0 0 1px rgba(0,255,255,0.2); }
+            .project-file { padding: 6px 10px; font-size: 12px; color: #94a3b8; cursor: pointer; border-radius: 6px; display: flex; align-items: center; gap: 10px; transition: all 0.2s; }
+            .project-file:hover { background: rgba(0,255,255,0.1); color: #fff; transform: translateX(5px); }
+            .file-page { color: #facc15 !important; font-weight: 600; text-shadow: 0 0 5px rgba(250,204,21,0.2); }
+            .file-model { color: #4ade80 !important; font-weight: 600; text-shadow: 0 0 5px rgba(74,222,128,0.2); }
+            .canvas-container { border: 2px dashed rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; position: relative; min-height: 80px; transition: all 0.3s; }
+            .canvas-container:hover { border-color: var(--jettra-accent); background: rgba(0,255,255,0.02); }
+            .view-model-row { margin-bottom: 20px; padding: 12px; background: rgba(0,255,255,0.05); border-radius: 8px; border: 1px solid rgba(0,255,255,0.1); }
+            .btn-event { background: linear-gradient(135deg, var(--jettra-accent), #0891b2); color: #000; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 5px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3); }
+            .btn-event:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,255,255,0.4); }
+            .btn-event:active { transform: translateY(0); }
+            
+            /* 3D Effects for Modals */
+            #confirm-3d-modal, #event-editor-modal {
+                transform-style: preserve-3d;
+                perspective: 1000px;
+                transition: transform 0.1s ease-out, opacity 0.3s ease-out;
+                animation: modalAppear 0.4s ease-out;
+            }
+            .modal-content-3d {
+                transform: translateZ(50px);
+                transform-style: preserve-3d;
+            }
+            .btn-3d {
+                background: linear-gradient(135deg, var(--jettra-accent), #0891b2);
+                border: none;
+                box-shadow: 0 4px 0 #044e5e, 0 8px 15px rgba(0,0,0,0.4);
+                transition: all 0.1s;
+                transform: translateZ(20px);
+            }
+            .btn-3d:active {
+                box-shadow: 0 2px 0 #044e5e, 0 4px 8px rgba(0,0,0,0.4);
+                transform: translateY(2px) translateZ(10px);
+            }
+            @keyframes modalAppear {
+                from { opacity: 0; transform: translateY(-30px) scale(0.9) rotateX(-15deg); }
+                to { opacity: 1; transform: translateY(0) scale(1) rotateX(0); }
+            }
+            .glass-panel {
+                background: linear-gradient(145deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+                backdrop-filter: blur(16px);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
         """);
         
         Script script = new Script("""
@@ -393,14 +475,16 @@ public class WebDesignerPage extends DashboardBasePage {
 
                 const supportedEvents = ['onClick', 'onChange', 'onAction'];
                 html += `
-                    <div class="inspector-row">
-                        <span class="inspector-label">Events</span>
-                        ${supportedEvents.map(ev => `
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px">
-                                <span style="font-size:10px">${ev}</span>
-                                <button class="btn-event" type="button" onclick="window.openEventEditor('${ev}')">Edit Handler</button>
-                            </div>
-                        `).join('')}
+                    <div style="margin-top:20px; border-top:1px solid rgba(0,255,255,0.1); padding-top:15px">
+                        <span class="inspector-label" style="color:var(--jettra-accent); font-weight:bold">⚡ Event Handlers</span>
+                        <div style="display:flex; flex-direction:column; gap:8px; margin-top:10px">
+                            ${supportedEvents.map(ev => `
+                                <div class="inspector-row" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center" onclick="window.openEventEditor('${ev}')">
+                                    <span style="font-size:11px; color:#ccc">${ev}</span>
+                                    <span style="font-size:10px; color:var(--jettra-accent)">Configure ⇢</span>
+                                </div>
+                            `).join('')}
+                        </div>
                     </div>
                 `;
 
@@ -413,6 +497,8 @@ public class WebDesignerPage extends DashboardBasePage {
                 if (model) {
                     currentModel = model;
                     window.parseModelFields(model.file);
+                    window.show3DConfirm("Model Attached", "Se ha vinculado el modelo " + name + " a la vista.", () => {});
+                    // Auto close after 2s if no action? No, user asked for dialog.
                 } else {
                     modelFields = [];
                     window.updateInspector();
@@ -531,6 +617,7 @@ public class WebDesignerPage extends DashboardBasePage {
                 let finalHtml = "";
                 for (const root in tree) finalHtml += renderTree(tree[root], root);
                 viewer.innerHTML = finalHtml;
+                window.updateModelSelect();
                 window.updateInspector();
             };
 
@@ -551,33 +638,94 @@ public class WebDesignerPage extends DashboardBasePage {
                 reader.readAsText(file);
             };
 
+            window.show3DConfirm = function(title, body, yesAction) {
+                const modal = document.getElementById('confirm-3d-modal');
+                document.getElementById('confirm-title').innerText = title;
+                document.getElementById('confirm-body').innerText = body;
+                const yesBtn = document.getElementById('confirm-yes-btn');
+                yesBtn.onclick = () => {
+                   window.close3DConfirm();
+                   yesAction();
+                };
+                modal.style.display = 'block';
+                window.apply3DTracking(modal);
+            };
+
+            window.close3DConfirm = function() {
+                const modal = document.getElementById('confirm-3d-modal');
+                modal.style.display = 'none';
+                modal.onmousemove = null;
+                modal.style.transform = '';
+            };
+
+            window.apply3DTracking = function(el) {
+                el.onmousemove = (e) => {
+                    const rect = el.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const xc = rect.width / 2;
+                    const yc = rect.height / 2;
+                    const dx = x - xc;
+                    const dy = y - yc;
+                    el.style.transform = `perspective(1000px) rotateX(${-dy / 25}deg) rotateY(${dx / 25}deg)`;
+                };
+                el.onmouseleave = () => {
+                    el.style.transform = `perspective(1000px) rotateX(0) rotateY(0)`;
+                };
+            };
+
+            window.updateModelSelect = function() {
+                const container = document.getElementById('model-select-container');
+                if (!container) return;
+                
+                let html = `<select class="inspector-input" onchange="window.selectModel(this.value)">`;
+                html += `<option value="">-- Select Model --</option>`;
+                availableModels.forEach(m => {
+                    html += `<option value="${m.name}" ${viewModelName === m.name ? 'selected' : ''}>${m.name}</option>`;
+                });
+                html += `</select>`;
+                container.innerHTML = html;
+            };
+
             window.openClass = function(name) {
                 const canvas = document.getElementById('canvas-area');
                 if (!canvas) return;
 
-                if (!name.endsWith('Page.java') && name.endsWith('.java')) {
-                    // Not a Page.java, maybe just show content
+                // Validation for {nombre}Page.java
+                const isPage = name.endsWith('Page.java');
+                const isModel = name.endsWith('Model.java');
+
+                if (!isPage && !isModel && name.endsWith('.java')) {
+                    // It's a java class but does NOT follow Page or Model syntax
                     const fileObj = projectFilesMap[name];
                     if (fileObj) window.loadFileContent(fileObj.webkitRelativePath);
                     return;
                 }
 
-                if (name.endsWith('Page.java')) {
+                if (isPage) {
                     const items = canvas.querySelectorAll('.canvas-item');
+                    const fileObj = projectFilesMap[name];
+
                     const doOpen = () => {
-                        alert("Opening Page: " + name + ". Clearing canvas for new design.");
+                        if (fileObj) {
+                            window.loadFileContent(fileObj.webkitRelativePath);
+                        }
+                        // For demonstration, we clear the canvas since we don't have a real parser for the .java code yet
                         canvas.innerHTML = '<div class="canvas-placeholder">Start dragging components here to design ' + name + '</div>';
                         window.updateGeneratedCode();
                     };
 
                     if (items.length > 0) {
-                        if (confirm("Hay elementos en el diseñador. ¿Desea borrarlos y abrir " + name + "?")) {
-                            doOpen();
-                        }
+                        window.show3DConfirm(
+                            "Confirmación 3D", 
+                            "Hay elementos en el diseñador. ¿Desea borrarlos y abrir " + name + " en el Diseñador? Esto también mostrará el código.",
+                            doOpen
+                        );
                     } else {
+                        // Si no hay ningun elemento en el diseñador agregado se muestra el contenido del codigo y se muestra el diseño en el diseñador.
                         doOpen();
                     }
-                } else if (name.endsWith('Model.java')) {
+                } else if (isModel) {
                     window.selectModel(name.replace('.java',''));
                 }
             };
@@ -586,7 +734,7 @@ public class WebDesignerPage extends DashboardBasePage {
                 const canvas = document.getElementById('canvas-area');
                 if (!canvas) return;
                 if (!currentModel) {
-                    alert("Please select a View Model in the Project Explorer first.");
+                    window.show3DConfirm("Error", "Please select a View Model in the Project Explorer first.", () => {});
                     return;
                 }
                 
@@ -594,28 +742,73 @@ public class WebDesignerPage extends DashboardBasePage {
                 const placeholder = document.querySelector('.canvas-placeholder');
                 if (placeholder) placeholder.remove();
 
+                // 1. Title Header
                 window.addComponentToCanvas('Header', canvas);
                 const lastHeader = canvas.lastElementChild;
                 lastHeader.setAttribute('data-props', JSON.stringify({text: currentModel.name + " Management", columns: 2, events: {}, binding: ""}));
                 const h2 = lastHeader.querySelector('h2');
                 if (h2) h2.innerText = currentModel.name + " Management";
 
+                // 2. Action Bar (Grid with Add Button)
                 window.addComponentToCanvas('Grid', canvas);
                 const grid = canvas.lastElementChild;
                 const gridContainer = grid.querySelector('.canvas-container');
+                grid.setAttribute('data-props', JSON.stringify({text: "Actions", columns: 2, events: {}, binding: ""}));
                 
                 window.addComponentToCanvas('Button', gridContainer);
                 const addBtn = gridContainer.lastElementChild;
-                addBtn.setAttribute('data-props', JSON.stringify({text: "Add New " + currentModel.name, columns: 2, events: {onClick: "e -> { \\n    document.getElementById('" + currentModel.name.toLowerCase() + "-modal').style.display = 'block';\\n}"}, binding: ""}));
+                const modalId = currentModel.name.toLowerCase() + "-modal-" + Math.floor(Math.random()*1000);
+                addBtn.setAttribute('data-props', JSON.stringify({text: "⚡ Add New " + currentModel.name, columns: 2, events: {onClick: "e -> { \\n    document.getElementById('" + modalId + "').style.display = 'block';\\n}"}, binding: ""}));
                 const btn = addBtn.querySelector('button');
-                if (btn) btn.innerText = "Add New " + currentModel.name;
+                if (btn) {
+                    btn.innerText = "⚡ Add New " + currentModel.name;
+                    btn.className = "j-btn-primary btn-3d";
+                }
 
+                // 3. Data Table
                 window.addComponentToCanvas('Table', canvas);
+                const table = canvas.lastElementChild;
+                table.setAttribute('data-props', JSON.stringify({text: currentModel.name + " List", columns: 2, events: {}, binding: ""}));
+
+                // 4. Modal with Form Fields
                 window.addComponentToCanvas('Modal', canvas);
                 const modal = canvas.lastElementChild;
-                modal.setAttribute('data-props', JSON.stringify({text: "Edit " + currentModel.name, columns: 2, events: {}, binding: ""}));
+                modal.id = modalId;
+                modal.setAttribute('data-props', JSON.stringify({text: "Enter " + currentModel.name + " Details", columns: 2, events: {}, binding: ""}));
+                const modalContainer = modal.querySelector('.canvas-container') || modal;
                 
-                alert("CRUD layout generated for " + currentModel.name + ". Fields detected: " + modelFields.join(", "));
+                // Add fields from model
+                modelFields.forEach(field => {
+                    const fieldRow = document.createElement('div');
+                    fieldRow.style.marginBottom = "10px";
+                    fieldRow.innerHTML = `<label style="font-size:10px; color:#aaa; display:block">${field}</label>`;
+                    modalContainer.appendChild(fieldRow);
+                    
+                    window.addComponentToCanvas('TextBox', modalContainer);
+                    const tb = modalContainer.lastElementChild;
+                    tb.setAttribute('data-props', JSON.stringify({text: field, columns: 2, events: {}, binding: field}));
+                });
+
+                // Modal Actions (Save/Cancel)
+                const modalActions = document.createElement('div');
+                modalActions.style.display = "flex";
+                modalActions.style.gap = "10px";
+                modalActions.style.marginTop = "20px";
+                modalContainer.appendChild(modalActions);
+
+                window.addComponentToCanvas('Button', modalActions);
+                const saveBtn = modalActions.lastElementChild;
+                saveBtn.setAttribute('data-props', JSON.stringify({text: "Save " + currentModel.name, columns: 2, events: {onClick: "e -> { \\n    alert('Saving " + currentModel.name + "...'); \\n    document.getElementById('" + modalId + "').style.display = 'none'; \\n}"}, binding: ""}));
+                
+                window.addComponentToCanvas('Button', modalActions);
+                const cancelBtn = modalActions.lastElementChild;
+                cancelBtn.setAttribute('data-props', JSON.stringify({text: "Cancel", columns: 2, events: {onClick: "e -> { \\n    document.getElementById('" + modalId + "').style.display = 'none'; \\n}"}, binding: ""}));
+
+                window.show3DConfirm(
+                    "CRUD Generado", 
+                    "Se ha generado automáticamente el layout CRUD para " + currentModel.name + ". Hemos añadido " + modelFields.length + " campos vinculados al modelo.",
+                    () => {}
+                );
                 window.updateGeneratedCode();
             };
 
