@@ -108,8 +108,13 @@ public class WebDesignerPage extends DashboardBasePage {
         Button openBtn = new Button("OPEN FILE");
         openBtn.addClass("j-btn-secondary");
         openBtn.setProperty("type", "button");
+
+        Button clearBtn = new Button("CLEAR ALL");
+        clearBtn.addClass("j-btn-danger");
+        clearBtn.setProperty("type", "button");
+        clearBtn.setProperty("onclick", "window.clearDesigner()");
         
-        actions.add(saveBtn).add(openBtn);
+        actions.add(saveBtn).add(openBtn).add(clearBtn);
         codeView.add(codeHeader).add(codeContainer).add(hiddenCode).add(actions);
 
         // 4. Property Inspector (Floating/Right Sidebar)
@@ -311,8 +316,8 @@ public class WebDesignerPage extends DashboardBasePage {
                     case 'Header': content = '<h2>New Header</h2>'; break;
                     case 'Paragraph': content = '<p style="color:#ccc">Sample text...</p>'; break;
                     case 'Divide': content = '<div style="border-top:2px solid var(--jettra-accent); margin:15px 0; opacity:0.5; width:100%"></div>'; break;
-                    case 'Button': content = '<button class="j-btn-primary">Interactive Button</button>'; break;
-                    case 'TextBox': content = '<input type="text" placeholder="TextBox..." style="width:100%; padding:10px; background:#111; color:#fff; border:1px solid #444; border-radius:4px">'; break;
+                    case 'Button': content = '<button class="j-btn-primary" type="button">Interactive Button</button>'; break;
+                    case 'TextBox': content = '<input type="text" placeholder="TextBox..." style="width:100%; padding:10px; background:#111; color:#fff; border:1px solid #444; border-radius:4px" onfocus="this.blur()">'; break;
                     case 'Panel': 
                     case 'Grid':
                         content = '<div class="canvas-container" style="display:grid; grid-template-columns:1fr 1fr; gap:10px"></div>'; 
@@ -320,10 +325,10 @@ public class WebDesignerPage extends DashboardBasePage {
                     default: content = `<div style="padding:10px; border:1px solid #444; color:#888">${type} Placeholder</div>`;
                 }
 
-                wrapper.innerHTML = content + '<div class="delete-tool" onclick="this.parentElement.remove(); updateGeneratedCode();">×</div>';
-                parent.appendChild(wrapper);
-                updateGeneratedCode();
-            }
+                wrapper.innerHTML = content + '<div class="delete-tool" onclick="this.parentElement.remove(); window.updateGeneratedCode();">×</div>';
+                targetParent.appendChild(wrapper);
+                window.updateGeneratedCode();
+            };
 
             window.selectElement = function(el) {
                 if (selectedItem) selectedItem.classList.remove('selected');
@@ -393,14 +398,14 @@ public class WebDesignerPage extends DashboardBasePage {
                         ${supportedEvents.map(ev => `
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px">
                                 <span style="font-size:10px">${ev}</span>
-                                <button class="btn-event" onclick="openEventEditor('${ev}')">Edit Handler</button>
+                                <button class="btn-event" type="button" onclick="window.openEventEditor('${ev}')">Edit Handler</button>
                             </div>
                         `).join('')}
                     </div>
                 `;
 
                 inspector.innerHTML = html;
-            }
+            };
 
             window.selectModel = function(name) {
                 viewModelName = name;
@@ -549,12 +554,31 @@ public class WebDesignerPage extends DashboardBasePage {
             window.openClass = function(name) {
                 const canvas = document.getElementById('canvas-area');
                 if (!canvas) return;
+
+                if (!name.endsWith('Page.java') && name.endsWith('.java')) {
+                    // Not a Page.java, maybe just show content
+                    const fileObj = projectFilesMap[name];
+                    if (fileObj) window.loadFileContent(fileObj.webkitRelativePath);
+                    return;
+                }
+
                 if (name.endsWith('Page.java')) {
-                   alert("Opening Page: " + name + ". Clearing canvas for new design.");
-                   canvas.innerHTML = '<div class="canvas-placeholder">Start dragging components here to design ' + name + '</div>';
-                   window.updateGeneratedCode();
+                    const items = canvas.querySelectorAll('.canvas-item');
+                    const doOpen = () => {
+                        alert("Opening Page: " + name + ". Clearing canvas for new design.");
+                        canvas.innerHTML = '<div class="canvas-placeholder">Start dragging components here to design ' + name + '</div>';
+                        window.updateGeneratedCode();
+                    };
+
+                    if (items.length > 0) {
+                        if (confirm("Hay elementos en el diseñador. ¿Desea borrarlos y abrir " + name + "?")) {
+                            doOpen();
+                        }
+                    } else {
+                        doOpen();
+                    }
                 } else if (name.endsWith('Model.java')) {
-                   window.selectModel(name.replace('.java',''));
+                    window.selectModel(name.replace('.java',''));
                 }
             };
 
@@ -595,10 +619,30 @@ public class WebDesignerPage extends DashboardBasePage {
                 window.updateGeneratedCode();
             };
 
+            window.clearDesigner = function() {
+                const canvas = document.getElementById('canvas-area');
+                if (!canvas) return;
+                canvas.innerHTML = '<div class="canvas-placeholder">Start dragging components here to design</div>';
+                
+                document.getElementById('generated-code-display').innerText = "// Designer Cleared";
+                document.getElementById('generated-code-hidden').value = "";
+                
+                selectedItem = null;
+                currentModel = null;
+                window.updateInspector();
+                alert("Designer Cleared!");
+            };
+
             window.updateGeneratedCode = function() {
                 const display = document.getElementById('generated-code-display');
                 const hidden = document.getElementById('generated-code-hidden');
                 if (!display || !hidden) return;
+
+                const canvasItems = document.querySelectorAll('#canvas-area > .canvas-item, .canvas-container > .canvas-item');
+                if (canvasItems.length === 0) {
+                    display.innerText = "// No components added yet";
+                    return;
+                }
 
                 let code = `package com.jettra.example.pages;\\n\\nimport io.jettra.wui.complex.*;\\nimport io.jettra.wui.components.*;\\n\\n`;
                 code += `public class GeneratedPage extends DashboardBasePage {\\n`;
