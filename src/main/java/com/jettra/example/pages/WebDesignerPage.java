@@ -69,6 +69,7 @@ public class WebDesignerPage extends DashboardBasePage {
         Button crudBtn = new Button("CRUD ⚡");
         crudBtn.addClass("j-btn-primary");
         crudBtn.setStyle("font-size", "11px").setStyle("padding", "5px 12px");
+        crudBtn.setProperty("type", "button");
         crudBtn.setProperty("onclick", "generateCRUD()");
         
         canvasHeader.add(canvasTitle).add(crudBtn);
@@ -106,6 +107,7 @@ public class WebDesignerPage extends DashboardBasePage {
         
         Button openBtn = new Button("OPEN FILE");
         openBtn.addClass("j-btn-secondary");
+        openBtn.setProperty("type", "button");
         
         actions.add(saveBtn).add(openBtn);
         codeView.add(codeHeader).add(codeContainer).add(hiddenCode).add(actions);
@@ -141,6 +143,7 @@ public class WebDesignerPage extends DashboardBasePage {
         
         Button cancelBtn = new Button("Cancel");
         cancelBtn.addClass("j-btn");
+        cancelBtn.setProperty("type", "button");
         cancelBtn.setProperty("onclick", "document.getElementById('event-editor-modal').style.display = 'none'");
         
         Button saveEventBtn = new Button("Save Handler");
@@ -255,7 +258,7 @@ public class WebDesignerPage extends DashboardBasePage {
             let activeEventProperty = null;
 
             function drag(ev) {
-                ev.dataTransfer.setData("type", ev.target.getAttribute("data-type"));
+                ev.dataTransfer.setData("type", ev.currentTarget.getAttribute("data-type"));
             }
 
             const canvas = document.getElementById('canvas-area');
@@ -449,7 +452,7 @@ public class WebDesignerPage extends DashboardBasePage {
                 for (let i = 0; i < files.length; i++) {
                     const f = files[i];
                     const relPath = f.webkitRelativePath;
-                    if (!relPath.endsWith('.java')) continue;
+                    if (!relPath.endsWith('.java') && !relPath.endsWith('.properties')) continue;
 
                     const parts = relPath.split('/');
                     let curr = tree;
@@ -466,12 +469,15 @@ public class WebDesignerPage extends DashboardBasePage {
                 }
 
                 function renderTree(node, name, depth = 0) {
-                    const hasJava = Object.keys(node._children).some(k => k.endsWith('.java') || Object.keys(node._children[k]._children).length > 0);
-                    if (!hasJava && !name.endsWith('.java')) return "";
+                    const childrenKeys = Object.keys(node._children);
+                    const isFile = !!node._file;
+                    
+                    if (!isFile && childrenKeys.length === 0) return "";
 
                     let cssClass = "";
                     if (name.endsWith('Page.java')) cssClass = "file-page";
                     if (name.endsWith('Model.java')) cssClass = "file-model";
+                    if (name.endsWith('.properties')) cssClass = "file-props";
 
                     let html = `<div class="project-file ${cssClass}" style="padding-left:${depth * 12}px" onclick="${node._file ? `openClass('${name}')` : ''}">${node._file ? '📄' : '📂'} ${name}</div>`;
                     for (const child in node._children) {
