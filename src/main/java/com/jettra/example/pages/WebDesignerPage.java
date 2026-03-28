@@ -170,6 +170,7 @@ public class WebDesignerPage extends DashboardBasePage {
 
         FolderSelector folderSel = new FolderSelector("fs-explorer");
         folderSel.setReferenceLocation("/").setReferenceContent("Root");
+        folderSel.excludeTarget(true);
         folderSel.setStyle("width", "100%").setStyle("margin-bottom", "10px");
         
         // Custom ID for JS hook
@@ -250,30 +251,50 @@ public class WebDesignerPage extends DashboardBasePage {
         """);
         
         Script script = new Script("""
-            let selectedItem = null;
-            let currentModel = null;
-            let modelFields = [];
-            let availableModels = [];
-            let viewModelName = "BaseViewModel";
-            let activeEventProperty = null;
+            // Designer GLOBALS
+            var selectedItem = null;
+            var currentModel = null;
+            var modelFields = [];
+            var availableModels = [];
+            var viewModelName = "BaseViewModel";
+            var activeEventProperty = null;
+            var projectFilesMap = {};
 
-            function drag(ev) {
+            // EXPOSE FUNCTIONS TO WINDOW EXPLICITLY
+            window.drag = function(ev) {
                 ev.dataTransfer.setData("type", ev.currentTarget.getAttribute("data-type"));
+                ev.dataTransfer.effectAllowed = "move";
+            };
+
+            function setupCanvasHandlers() {
+                const canvas = document.getElementById('canvas-area');
+                if (!canvas) return;
+                
+                canvas.ondragover = function(ev) {
+                    ev.preventDefault();
+                    ev.dataTransfer.dropEffect = "move";
+                };
+
+                canvas.ondrop = function(ev) {
+                    ev.preventDefault();
+                    const type = ev.dataTransfer.getData("type");
+                    if (!type) return; 
+                    const target = ev.target.closest('.canvas-container');
+                    window.addComponentToCanvas(type, target || canvas);
+                };
             }
 
-            const canvas = document.getElementById('canvas-area');
-            canvas.ondragover = function(ev) {
-                ev.preventDefault();
-            };
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', setupCanvasHandlers);
+            } else {
+                setupCanvasHandlers();
+            }
 
-            canvas.ondrop = function(ev) {
-                ev.preventDefault();
-                const type = ev.dataTransfer.getData("type");
-                const target = ev.target.closest('.canvas-container');
-                addComponentToCanvas(type, target || canvas);
-            };
+            window.addComponentToCanvas = function(type, parent) {
+                const canvas = document.getElementById('canvas-area');
+                const targetParent = parent || canvas;
+                if (!targetParent) return;
 
-            function addComponentToCanvas(type, parent = canvas) {
                 const placeholder = document.querySelector('.canvas-placeholder');
                 if (placeholder) placeholder.style.display = 'none';
 
@@ -304,20 +325,24 @@ public class WebDesignerPage extends DashboardBasePage {
                 updateGeneratedCode();
             }
 
-            function selectElement(el) {
+            window.selectElement = function(el) {
                 if (selectedItem) selectedItem.classList.remove('selected');
                 selectedItem = el;
                 selectedItem.classList.add('selected');
-                updateInspector();
-            }
+                window.updateInspector();
+            };
 
-            function showInspector() { document.getElementById('property-inspector').style.display = 'flex'; }
+            window.showInspector = function() { 
+                const inspector = document.getElementById('property-inspector');
+                if (inspector) inspector.style.display = 'flex'; 
+            };
 
-            function updateInspector() {
+            window.updateInspector = function() {
                 if (!selectedItem) return;
                 const type = selectedItem.getAttribute('data-type');
                 const props = JSON.parse(selectedItem.getAttribute('data-props'));
                 const inspector = document.getElementById('inspector-properties');
+                if (!inspector) return;
                 
                 let html = `
                     <div class="view-model-row">
@@ -377,54 +402,54 @@ public class WebDesignerPage extends DashboardBasePage {
                 inspector.innerHTML = html;
             }
 
-            function selectModel(name) {
+            window.selectModel = function(name) {
                 viewModelName = name;
                 const model = availableModels.find(m => m.name === name);
                 if (model) {
                     currentModel = model;
-                    parseModelFields(model.file);
+                    window.parseModelFields(model.file);
                 } else {
                     modelFields = [];
-                    updateInspector();
-                    updateGeneratedCode();
+                    window.updateInspector();
+                    window.updateGeneratedCode();
                 }
-            }
+            };
 
-            function parseModelFields(file) {
+            window.parseModelFields = function(file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const content = e.target.result;
-                    // Simple Regex to find private fields - use double backslash for Java text blocks
-                    const fieldRegex = /private\\\\s+\\\\w+\\\\s+(\\\\w+);/g;
+                    // Simple Regex to find private fields
+                    const fieldRegex = /private\\s+\\w+\\s+(\\w+);/g;
                     let match;
                     modelFields = [];
                     while ((match = fieldRegex.exec(content)) !== null) {
                         modelFields.push(match[1]);
                     }
-                    updateInspector();
-                    updateGeneratedCode();
+                    window.updateInspector();
+                    window.updateGeneratedCode();
                 };
                 reader.readAsText(file);
-            }
+            };
 
-            function openEventEditor(eventName) {
+            window.openEventEditor = function(eventName) {
                 activeEventProperty = eventName;
                 const props = JSON.parse(selectedItem.getAttribute('data-props'));
-                const existingCode = props.events[eventName] || "e -> { \\\\n    // Code for " + eventName + "\\\\n}";
-                document.getElementById('event-code-input').querySelector('textarea').value = existingCode;
+                const existingCode = props.events[eventName] || "e -> { \\n    // Code for " + eventName + "\\n}";
+                document.querySelector('#event-code-input textarea').value = existingCode;
                 document.getElementById('event-editor-modal').style.display = 'block';
-            }
+            };
 
-            function saveEventHandler() {
-                const code = document.getElementById('event-code-input').querySelector('textarea').value;
+            window.saveEventHandler = function() {
+                const code = document.querySelector('#event-code-input textarea').value;
                 const props = JSON.parse(selectedItem.getAttribute('data-props'));
                 props.events[activeEventProperty] = code;
                 selectedItem.setAttribute('data-props', JSON.stringify(props));
                 document.getElementById('event-editor-modal').style.display = 'none';
-                updateGeneratedCode();
-            }
+                window.updateGeneratedCode();
+            };
 
-            function updateProp(key, value) {
+            window.updateProp = function(key, value) {
                 if (!selectedItem) return;
                 const props = JSON.parse(selectedItem.getAttribute('data-props'));
                 props[key] = value;
@@ -436,30 +461,42 @@ public class WebDesignerPage extends DashboardBasePage {
                     if (el) el.innerText = value;
                 }
                 if (key === 'columns' && (type === 'Panel' || type === 'Grid')) {
-                    selectedItem.querySelector('.canvas-container').style.gridTemplateColumns = `repeat(${value}, 1fr)`;
+                    const container = selectedItem.querySelector('.canvas-container');
+                    if (container) container.style.gridTemplateColumns = `repeat(${value}, 1fr)`;
                 }
-                updateGeneratedCode();
-            }
+                window.updateGeneratedCode();
+            };
 
-            function loadFiles(input) {
+            var projectFilesMap = {};
+
+            window.loadFiles = function(input) {
                 const viewer = document.getElementById('explorer-tree-view');
+                if (!viewer) return;
                 viewer.innerHTML = 'Loading...';
                 
                 const files = input.querySelector('input').files;
+                const excludeTarget = input.getAttribute('data-exclude-target') === 'true';
+                
                 availableModels = [];
+                projectFilesMap = {};
                 const tree = {};
 
                 for (let i = 0; i < files.length; i++) {
                     const f = files[i];
                     const relPath = f.webkitRelativePath;
+                    
+                    if (excludeTarget && (relPath.includes('/target/') || relPath.includes('target/'))) continue;
                     if (!relPath.endsWith('.java') && !relPath.endsWith('.properties')) continue;
 
                     const parts = relPath.split('/');
                     let curr = tree;
                     for (let j = 0; j < parts.length; j++) {
                         const part = parts[j];
-                        if (!curr[part]) curr[part] = { _children: {}, _file: null };
-                        if (j === parts.length - 1) curr[part]._file = f;
+                        if (!curr[part]) curr[part] = { _children: {}, _file: null, _path: relPath };
+                        if (j === parts.length - 1) {
+                            curr[part]._file = f;
+                            projectFilesMap[relPath] = f;
+                        }
                         curr = curr[part]._children;
                     }
 
@@ -471,7 +508,6 @@ public class WebDesignerPage extends DashboardBasePage {
                 function renderTree(node, name, depth = 0) {
                     const childrenKeys = Object.keys(node._children);
                     const isFile = !!node._file;
-                    
                     if (!isFile && childrenKeys.length === 0) return "";
 
                     let cssClass = "";
@@ -479,7 +515,8 @@ public class WebDesignerPage extends DashboardBasePage {
                     if (name.endsWith('Model.java')) cssClass = "file-model";
                     if (name.endsWith('.properties')) cssClass = "file-props";
 
-                    let html = `<div class="project-file ${cssClass}" style="padding-left:${depth * 12}px" onclick="${node._file ? `openClass('${name}')` : ''}">${node._file ? '📄' : '📂'} ${name}</div>`;
+                    let action = isFile ? `onclick="window.openClass('${name}')" ondblclick="window.loadFileContent('${node._path}')"` : "";
+                    let html = `<div class="project-file ${cssClass}" style="padding-left:${depth * 12}px" ${action}>${isFile ? '📄' : '📂'} ${name}</div>`;
                     for (const child in node._children) {
                         html += renderTree(node._children[child], child, depth + 1);
                     }
@@ -489,20 +526,41 @@ public class WebDesignerPage extends DashboardBasePage {
                 let finalHtml = "";
                 for (const root in tree) finalHtml += renderTree(tree[root], root);
                 viewer.innerHTML = finalHtml;
-                updateInspector();
-            }
+                window.updateInspector();
+            };
 
-            function openClass(name) {
+            window.loadFileContent = function(path) {
+                const file = projectFilesMap[path];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const content = e.target.result;
+                    document.getElementById('generated-code-display').innerText = content;
+                    document.getElementById('generated-code-hidden').value = content;
+                    
+                    if (path.endsWith('Page.java')) {
+                        alert("Page content loaded into source view: " + path);
+                    }
+                };
+                reader.readAsText(file);
+            };
+
+            window.openClass = function(name) {
+                const canvas = document.getElementById('canvas-area');
+                if (!canvas) return;
                 if (name.endsWith('Page.java')) {
                    alert("Opening Page: " + name + ". Clearing canvas for new design.");
                    canvas.innerHTML = '<div class="canvas-placeholder">Start dragging components here to design ' + name + '</div>';
-                   updateGeneratedCode();
+                   window.updateGeneratedCode();
                 } else if (name.endsWith('Model.java')) {
-                   selectModel(name.replace('.java',''));
+                   window.selectModel(name.replace('.java',''));
                 }
-            }
+            };
 
-            function generateCRUD() {
+            window.generateCRUD = function() {
+                const canvas = document.getElementById('canvas-area');
+                if (!canvas) return;
                 if (!currentModel) {
                     alert("Please select a View Model in the Project Explorer first.");
                     return;
@@ -512,38 +570,42 @@ public class WebDesignerPage extends DashboardBasePage {
                 const placeholder = document.querySelector('.canvas-placeholder');
                 if (placeholder) placeholder.remove();
 
-                addComponentToCanvas('Header', canvas);
+                window.addComponentToCanvas('Header', canvas);
                 const lastHeader = canvas.lastElementChild;
                 lastHeader.setAttribute('data-props', JSON.stringify({text: currentModel.name + " Management", columns: 2, events: {}, binding: ""}));
-                lastHeader.querySelector('h2').innerText = currentModel.name + " Management";
+                const h2 = lastHeader.querySelector('h2');
+                if (h2) h2.innerText = currentModel.name + " Management";
 
-                addComponentToCanvas('Grid', canvas);
+                window.addComponentToCanvas('Grid', canvas);
                 const grid = canvas.lastElementChild;
                 const gridContainer = grid.querySelector('.canvas-container');
                 
-                addComponentToCanvas('Button', gridContainer);
+                window.addComponentToCanvas('Button', gridContainer);
                 const addBtn = gridContainer.lastElementChild;
-                addBtn.setAttribute('data-props', JSON.stringify({text: "Add New " + currentModel.name, columns: 2, events: {onClick: "e -> { \\\\n    document.getElementById('" + currentModel.name.toLowerCase() + "-modal').style.display = 'block';\\\\n}"}, binding: ""}));
-                addBtn.querySelector('button').innerText = "Add New " + currentModel.name;
+                addBtn.setAttribute('data-props', JSON.stringify({text: "Add New " + currentModel.name, columns: 2, events: {onClick: "e -> { \\n    document.getElementById('" + currentModel.name.toLowerCase() + "-modal').style.display = 'block';\\n}"}, binding: ""}));
+                const btn = addBtn.querySelector('button');
+                if (btn) btn.innerText = "Add New " + currentModel.name;
 
-                addComponentToCanvas('Table', canvas);
-                
-                addComponentToCanvas('Modal', canvas);
+                window.addComponentToCanvas('Table', canvas);
+                window.addComponentToCanvas('Modal', canvas);
                 const modal = canvas.lastElementChild;
                 modal.setAttribute('data-props', JSON.stringify({text: "Edit " + currentModel.name, columns: 2, events: {}, binding: ""}));
                 
                 alert("CRUD layout generated for " + currentModel.name + ". Fields detected: " + modelFields.join(", "));
-                updateGeneratedCode();
-            }
+                window.updateGeneratedCode();
+            };
 
-            function updateGeneratedCode() {
-                const canvasItems = document.querySelectorAll('#canvas-area > .canvas-item, .canvas-container > .canvas-item');
-                let code = `package com.jettra.example.pages;\n\nimport io.jettra.wui.complex.*;\nimport io.jettra.wui.components.*;\n\n`;
-                code += `public class GeneratedPage extends DashboardBasePage {\n`;
-                code += `    private ${viewModelName} model = ${viewModelName}.getInstance();\n\n`;
-                code += `    protected void initCenter(Center center, String username) {\n`;
+            window.updateGeneratedCode = function() {
+                const display = document.getElementById('generated-code-display');
+                const hidden = document.getElementById('generated-code-hidden');
+                if (!display || !hidden) return;
+
+                let code = `package com.jettra.example.pages;\\n\\nimport io.jettra.wui.complex.*;\\nimport io.jettra.wui.components.*;\\n\\n`;
+                code += `public class GeneratedPage extends DashboardBasePage {\\n`;
+                code += `    private ${viewModelName} model = ${viewModelName}.getInstance();\\n\\n`;
+                code += `    protected void initCenter(Center center, String username) {\\n`;
                 
-                function walk(items, container = "center") {
+                function walk(items, container) {
                     let out = "";
                     items.forEach(it => {
                         const type = it.getAttribute('data-type');
@@ -551,46 +613,45 @@ public class WebDesignerPage extends DashboardBasePage {
                         const v = type.toLowerCase() + "_" + Math.floor(Math.random()*1000);
                         
                         switch(type) {
-                            case 'Header': out += `        ${container}.add(new Header(1, "${props.text}"));\n`; break;
-                            case 'Paragraph': out += `        ${container}.add(new Paragraph("${props.text}"));\n`; break;
-                            case 'Divide': out += `        ${container}.add(new Divide());\n`; break;
+                            case 'Header': out += `        ${container}.add(new Header(1, "${props.text}"));\\n`; break;
+                            case 'Paragraph': out += `        ${container}.add(new Paragraph("${props.text}"));\\n`; break;
+                            case 'Divide': out += `        ${container}.add(new Divide());\\n`; break;
                             case 'Button': 
-                                out += `        Button ${v} = new Button("${props.text}");\n`;
+                                out += `        Button ${v} = new Button("${props.text}");\\n`;
                                 Object.keys(props.events).forEach(ev => {
-                                    // Replace \\\\n with actual \n for the generated code string
-                                    const eventCode = props.events[ev].replace(/\\\\\\\\n/g, '\\n');
-                                    out += `        ${v}.${ev}(${eventCode});\n`;
+                                    const eventCode = props.events[ev].replace(/\\\\n/g, '\\n');
+                                    out += `        ${v}.${ev}(${eventCode});\\n`;
                                 });
-                                out += `        ${container}.add(${v});\n`;
+                                out += `        ${container}.add(${v});\\n`;
                                 break;
                             case 'TextBox':
-                                out += `        TextBox ${v} = new TextBox("${v}", "Enter value");\n`;
-                                if (props.binding) out += `        ${v}.setValue(model.get${props.binding.charAt(0).toUpperCase() + props.binding.slice(1)}());\n`;
-                                out += `        ${container}.add(${v});\n`;
+                                out += `        TextBox ${v} = new TextBox("${v}", "Enter value");\\n`;
+                                if (props.binding) out += `        ${v}.setValue(model.get${props.binding.charAt(0).toUpperCase() + props.binding.slice(1)}());\\n`;
+                                out += `        ${container}.add(${v});\\n`;
                                 break;
                             case 'TextArea':
-                                out += `        TextArea ${v} = new TextArea("${v}", "");\n`;
-                                if (props.binding) out += `        ${v}.setValue(model.get${props.binding.charAt(0).toUpperCase() + props.binding.slice(1)}());\n`;
-                                out += `        ${container}.add(${v});\n`;
+                                out += `        TextArea ${v} = new TextArea("${v}", "");\\n`;
+                                if (props.binding) out += `        ${v}.setValue(model.get${props.binding.charAt(0).toUpperCase() + props.binding.slice(1)}());\\n`;
+                                out += `        ${container}.add(${v});\\n`;
                                 break;
                             case 'Panel':
                             case 'Grid':
-                                out += `        ${type} ${v} = new ${type}(${props.columns});\n`;
+                                out += `        ${type} ${v} = new ${type}(${props.columns});\\n`;
                                 const kids = it.querySelectorAll(':scope > .canvas-container > .canvas-item');
                                 if (kids.length > 0) out += walk(kids, v);
-                                out += `        ${container}.add(${v});\n`;
+                                out += `        ${container}.add(${v});\\n`;
                                 break;
-                            default: out += `        ${container}.add(new ${type}());\n`;
+                            default: out += `        ${container}.add(new ${type}());\\n`;
                         }
                     });
                     return out;
                 }
-                code += walk(document.querySelectorAll('#canvas-area > .canvas-item'));
-                code += `    }\n}`;
+                code += walk(document.querySelectorAll('#canvas-area > .canvas-item'), "center");
+                code += `    }\\n}`;
                 
-                document.getElementById('generated-code-display').innerText = code;
-                document.getElementById('generated-code-hidden').value = code;
-            }
+                display.innerText = code;
+                hidden.value = code;
+            };
         """);
         
         center.add(style);
