@@ -3,7 +3,6 @@ package com.jettra.example.pages;
 import io.jettra.wui.complex.Center;
 import io.jettra.wui.complex.Modal;
 import io.jettra.wui.components.*;
-import java.util.Properties;
 
 /**
  * JettraWebDesigner: A visual designer for JettraWUI interfaces.
@@ -130,16 +129,17 @@ public class WebDesignerPage extends DashboardBasePage {
         
         // 5. Event Editor Modal
         Modal eventModal = new Modal("event-editor-modal");
-        eventModal.setStyle("display", "none").setStyle("background", "linear-gradient(145deg, rgba(25, 40, 60, 0.95), rgba(10, 20, 35, 0.98))")
-                 .setStyle("backdrop-filter", "blur(20px)").setStyle("padding", "30px").setStyle("border-radius", "20px")
-                 .setStyle("width", "700px").setStyle("border", "1px solid rgba(0, 255, 255, 0.3)")
-                 .setStyle("box-shadow", "0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 2px 0 0 rgba(255, 255, 255, 0.1), 0 0 20px rgba(0, 255, 255, 0.2)");
+        eventModal.addClass("modal-3d-effect");
+        eventModal.setStyle("display", "none").setStyle("background", "linear-gradient(145deg, rgba(30, 50, 80, 0.98), rgba(15, 25, 45, 1))")
+                 .setStyle("backdrop-filter", "blur(25px)").setStyle("padding", "40px").setStyle("border-radius", "30px")
+                 .setStyle("width", "750px").setStyle("border", "1px solid rgba(0, 255, 255, 0.5)")
+                 .setStyle("box-shadow", "0 40px 100px -20px rgba(0, 0, 0, 0.8), inset 0 2px 2px 0 rgba(255, 255, 255, 0.2), 0 0 30px rgba(0, 255, 255, 0.3)");
         
-        Header modalHeader = new Header(3, "⚡ Event Handler Editor");
-        modalHeader.setStyle("color", "var(--jettra-accent)").setStyle("margin-top", "0").setStyle("text-shadow", "0 2px 4px rgba(0,255,255,0.3)");
+        Header modalHeader = new Header(3, "⚡ Pro Event Handler Editor");
+        modalHeader.setStyle("color", "var(--jettra-accent)").setStyle("margin-top", "0").setStyle("text-shadow", "0 0 15px rgba(0,255,255,0.6)").setStyle("font-weight", "800").setStyle("letter-spacing", "1px");
         
         TextArea codeInput = new TextArea("event-code-input", "e -> { \n    // Write your Java code here\n}");
-        codeInput.setStyle("width", "100%").setStyle("height", "300px").setStyle("background", "rgba(0,0,0,0.5)").setStyle("color", "#0ff").setStyle("font-family", "monospace").setStyle("padding", "15px").setStyle("border", "1px solid rgba(0,255,255,0.2)").setStyle("border-radius", "10px").setStyle("box-shadow", "inset 0 2px 10px rgba(0,0,0,0.5)");
+        codeInput.setStyle("width", "100%").setStyle("height", "350px").setStyle("background", "rgba(0,0,0,0.7)").setStyle("color", "#0ff").setStyle("font-family", "'Fira Code', monospace").setStyle("padding", "20px").setStyle("border", "1px solid rgba(0,255,255,0.3)").setStyle("border-radius", "15px").setStyle("box-shadow", "inset 0 4px 20px rgba(0,0,0,0.7)");
         
         Div modalActions = new Div();
         modalActions.setStyle("display", "flex").setStyle("justify-content", "flex-end").setStyle("gap", "15px").setStyle("margin-top", "25px");
@@ -160,10 +160,11 @@ public class WebDesignerPage extends DashboardBasePage {
         
         // 6. 3D Confirmation Modal
         Modal confirmModal = new Modal("confirm-3d-modal");
+        confirmModal.addClass("modal-3d-effect");
         confirmModal.setStyle("display", "none").setStyle("background", "linear-gradient(135deg, #1e293b, #0f172a)")
-                   .setStyle("border", "1px solid rgba(0, 255, 255, 0.4)").setStyle("border-radius", "24px")
-                   .setStyle("padding", "40px").setStyle("width", "450px")
-                   .setStyle("box-shadow", "0 30px 60px -12px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.1)");
+                   .setStyle("border", "2px solid rgba(0, 255, 255, 0.6)").setStyle("border-radius", "30px")
+                   .setStyle("padding", "50px").setStyle("width", "500px")
+                   .setStyle("box-shadow", "0 50px 100px -20px rgba(0, 0, 0, 0.8), inset 0 2px 2px rgba(255, 255, 255, 0.1), 0 0 40px rgba(0, 255, 255, 0.2)");
         
         Header confirmTitle = new Header(3, "Confirm Action");
         confirmTitle.setProperty("id", "confirm-title");
@@ -304,6 +305,31 @@ public class WebDesignerPage extends DashboardBasePage {
             .btn-event:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,255,255,0.4); }
             .btn-event:active { transform: translateY(0); }
             
+            /* Enhanced 3D Styles for Modals */
+            .modal-3d-effect {
+                transform-style: preserve-3d;
+                perspective: 2000px;
+                transition: transform 0.1s ease-out, opacity 0.3s ease-out;
+                animation: modalDeepAppear 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            }
+            @keyframes modalDeepAppear {
+                from { 
+                    opacity: 0; 
+                    transform: translateY(50px) scale(0.8) rotateX(-25deg); 
+                }
+                to { 
+                    opacity: 1; 
+                    transform: translateY(0) scale(1) rotateX(0); 
+                }
+            }
+            
+            .canvas-container.modal-container-mock {
+                background: rgba(30, 50, 80, 0.3);
+                border: 2px solid var(--jettra-accent);
+                box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+                min-height: 120px;
+            }
+            
             /* 3D Effects for Modals */
             #confirm-3d-modal, #event-editor-modal {
                 transform-style: preserve-3d;
@@ -403,6 +429,11 @@ public class WebDesignerPage extends DashboardBasePage {
                     case 'Panel': 
                     case 'Grid':
                         content = '<div class="canvas-container" style="display:grid; grid-template-columns:1fr 1fr; gap:10px"></div>'; 
+                        break;
+                    case 'Modal':
+                        content = '<div class="canvas-container modal-container-mock" style="padding:20px; border-radius:15px; border:2px solid var(--jettra-accent); background:rgba(20,40,70,0.4)">' +
+                                  '<h3 style="margin-top:0; color:var(--jettra-accent)">Modal Component</h3>' +
+                                  '</div>';
                         break;
                     default: content = `<div style="padding:10px; border:1px solid #444; color:#888">${type} Placeholder</div>`;
                 }
@@ -632,7 +663,7 @@ public class WebDesignerPage extends DashboardBasePage {
                     document.getElementById('generated-code-hidden').value = content;
                     
                     if (path.endsWith('Page.java')) {
-                        alert("Page content loaded into source view: " + path);
+                        window.show3DConfirm("Page Loaded", "Page content loaded into source view: " + path, () => {});
                     }
                 };
                 reader.readAsText(file);
@@ -667,10 +698,10 @@ public class WebDesignerPage extends DashboardBasePage {
                     const yc = rect.height / 2;
                     const dx = x - xc;
                     const dy = y - yc;
-                    el.style.transform = `perspective(1000px) rotateX(${-dy / 25}deg) rotateY(${dx / 25}deg)`;
+                    el.style.transform = `perspective(2000px) rotateX(${-dy / 20}deg) rotateY(${dx / 20}deg) translateZ(50px)`;
                 };
                 el.onmouseleave = () => {
-                    el.style.transform = `perspective(1000px) rotateX(0) rotateY(0)`;
+                    el.style.transform = `perspective(2000px) rotateX(0) rotateY(0) translateZ(0)`;
                 };
             };
 
@@ -798,7 +829,7 @@ public class WebDesignerPage extends DashboardBasePage {
 
                 window.addComponentToCanvas('Button', modalActions);
                 const saveBtn = modalActions.lastElementChild;
-                saveBtn.setAttribute('data-props', JSON.stringify({text: "Save " + currentModel.name, columns: 2, events: {onClick: "e -> { \\n    alert('Saving " + currentModel.name + "...'); \\n    document.getElementById('" + modalId + "').style.display = 'none'; \\n}"}, binding: ""}));
+                saveBtn.setAttribute('data-props', JSON.stringify({text: "Save " + currentModel.name, columns: 2, events: {onClick: "e -> { \\n    window.show3DConfirm('Data Saved', 'Saving " + currentModel.name + " to database...', () => {}); \\n    document.getElementById('" + modalId + "').style.display = 'none'; \\n}"}, binding: ""}));
                 
                 window.addComponentToCanvas('Button', modalActions);
                 const cancelBtn = modalActions.lastElementChild;
@@ -813,17 +844,23 @@ public class WebDesignerPage extends DashboardBasePage {
             };
 
             window.clearDesigner = function() {
-                const canvas = document.getElementById('canvas-area');
-                if (!canvas) return;
-                canvas.innerHTML = '<div class="canvas-placeholder">Start dragging components here to design</div>';
-                
-                document.getElementById('generated-code-display').innerText = "// Designer Cleared";
-                document.getElementById('generated-code-hidden').value = "";
-                
-                selectedItem = null;
-                currentModel = null;
-                window.updateInspector();
-                alert("Designer Cleared!");
+                window.show3DConfirm(
+                    "Clear Canvas", 
+                    "Are you sure you want to delete all elements and start over?", 
+                    () => {
+                        const canvas = document.getElementById('canvas-area');
+                        if (!canvas) return;
+                        canvas.innerHTML = '<div class="canvas-placeholder">Start dragging components here to design</div>';
+                        
+                        document.getElementById('generated-code-display').innerText = "// Designer Cleared";
+                        document.getElementById('generated-code-hidden').value = "";
+                        
+                        selectedItem = null;
+                        currentModel = null;
+                        window.updateInspector();
+                        window.show3DConfirm("Canvas Cleared", "Designer session has been reset.", () => {});
+                    }
+                );
             };
 
             window.updateGeneratedCode = function() {

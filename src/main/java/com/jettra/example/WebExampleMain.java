@@ -65,7 +65,13 @@ public class WebExampleMain {
         server.addHandler("/tree", com.jettra.example.pages.TreePage.class);
         server.addHandler("/divide", com.jettra.example.pages.DividePage.class);
         server.addHandler("/fileupload", com.jettra.example.pages.FileUploadPage.class);
-        server.addHandler("/folderselector", com.jettra.example.pages.FolderSelectorPage.class);
+        server.addHandler("/forms", com.jettra.example.pages.FormsPage.class);
+        server.addHandler("/textarea", com.jettra.example.pages.TextAreaPage.class);
+        server.addHandler("/navigation", com.jettra.example.pages.NavigationPage.class);
+        server.addHandler("/feedback", com.jettra.example.pages.FeedbackPage.class);
+        server.addHandler("/icon", com.jettra.example.pages.IconPage.class);
+        server.addHandler("/typography", com.jettra.example.pages.TypographyPage.class);
+        server.addHandler("/layoutdisplay", com.jettra.example.pages.LayoutDisplayPage.class);
 
         server.start();
     }
