@@ -222,8 +222,8 @@ public class WebDesignerPage extends DashboardBasePage {
 
         FolderSelector folderSel = new FolderSelector("fs-explorer");
         folderSel.setReferenceLocation("/").setReferenceContent("Root");
-        folderSel.excludeTarget(true);
-        folderSel.setStyle("width", "100%").setStyle("margin-bottom", "10px");
+        folderSel.excludeTarget(true).style3D().setConfirmUpload(true, "Explorador de Proyecto", "¿Desea cargar los archivos de esta carpeta?");
+        folderSel.setStyle("width", "100%").setStyle("margin-top", "10px").setStyle("margin-bottom", "10px");
         
         // Custom ID for JS hook
         folderSel.setProperty("onchange", "loadFiles(this)");
@@ -251,7 +251,7 @@ public class WebDesignerPage extends DashboardBasePage {
         // Feedback
         addPaletteCategory(palette, "Feedback", new String[]{"Alert", "Modal", "Notification", "SessionTimeout"});
         // Layout & Display
-        addPaletteCategory(palette, "Layout & Display", new String[]{"Avatar", "AvatarGroup", "Carousel", "Datatable", "Div", "Divide", "FileUpload", "FolderSelector", "Grid", "Image", "Panel", "Table", "TabView", "Tree"});
+        addPaletteCategory(palette, "Layout", new String[]{"Avatar", "Carousel", "Clock", "Div", "Divide", "FileUpload", "FolderSelector", "Grid", "Image", "LayoutDisplay", "Panel", "ProgressBar", "Table", "TabView", "Tree"});
 
         return palette;
     }
@@ -435,6 +435,14 @@ public class WebDesignerPage extends DashboardBasePage {
                                   '<h3 style="margin-top:0; color:var(--jettra-accent)">Modal Component</h3>' +
                                   '</div>';
                         break;
+                    case 'Avatar':
+                        content = '<div class="j-avatar j-avatar-circle j-avatar-md" style="background:var(--jettra-accent); color:#000; display:flex; align-items:center; justify-content:center; font-weight:bold">AV</div>';
+                        break;
+                    case 'ProgressBar':
+                        content = '<div class="j-progressbar-container" style="width:100%; height:12px; background:rgba(255,255,255,0.05); border-radius:6px; overflow:hidden; border:1px solid rgba(255,255,255,0.1)">' +
+                                  '<div class="j-progressbar-fill" style="width:60%; height:100%; background:var(--jettra-accent); box-shadow:0 0 10px var(--jettra-accent)"></div>' +
+                                  '</div>';
+                        break;
                     default: content = `<div style="padding:10px; border:1px solid #444; color:#888">${type} Placeholder</div>`;
                 }
 
@@ -500,6 +508,45 @@ public class WebDesignerPage extends DashboardBasePage {
                         <div class="inspector-row">
                             <span class="inspector-label">Columns</span>
                             <input type="number" class="inspector-input" value="${props.columns || 2}" min="1" max="12" onchange="updateProp('columns', this.value)">
+                        </div>
+                    `;
+                }
+
+                if (type === 'Avatar') {
+                    html += `
+                        <div class="inspector-row">
+                            <span class="inspector-label">Avatar Text</span>
+                            <input type="text" class="inspector-input" value="${props.text || ""}" onchange="updateProp('text', this.value)">
+                        </div>
+                        <div class="inspector-row">
+                            <span class="inspector-label">Avatar Icon</span>
+                            <div style="display:grid; grid-template-columns: repeat(5, 1fr); gap:5px; margin-top:5px;">
+                                ${['👤','👥','🏠','⚙️','🔔','📧','📁','📊','🚀','🌙','☀️','➕','✏️','🗑️','✅'].map(icon => 
+                                    `<div class="icon-preset" style="cursor:pointer; padding:5px; text-align:center; border:1px solid ${props.icon === icon ? 'var(--jettra-accent)' : 'rgba(255,255,255,0.1)'}" onclick="updateProp('icon', '${icon}')">${icon}</div>`
+                                ).join('')}
+                            </div>
+                            <input type="text" class="inspector-input" style="margin-top:5px" placeholder="Custom icon/unicode" value="${props.icon || ""}" onchange="updateProp('icon', this.value)">
+                        </div>
+                    `;
+                }
+
+                if (type === 'ProgressBar') {
+                    html += `
+                        <div class="inspector-row">
+                            <span class="inspector-label">Value</span>
+                            <input type="number" class="inspector-input" value="${props.value || 60}" onchange="updateProp('value', this.value)">
+                        </div>
+                        <div class="inspector-row">
+                            <span class="inspector-label">Max</span>
+                            <input type="number" class="inspector-input" value="${props.max || 100}" onchange="updateProp('max', this.value)">
+                        </div>
+                        <div class="inspector-row">
+                            <span class="inspector-label">Color</span>
+                            <input type="color" class="inspector-input" value="${props.color || '#00ffff'}" onchange="updateProp('color', this.value)">
+                        </div>
+                        <div class="inspector-row" style="display:flex; justify-content:space-between; align-items:center;">
+                            <span class="inspector-label">Indeterminate</span>
+                            <input type="checkbox" ${props.indeterminate ? 'checked' : ''} onchange="updateProp('indeterminate', this.checked)">
                         </div>
                     `;
                 }
@@ -579,8 +626,29 @@ public class WebDesignerPage extends DashboardBasePage {
                 
                 const type = selectedItem.getAttribute('data-type');
                 if (key === 'text') {
-                    const el = selectedItem.querySelector('h2, p, button, label');
+                    const el = selectedItem.querySelector('h2, p, button, label, .j-avatar');
                     if (el) el.innerText = value;
+                }
+                if (key === 'icon' && type === 'Avatar') {
+                    const el = selectedItem.querySelector('.j-avatar');
+                    if (el) el.innerText = value;
+                }
+                if (type === 'ProgressBar') {
+                    const fill = selectedItem.querySelector('.j-progressbar-fill');
+                    if (key === 'value' || key === 'max') {
+                        const val = parseInt(selectedItem.getAttribute('data-props-value') || props.value || 60);
+                        const mx = parseInt(selectedItem.getAttribute('data-props-max') || props.max || 100);
+                        const pct = (key === 'value' ? value : val) / (key === 'max' ? value : mx) * 100;
+                        fill.style.width = pct + '%';
+                    }
+                    if (key === 'color') {
+                        fill.style.background = value;
+                        fill.style.boxShadow = `0 0 10px ${value}`;
+                    }
+                    if (key === 'indeterminate') {
+                        if (value) fill.classList.add('j-progress-indeterminate');
+                        else fill.classList.remove('j-progress-indeterminate');
+                    }
                 }
                 if (key === 'columns' && (type === 'Panel' || type === 'Grid')) {
                     const container = selectedItem.querySelector('.canvas-container');
@@ -592,64 +660,72 @@ public class WebDesignerPage extends DashboardBasePage {
             var projectFilesMap = {};
 
             window.loadFiles = function(input) {
-                const viewer = document.getElementById('explorer-tree-view');
-                if (!viewer) return;
-                viewer.innerHTML = 'Loading...';
-                
-                const files = input.querySelector('input').files;
-                const excludeTarget = input.getAttribute('data-exclude-target') === 'true';
-                
-                availableModels = [];
-                projectFilesMap = {};
-                const tree = {};
-
-                for (let i = 0; i < files.length; i++) {
-                    const f = files[i];
-                    const relPath = f.webkitRelativePath;
+                const triggerLoad = () => {
+                    const viewer = document.getElementById('explorer-tree-view');
+                    if (!viewer) return;
+                    viewer.innerHTML = 'Loading...';
                     
-                    if (excludeTarget && (relPath.includes('/target/') || relPath.includes('target/'))) continue;
-                    if (!relPath.endsWith('.java') && !relPath.endsWith('.properties')) continue;
+                    const files = input.querySelector('input').files;
+                    const excludeTarget = input.getAttribute('data-exclude-target') === 'true';
+                    
+                    availableModels = [];
+                    projectFilesMap = {};
+                    const tree = {};
 
-                    const parts = relPath.split('/');
-                    let curr = tree;
-                    for (let j = 0; j < parts.length; j++) {
-                        const part = parts[j];
-                        if (!curr[part]) curr[part] = { _children: {}, _file: null, _path: relPath };
-                        if (j === parts.length - 1) {
-                            curr[part]._file = f;
-                            projectFilesMap[relPath] = f;
+                    for (let i = 0; i < files.length; i++) {
+                        const f = files[i];
+                        const relPath = f.webkitRelativePath;
+                        
+                        if (excludeTarget && (relPath.includes('/target/') || relPath.includes('target/'))) continue;
+                        if (!relPath.endsWith('.java') && !relPath.endsWith('.properties')) continue;
+
+                        const parts = relPath.split('/');
+                        let curr = tree;
+                        for (let j = 0; j < parts.length; j++) {
+                            const part = parts[j];
+                            if (!curr[part]) curr[part] = { _children: {}, _file: null, _path: relPath };
+                            if (j === parts.length - 1) {
+                                curr[part]._file = f;
+                                projectFilesMap[relPath] = f;
+                            }
+                            curr = curr[part]._children;
                         }
-                        curr = curr[part]._children;
+
+                        if (f.name.endsWith('Model.java')) {
+                            availableModels.push({ name: f.name.replace('.java',''), file: f });
+                        }
                     }
 
-                    if (f.name.endsWith('Model.java')) {
-                        availableModels.push({ name: f.name.replace('.java',''), file: f });
+                    function renderTree(node, name, depth = 0) {
+                        const childrenKeys = Object.keys(node._children);
+                        const isFile = !!node._file;
+                        if (!isFile && childrenKeys.length === 0) return "";
+
+                        let cssClass = "";
+                        if (name.endsWith('Page.java')) cssClass = "file-page";
+                        if (name.endsWith('Model.java')) cssClass = "file-model";
+                        if (name.endsWith('.properties')) cssClass = "file-props";
+
+                        let action = isFile ? `onclick="window.openClass('${name}')" ondblclick="window.loadFileContent('${node._path}')"` : "";
+                        let html = `<div class="project-file ${cssClass}" style="padding-left:${depth * 12}px" ${action}>${isFile ? '📄' : '📂'} ${name}</div>`;
+                        for (const child in node._children) {
+                            html += renderTree(node._children[child], child, depth + 1);
+                        }
+                        return html;
                     }
-                }
 
-                function renderTree(node, name, depth = 0) {
-                    const childrenKeys = Object.keys(node._children);
-                    const isFile = !!node._file;
-                    if (!isFile && childrenKeys.length === 0) return "";
+                    let finalHtml = "";
+                    for (const root in tree) finalHtml += renderTree(tree[root], root);
+                    viewer.innerHTML = finalHtml;
+                    window.updateModelSelect();
+                    window.updateInspector();
+                };
 
-                    let cssClass = "";
-                    if (name.endsWith('Page.java')) cssClass = "file-page";
-                    if (name.endsWith('Model.java')) cssClass = "file-model";
-                    if (name.endsWith('.properties')) cssClass = "file-props";
-
-                    let action = isFile ? `onclick="window.openClass('${name}')" ondblclick="window.loadFileContent('${node._path}')"` : "";
-                    let html = `<div class="project-file ${cssClass}" style="padding-left:${depth * 12}px" ${action}>${isFile ? '📄' : '📂'} ${name}</div>`;
-                    for (const child in node._children) {
-                        html += renderTree(node._children[child], child, depth + 1);
-                    }
-                    return html;
-                }
-
-                let finalHtml = "";
-                for (const root in tree) finalHtml += renderTree(tree[root], root);
-                viewer.innerHTML = finalHtml;
-                window.updateModelSelect();
-                window.updateInspector();
+                window.show3DConfirm(
+                    "Explorador de Proyecto", 
+                    "¿Desea cargar los archivos de esta carpeta al explorador?", 
+                    triggerLoad
+                );
             };
 
             window.loadFileContent = function(path) {
@@ -886,26 +962,48 @@ public class WebDesignerPage extends DashboardBasePage {
                         const props = JSON.parse(it.getAttribute('data-props'));
                         const v = type.toLowerCase() + "_" + Math.floor(Math.random()*1000);
                         
+                        const handleEvents = (compVar) => {
+                            let evOut = "";
+                            Object.keys(props.events).forEach(ev => {
+                                const eventCode = props.events[ev].replace(/\\\\n/g, '\\n');
+                                evOut += `        ${compVar}.${ev}(${eventCode});\\n`;
+                            });
+                            return evOut;
+                        };
+
                         switch(type) {
                             case 'Header': out += `        ${container}.add(new Header(1, "${props.text}"));\\n`; break;
                             case 'Paragraph': out += `        ${container}.add(new Paragraph("${props.text}"));\\n`; break;
                             case 'Divide': out += `        ${container}.add(new Divide());\\n`; break;
+                            case 'Avatar':
+                                out += `        Avatar ${v} = new Avatar();\\n`;
+                                if (props.text) out += `        ${v}.setText("${props.text}");\\n`;
+                                if (props.icon) out += `        ${v}.setIcon("${props.icon}");\\n`;
+                                out += handleEvents(v);
+                                out += `        ${container}.add(${v});\\n`;
+                                break;
+                            case 'ProgressBar':
+                                out += `        ProgressBar ${v} = new ProgressBar(${props.value || 0}, ${props.max || 100});\\n`;
+                                if (props.color) out += `        ${v}.setColor("${props.color}");\\n`;
+                                if (props.indeterminate) out += `        ${v}.setIndeterminate(true);\\n`;
+                                out += handleEvents(v);
+                                out += `        ${container}.add(${v});\\n`;
+                                break;
                             case 'Button': 
                                 out += `        Button ${v} = new Button("${props.text}");\\n`;
-                                Object.keys(props.events).forEach(ev => {
-                                    const eventCode = props.events[ev].replace(/\\\\n/g, '\\n');
-                                    out += `        ${v}.${ev}(${eventCode});\\n`;
-                                });
+                                out += handleEvents(v);
                                 out += `        ${container}.add(${v});\\n`;
                                 break;
                             case 'TextBox':
                                 out += `        TextBox ${v} = new TextBox("${v}", "Enter value");\\n`;
                                 if (props.binding) out += `        ${v}.setValue(model.get${props.binding.charAt(0).toUpperCase() + props.binding.slice(1)}());\\n`;
+                                out += handleEvents(v);
                                 out += `        ${container}.add(${v});\\n`;
                                 break;
                             case 'TextArea':
                                 out += `        TextArea ${v} = new TextArea("${v}", "");\\n`;
                                 if (props.binding) out += `        ${v}.setValue(model.get${props.binding.charAt(0).toUpperCase() + props.binding.slice(1)}());\\n`;
+                                out += handleEvents(v);
                                 out += `        ${container}.add(${v});\\n`;
                                 break;
                             case 'Panel':
@@ -913,9 +1011,13 @@ public class WebDesignerPage extends DashboardBasePage {
                                 out += `        ${type} ${v} = new ${type}(${props.columns});\\n`;
                                 const kids = it.querySelectorAll(':scope > .canvas-container > .canvas-item');
                                 if (kids.length > 0) out += walk(kids, v);
+                                out += handleEvents(v);
                                 out += `        ${container}.add(${v});\\n`;
                                 break;
-                            default: out += `        ${container}.add(new ${type}());\\n`;
+                            default: 
+                                out += `        ${type} ${v} = new ${type}();\\n`;
+                                out += handleEvents(v);
+                                out += `        ${container}.add(${v});\\n`;
                         }
                     });
                     return out;
@@ -926,6 +1028,7 @@ public class WebDesignerPage extends DashboardBasePage {
                 display.innerText = code;
                 hidden.value = code;
             };
+
         """);
         
         center.add(style);

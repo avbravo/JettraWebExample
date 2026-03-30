@@ -3,6 +3,7 @@ package com.jettra.example;
 import com.jettra.server.JettraServer;
 import com.jettra.server.config.JettraConfigProperty;
 import com.jettra.server.config.ConfigInjector;
+
 public class WebExampleMain {
 
     @JettraConfigProperty(name = "app.title")
@@ -22,19 +23,26 @@ public class WebExampleMain {
 
         // Register pages as classes to ensure a fresh, isolated instance per request
         server.addHandler("/", com.jettra.example.pages.LoginPage.class);
-        server.addHandler("/login", com.jettra.example.pages.LoginPage.class);
-        server.addHandler("/logout", com.jettra.example.pages.LoginPage.class);
-
-        server.addHandler("/dashboard", com.jettra.example.pages.DashboardPage.class);
-        server.addHandler("/persona", com.jettra.example.pages.PersonaPage.class);
-        server.addHandler("/avatar", com.jettra.example.pages.AvatarPage.class);
         server.addHandler("/alert", com.jettra.example.pages.AlertPage.class);
+        server.addHandler("/avatar", com.jettra.example.pages.AvatarPage.class);
+        server.addHandler("/avatargroup", com.jettra.example.pages.AvatarGroupPage.class);
+
         server.addHandler("/button", com.jettra.example.pages.ButtonPage.class);
         server.addHandler("/checkbox", com.jettra.example.pages.CheckBoxPage.class);
         server.addHandler("/clock", com.jettra.example.pages.ClockPage.class);
-        server.addHandler("/header", com.jettra.example.pages.HeaderPage.class);
-        server.addHandler("/icon", com.jettra.example.pages.IconPage.class);
+        server.addHandler("/dashboard", com.jettra.example.pages.DashboardPage.class);
+    server.addHandler("/header", com.jettra.example.pages.HeaderPage.class);
+      server.addHandler("/icon", com.jettra.example.pages.IconPage.class);
         server.addHandler("/image", com.jettra.example.pages.ImagePage.class);
+        server.addHandler("/layoutdisplay", com.jettra.example.pages.LayoutDisplayPage.class);
+        server.addHandler("/login", com.jettra.example.pages.LoginPage.class);
+        server.addHandler("/logout", com.jettra.example.pages.LoginPage.class);
+
+
+        server.addHandler("/persona", com.jettra.example.pages.PersonaPage.class);
+
+    
+      
         server.addHandler("/label", com.jettra.example.pages.LabelPage.class);
         server.addHandler("/link", com.jettra.example.pages.LinkPage.class);
         server.addHandler("/paragraph", com.jettra.example.pages.ParagraphPage.class);
@@ -47,7 +55,7 @@ public class WebExampleMain {
         server.addHandler("/modal", com.jettra.example.pages.ModalPage.class);
         server.addHandler("/notification", com.jettra.example.pages.NotificationPage.class);
         server.addHandler("/menubar", com.jettra.example.pages.MenuBarPage.class);
-        server.addHandler("/avatargroup", com.jettra.example.pages.AvatarGroupPage.class);
+
         server.addHandler("/selectoneicon", com.jettra.example.pages.SelectOneIconPage.class);
         server.addHandler("/grid", com.jettra.example.pages.GridPage.class);
         server.addHandler("/sessiontimeout", com.jettra.example.pages.SessionTimeoutDialogPage.class);
@@ -65,13 +73,14 @@ public class WebExampleMain {
         server.addHandler("/tree", com.jettra.example.pages.TreePage.class);
         server.addHandler("/divide", com.jettra.example.pages.DividePage.class);
         server.addHandler("/fileupload", com.jettra.example.pages.FileUploadPage.class);
+        server.addHandler("/folderselector", com.jettra.example.pages.FolderSelectorPage.class);
         server.addHandler("/forms", com.jettra.example.pages.FormsPage.class);
+        server.addHandler("/progressbar", com.jettra.example.pages.ProgressBarPage.class);
         server.addHandler("/textarea", com.jettra.example.pages.TextAreaPage.class);
         server.addHandler("/navigation", com.jettra.example.pages.NavigationPage.class);
         server.addHandler("/feedback", com.jettra.example.pages.FeedbackPage.class);
         server.addHandler("/icon", com.jettra.example.pages.IconPage.class);
         server.addHandler("/typography", com.jettra.example.pages.TypographyPage.class);
-        server.addHandler("/layoutdisplay", com.jettra.example.pages.LayoutDisplayPage.class);
 
         server.start();
     }
