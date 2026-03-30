@@ -243,15 +243,15 @@ public class WebDesignerPage extends DashboardBasePage {
         palette.add(h);
 
         // Typography
-        addPaletteCategory(palette, "Typography", new String[]{"Header", "Paragraph", "Span", "Label", "Separator"});
+        addPaletteCategory(palette, "Typography", new String[]{"Header", "Paragraph", "Span", "Label", "Separator", "Divide"});
         // Forms
-        addPaletteCategory(palette, "Forms", new String[]{"Button", "CheckBox", "Form", "RadioButton", "SelectOne", "SelectOneIcon", "Spinner", "TextBox", "TextArea", "ToggleSwitch"});
+        addPaletteCategory(palette, "Forms", new String[]{"Button", "CheckBox", "RadioButton", "SelectOne", "SelectOneIcon", "TextBox", "TextArea", "ToggleSwitch", "FileUpload", "FolderSelector"});
         // Navigation
         addPaletteCategory(palette, "Navigation", new String[]{"Link", "Menu", "MenuBar"});
         // Feedback
-        addPaletteCategory(palette, "Feedback", new String[]{"Alert", "Modal", "Notification", "SessionTimeout"});
+        addPaletteCategory(palette, "Feedback", new String[]{"ProgressBar", "Spinner", "Alert", "Notification", "Clock"});
         // Layout & Display
-        addPaletteCategory(palette, "Layout", new String[]{"Avatar", "Carousel", "Clock", "Div", "Divide", "FileUpload", "FolderSelector", "Grid", "Image", "LayoutDisplay", "Panel", "ProgressBar", "Table", "TabView", "Tree"});
+        addPaletteCategory(palette, "Layout & Display", new String[]{"Grid", "Panel", "Avatar", "Carousel", "Table", "TabView", "Modal", "Tree", "Div", "Image", "LayoutDisplay"});
 
         return palette;
     }
@@ -581,6 +581,32 @@ public class WebDesignerPage extends DashboardBasePage {
                 `;
 
                 inspector.innerHTML = html;
+            };
+
+            window.openEventEditor = function(evName) {
+                if (!selectedItem) return;
+                const props = JSON.parse(selectedItem.getAttribute('data-props'));
+                const currentCode = props.events[evName] || "e -> { \\n    // Enter code here \\n}";
+                
+                const html = `
+                    <div style="display:flex; flex-direction:column; gap:10px;">
+                        <span style="font-size:12px; color:#aaa">Editing event handler for <b>${evName}</b></span>
+                        <textarea id="event-code-editor" style="width:100%; height:200px; background:#0f172a; color:#00ffff; border:1px solid #00ffff; border-radius:8px; padding:10px; font-family:monospace; font-size:12px; outline:none; resize:none;">${currentCode.replace(/\\\\n/g, '\\n')}</textarea>
+                        <div style="font-size:10px; color:#666">Supports Java Lambda syntax, e.g., e -> { ... }</div>
+                    </div>
+                `;
+
+                window.show3DConfirm(
+                    "Event Editor: " + evName,
+                    html,
+                    () => {
+                        const newCode = document.getElementById('event-code-editor').value;
+                        props.events[evName] = newCode.replace(/\\n/g, '\\\\n');
+                        selectedItem.setAttribute('data-props', JSON.stringify(props));
+                        window.updateGeneratedCode();
+                        window.updateInspector();
+                    }
+                );
             };
 
             window.selectModel = function(name) {
