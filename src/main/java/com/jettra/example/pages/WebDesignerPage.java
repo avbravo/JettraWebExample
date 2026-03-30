@@ -641,23 +641,6 @@ public class WebDesignerPage extends DashboardBasePage {
                 reader.readAsText(file);
             };
 
-            window.openEventEditor = function(eventName) {
-                activeEventProperty = eventName;
-                const props = JSON.parse(selectedItem.getAttribute('data-props'));
-                const existingCode = props.events[eventName] || "e -> { \\n    // Code for " + eventName + "\\n}";
-                document.querySelector('#event-code-input textarea').value = existingCode;
-                document.getElementById('event-editor-modal').style.display = 'block';
-            };
-
-            window.saveEventHandler = function() {
-                const code = document.querySelector('#event-code-input textarea').value;
-                const props = JSON.parse(selectedItem.getAttribute('data-props'));
-                props.events[activeEventProperty] = code;
-                selectedItem.setAttribute('data-props', JSON.stringify(props));
-                document.getElementById('event-editor-modal').style.display = 'none';
-                window.updateGeneratedCode();
-            };
-
             window.updateProp = function(key, value) {
                 if (!selectedItem) return;
                 const props = JSON.parse(selectedItem.getAttribute('data-props'));
@@ -668,10 +651,18 @@ public class WebDesignerPage extends DashboardBasePage {
                 if (key === 'text') {
                     const el = selectedItem.querySelector('h2, p, button, label, .j-avatar');
                     if (el) el.innerText = value;
+                    if (type === 'Avatar') {
+                        props.icon = "";
+                        selectedItem.setAttribute('data-props', JSON.stringify(props));
+                        setTimeout(window.updateInspector, 10);
+                    }
                 }
                 if (key === 'icon' && type === 'Avatar') {
                     const el = selectedItem.querySelector('.j-avatar');
-                    if (el) el.innerText = value;
+                    if (el) el.innerHTML = value;
+                    props.text = "";
+                    selectedItem.setAttribute('data-props', JSON.stringify(props));
+                    setTimeout(window.updateInspector, 10);
                 }
                 if (type === 'ProgressBar') {
                     const fill = selectedItem.querySelector('.j-progressbar-fill');
@@ -792,7 +783,7 @@ public class WebDesignerPage extends DashboardBasePage {
             window.show3DConfirm = function(title, body, yesAction) {
                 const modal = document.getElementById('confirm-3d-modal');
                 document.getElementById('confirm-title').innerText = title;
-                document.getElementById('confirm-body').innerText = body;
+                document.getElementById('confirm-body').innerHTML = body;
                 const yesBtn = document.getElementById('confirm-yes-btn');
                 yesBtn.onclick = () => {
                    window.close3DConfirm();
