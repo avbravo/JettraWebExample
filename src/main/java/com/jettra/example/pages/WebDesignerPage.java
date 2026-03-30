@@ -512,6 +512,16 @@ public class WebDesignerPage extends DashboardBasePage {
                     `;
                 }
 
+                // Common properties
+                html += `
+                    <div style="margin-top:15px; border-top:1px solid rgba(255,255,255,0.1); padding-top:10px">
+                        <div class="inspector-row">
+                            <span class="inspector-label">Update (IDs)</span>
+                            <input type="text" class="inspector-input" value="${props.update || ""}" onchange="updateProp('update', this.value)">
+                        </div>
+                    </div>
+                `;
+
                 if (type === 'Avatar') {
                     html += `
                         <div class="inspector-row">
@@ -547,6 +557,10 @@ public class WebDesignerPage extends DashboardBasePage {
                         <div class="inspector-row" style="display:flex; justify-content:space-between; align-items:center;">
                             <span class="inspector-label">Indeterminate</span>
                             <input type="checkbox" ${props.indeterminate ? 'checked' : ''} onchange="updateProp('indeterminate', this.checked)">
+                        </div>
+                        <div class="inspector-row" style="display:flex; justify-content:space-between; align-items:center;">
+                            <span class="inspector-label">Show %</span>
+                            <input type="checkbox" ${props.showPercent !== false ? 'checked' : ''} onchange="updateProp('showPercent', this.checked)">
                         </div>
                     `;
                 }
@@ -648,6 +662,10 @@ public class WebDesignerPage extends DashboardBasePage {
                     if (key === 'indeterminate') {
                         if (value) fill.classList.add('j-progress-indeterminate');
                         else fill.classList.remove('j-progress-indeterminate');
+                    }
+                    if (key === 'showPercent') {
+                        const lbl = selectedItem.querySelector('.j-progressbar-label');
+                        if (lbl) lbl.style.display = value ? 'block' : 'none';
                     }
                 }
                 if (key === 'columns' && (type === 'Panel' || type === 'Grid')) {
@@ -962,6 +980,12 @@ public class WebDesignerPage extends DashboardBasePage {
                         const props = JSON.parse(it.getAttribute('data-props'));
                         const v = type.toLowerCase() + "_" + Math.floor(Math.random()*1000);
                         
+                        const handleCommon = (compVar) => {
+                            let out = "";
+                            if (props.update) out += `        ${compVar}.setUpdate("${props.update}");\\n`;
+                            return out;
+                        };
+
                         const handleEvents = (compVar) => {
                             let evOut = "";
                             Object.keys(props.events).forEach(ev => {
@@ -986,23 +1010,28 @@ public class WebDesignerPage extends DashboardBasePage {
                                 out += `        ProgressBar ${v} = new ProgressBar(${props.value || 0}, ${props.max || 100});\\n`;
                                 if (props.color) out += `        ${v}.setColor("${props.color}");\\n`;
                                 if (props.indeterminate) out += `        ${v}.setIndeterminate(true);\\n`;
+                                if (props.showPercent === false) out += `        ${v}.setShowPercent(false);\\n`;
+                                out += handleCommon(v);
                                 out += handleEvents(v);
                                 out += `        ${container}.add(${v});\\n`;
                                 break;
                             case 'Button': 
                                 out += `        Button ${v} = new Button("${props.text}");\\n`;
+                                out += handleCommon(v);
                                 out += handleEvents(v);
                                 out += `        ${container}.add(${v});\\n`;
                                 break;
                             case 'TextBox':
                                 out += `        TextBox ${v} = new TextBox("${v}", "Enter value");\\n`;
                                 if (props.binding) out += `        ${v}.setValue(model.get${props.binding.charAt(0).toUpperCase() + props.binding.slice(1)}());\\n`;
+                                out += handleCommon(v);
                                 out += handleEvents(v);
                                 out += `        ${container}.add(${v});\\n`;
                                 break;
                             case 'TextArea':
                                 out += `        TextArea ${v} = new TextArea("${v}", "");\\n`;
                                 if (props.binding) out += `        ${v}.setValue(model.get${props.binding.charAt(0).toUpperCase() + props.binding.slice(1)}());\\n`;
+                                out += handleCommon(v);
                                 out += handleEvents(v);
                                 out += `        ${container}.add(${v});\\n`;
                                 break;
@@ -1011,11 +1040,13 @@ public class WebDesignerPage extends DashboardBasePage {
                                 out += `        ${type} ${v} = new ${type}(${props.columns});\\n`;
                                 const kids = it.querySelectorAll(':scope > .canvas-container > .canvas-item');
                                 if (kids.length > 0) out += walk(kids, v);
+                                out += handleCommon(v);
                                 out += handleEvents(v);
                                 out += `        ${container}.add(${v});\\n`;
                                 break;
                             default: 
                                 out += `        ${type} ${v} = new ${type}();\\n`;
+                                out += handleCommon(v);
                                 out += handleEvents(v);
                                 out += `        ${container}.add(${v});\\n`;
                         }

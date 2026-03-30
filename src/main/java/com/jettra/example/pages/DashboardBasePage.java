@@ -265,6 +265,23 @@ public abstract class DashboardBasePage extends Page {
                 .append("      el.style.opacity = '0.6';\n")
                 .append("    }\n")
                 .append("  }\n")
+                .append("  window.jtUpdate = function(ids) {\n")
+                .append("    console.log('[JettraWUI] Updating components:', ids);\n")
+                .append("    const idList = ids.split(/[\\s,]+/);\n")
+                .append("    idList.forEach(id => {\n")
+                .append("      const el = document.getElementById(id);\n")
+                .append("      if(el) {\n")
+                .append("        el.classList.add('j-refresh-effect');\n")
+                .append("        setTimeout(() => el.classList.remove('j-refresh-effect'), 500);\n")
+                .append("        // Note: Real partial re-rendering would happen here via fetch\n")
+                .append("      }\n")
+                .append("    });\n")
+                .append("  };\n")
+                .append("  // Global trigger for data-update\n")
+                .append("  document.addEventListener('click', e => {\n")
+                .append("    const target = e.target.closest('[data-update]');\n")
+                .append("    if(target) window.jtUpdate(target.getAttribute('data-update'));\n")
+                .append("  });\n")
                 .append("</script>");
         
         menuHtml.append("</div>");
