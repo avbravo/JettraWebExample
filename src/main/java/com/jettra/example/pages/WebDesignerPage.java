@@ -251,7 +251,7 @@ public class WebDesignerPage extends DashboardBasePage {
         // Feedback
         addPaletteCategory(palette, "Feedback", new String[]{"ProgressBar", "Spinner", "Alert", "Notification", "Clock"});
         // Layout & Display
-        addPaletteCategory(palette, "Layout & Display", new String[]{"Grid", "Panel", "Avatar", "Carousel", "Table", "TabView", "Modal", "Tree", "Div", "Image", "LayoutDisplay"});
+        addPaletteCategory(palette, "Layout & Display", new String[]{"Grid", "Panel", "Board", "Avatar", "Carousel", "Table", "TabView", "Modal", "Tree", "Div", "Image", "LayoutDisplay"});
 
         return palette;
     }
@@ -433,6 +433,16 @@ public class WebDesignerPage extends DashboardBasePage {
                     case 'Modal':
                         content = '<div class="canvas-container modal-container-mock" style="padding:20px; border-radius:15px; border:2px solid var(--jettra-accent); background:rgba(20,40,70,0.4)">' +
                                   '<h3 style="margin-top:0; color:var(--jettra-accent)">Modal Component</h3>' +
+                                  '</div>';
+                        break;
+                    case 'Board':
+                        content = '<div class="canvas-container board-container-mock" style="padding:20px; border-radius:20px; border:1px solid var(--jettra-accent); background:rgba(15,23,42,0.4)">' +
+                                  '<h2 style="margin-top:0; color:var(--jettra-accent); font-size:16px;">New Board</h2>' +
+                                  '<div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; min-height:80px;">' +
+                                  '<div class="canvas-container" style="border:1px dashed rgba(0,255,255,0.2); border-radius:8px;"></div>' +
+                                  '<div class="canvas-container" style="border:1px dashed rgba(0,255,255,0.2); border-radius:8px;"></div>' +
+                                  '<div class="canvas-container" style="border:1px dashed rgba(0,255,255,0.2); border-radius:8px;"></div>' +
+                                  '</div>' +
                                   '</div>';
                         break;
                     case 'Avatar':

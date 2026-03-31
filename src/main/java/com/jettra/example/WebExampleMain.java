@@ -26,6 +26,8 @@ public class WebExampleMain {
         server.addHandler("/alert", com.jettra.example.pages.AlertPage.class);
         server.addHandler("/avatar", com.jettra.example.pages.AvatarPage.class);
         server.addHandler("/avatargroup", com.jettra.example.pages.AvatarGroupPage.class);
+        server.addHandler("/board", com.jettra.example.pages.BoardPage.class);
+        server.addHandler("/kanban", com.jettra.example.pages.KanbanPage.class);
 
         server.addHandler("/button", com.jettra.example.pages.ButtonPage.class);
         server.addHandler("/checkbox", com.jettra.example.pages.CheckBoxPage.class);

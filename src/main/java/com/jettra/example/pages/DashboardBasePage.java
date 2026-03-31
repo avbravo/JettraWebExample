@@ -244,7 +244,7 @@ public abstract class DashboardBasePage extends Page {
         addCategory(menuHtml, "Forms", new String[]{"Button", "CheckBox", "Form", "Forms", "RadioButton", "SelectOne", "SelectOneIcon", "Spinner", "TextBox", "TextArea", "ToggleSwitch"}, menuClass, hoverEvents, categoryStyle, compIcon);
         addCategory(menuHtml, "Navigation", new String[]{"Link", "Menu", "MenuBar", "Navigation"}, menuClass, hoverEvents, categoryStyle, compIcon);
         addCategory(menuHtml, "Feedback", new String[]{"Alert", "Modal", "Notification", "SessionTimeout", "Feedback"}, menuClass, hoverEvents, categoryStyle, compIcon);
-        addCategory(menuHtml, "Layout", new String[]{"Avatar", "AvatarGroup", "Carousel", "Clock", "Div", "Divide", "FileUpload", "FolderSelector", "Grid", "Image", "LayoutDisplay", "LoginAdvanced", "Panel", "ProgressBar", "Table", "TabView", "Tree"}, menuClass, hoverEvents, categoryStyle, compIcon);
+        addCategory(menuHtml, "Layout", new String[]{"Avatar", "AvatarGroup", "Board", "Carousel", "Clock", "Div", "Divide", "FileUpload", "FolderSelector", "Grid", "Image", "Kanban", "LayoutDisplay", "LoginAdvanced", "Panel", "ProgressBar", "Table", "TabView", "Tree"}, menuClass, hoverEvents, categoryStyle, compIcon);
 
         // Logout
         menuHtml.append("<div style='margin-top:20px;'></div>");
