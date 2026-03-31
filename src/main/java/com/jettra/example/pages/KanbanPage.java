@@ -14,7 +14,7 @@ import io.jettra.wui.sync.JettraPageSincronized;
 import io.jettra.wui.sync.SyncType;
 import io.jettra.wui.sync.JettraSyncManager;
 
-@JettraPageSincronized(SyncType.ALL)
+@JettraPageSincronized(value = SyncType.ALL, entity = "KanbanCard")
 public class KanbanPage extends DashboardBasePage {
     private static final String STORAGE_DIR = "kanban_data";
     private static final String[] COLUMNS = {"PENDIENTE", "PROGRESO", "FINALIZADO"};
@@ -44,17 +44,19 @@ public class KanbanPage extends DashboardBasePage {
         String action = params.get("action");
         boolean changed = false;
         String loggedUser = getLoggedUser(currentExchange);
+        SyncType syncType = SyncType.ALL;
+        
         if (action != null) {
             switch (action) {
-                case "add": addCard(params, loggedUser); changed = true; break;
-                case "edit": editCard(params); changed = true; break;
-                case "remove": removeCard(params); changed = true; break;
-                case "move": moveCard(params); changed = true; break;
+                case "add": addCard(params, loggedUser); changed = true; syncType = SyncType.CREATE; break;
+                case "edit": editCard(params); changed = true; syncType = SyncType.UPDATE; break;
+                case "remove": removeCard(params); changed = true; syncType = SyncType.DELETE; break;
+                case "move": moveCard(params); changed = true; syncType = SyncType.UPDATE; break;
             }
         }
         
         if (changed) {
-            JettraSyncManager.notifyChange("KanbanCard", SyncType.ALL, loggedUser);
+            JettraSyncManager.notifyChange("KanbanCard", syncType, loggedUser);
             try {
                 redirect(currentExchange, com.jettra.server.JettraServer.resolvePath("/kanban"));
                 return;
