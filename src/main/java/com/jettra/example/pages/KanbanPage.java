@@ -10,7 +10,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import io.jettra.wui.sync.JettraPageSincronized;
+import io.jettra.wui.sync.SyncType;
+import io.jettra.wui.sync.JettraSyncManager;
 
+@JettraPageSincronized(SyncType.ALL)
 public class KanbanPage extends DashboardBasePage {
     private static final String STORAGE_DIR = "kanban_data";
     private static final String[] COLUMNS = {"PENDIENTE", "PROGRESO", "FINALIZADO"};
@@ -27,7 +31,7 @@ public class KanbanPage extends DashboardBasePage {
             for (String file : FILES) {
                 Path p = Paths.get(STORAGE_DIR, file);
                 if (!Files.exists(p)) {
-                    Files.write(p, "| ID | Titulo | Descripcion | Grupo | Estimacion |\n| --- | --- | --- | --- | --- |\n".getBytes());
+                    Files.write(p, "| ID | Titulo | Descripcion | Grupo | Estimacion | Creador |\n| --- | --- | --- | --- | --- | --- |\n".getBytes());
                 }
             }
         } catch (IOException e) {
@@ -38,18 +42,30 @@ public class KanbanPage extends DashboardBasePage {
     @Override
     protected void onPost(Map<String, String> params) {
         String action = params.get("action");
+        boolean changed = false;
+        String loggedUser = getLoggedUser(currentExchange);
         if (action != null) {
             switch (action) {
-                case "add": addCard(params); break;
-                case "edit": editCard(params); break;
-                case "remove": removeCard(params); break;
-                case "move": moveCard(params); break;
+                case "add": addCard(params, loggedUser); changed = true; break;
+                case "edit": editCard(params); changed = true; break;
+                case "remove": removeCard(params); changed = true; break;
+                case "move": moveCard(params); changed = true; break;
+            }
+        }
+        
+        if (changed) {
+            JettraSyncManager.notifyChange("KanbanCard", SyncType.ALL, loggedUser);
+            try {
+                redirect(currentExchange, com.jettra.server.JettraServer.resolvePath("/kanban"));
+                return;
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
         super.onPost(params);
     }
 
-    private void addCard(Map<String, String> params) {
+    private void addCard(Map<String, String> params, String loggedUser) {
         String title = params.get("title");
         String desc = params.get("description");
         String group = params.get("group");
@@ -59,7 +75,7 @@ public class KanbanPage extends DashboardBasePage {
         int idx = Arrays.asList(COLUMNS).indexOf(colName);
         if (idx != -1) {
             List<CardData> cards = loadCards(FILES[idx]);
-            CardData newCard = new CardData(UUID.randomUUID().toString(), title, desc, group, est);
+            CardData newCard = new CardData(UUID.randomUUID().toString(), title, desc, group, est, loggedUser);
             cards.add(newCard);
             saveCards(FILES[idx], cards);
         }
@@ -222,10 +238,18 @@ public class KanbanPage extends DashboardBasePage {
         Span g = new Span(data.group);
         g.setStyle("background", "rgba(0,255,255,0.1)").setStyle("color", "var(--jettra-accent)").setStyle("padding", "2px 6px").setStyle("border-radius", "4px");
         
+        Div extraInfo = new Div();
+        extraInfo.setStyle("display", "flex").setStyle("gap", "8px").setStyle("align-items", "center");
+        
+        Span usr = new Span("👤 " + (data.creator != null ? data.creator : "Unknown"));
+        usr.setStyle("opacity", "0.6").setStyle("font-size", "0.65rem");
+        
         Span e = new Span("⏱ " + data.estimation);
         e.setStyle("opacity", "0.5");
         
-        footer.add(g).add(e);
+        extraInfo.add(usr).add(e);
+        
+        footer.add(g).add(extraInfo);
         card.add(footer);
 
         return card;
@@ -338,8 +362,10 @@ public class KanbanPage extends DashboardBasePage {
                 String line = lines.get(i).trim();
                 if (line.startsWith("|")) {
                     String[] parts = line.split("\\|");
-                    if (parts.length >= 6) {
-                        list.add(new CardData(parts[1].trim(), parts[2].trim(), parts[3].trim(), parts[4].trim(), parts[5].trim()));
+                    if (parts.length >= 7) {
+                        list.add(new CardData(parts[1].trim(), parts[2].trim(), parts[3].trim(), parts[4].trim(), parts[5].trim(), parts[6].trim()));
+                    } else if (parts.length >= 6) {
+                        list.add(new CardData(parts[1].trim(), parts[2].trim(), parts[3].trim(), parts[4].trim(), parts[5].trim(), "Unknown"));
                     }
                 }
             }
@@ -352,10 +378,10 @@ public class KanbanPage extends DashboardBasePage {
     private void saveCards(String file, List<CardData> cards) {
         try {
             StringBuilder sb = new StringBuilder();
-            sb.append("| ID | Titulo | Descripcion | Grupo | Estimacion |\n");
-            sb.append("| --- | --- | --- | --- | --- |\n");
+            sb.append("| ID | Titulo | Descripcion | Grupo | Estimacion | Creador |\n");
+            sb.append("| --- | --- | --- | --- | --- | --- |\n");
             for (CardData c : cards) {
-                sb.append(String.format("| %s | %s | %s | %s | %s |\n", c.id, c.title, c.description, c.group, c.estimation));
+                sb.append(String.format("| %s | %s | %s | %s | %s | %s |\n", c.id, c.title, c.description, c.group, c.estimation, c.creator));
             }
             Files.write(Paths.get(STORAGE_DIR, file), sb.toString().getBytes());
         } catch (IOException e) {
@@ -364,9 +390,9 @@ public class KanbanPage extends DashboardBasePage {
     }
 
     private static class CardData {
-        String id, title, description, group, estimation;
-        CardData(String id, String title, String description, String group, String estimation) {
-            this.id = id; this.title = title; this.description = description; this.group = group; this.estimation = estimation;
+        String id, title, description, group, estimation, creator;
+        CardData(String id, String title, String description, String group, String estimation, String creator) {
+            this.id = id; this.title = title; this.description = description; this.group = group; this.estimation = estimation; this.creator = creator;
         }
     }
 }
