@@ -109,9 +109,11 @@ public abstract class DashboardBasePage extends Page {
         // Obtener valores por defecto de la configuración
         String defaultConfigLang = com.jettra.server.config.JettraConfig.getProperty("app.language");
         if (defaultConfigLang == null) defaultConfigLang = "en";
+        defaultConfigLang = defaultConfigLang.trim();
         
         String defaultConfigTheme = com.jettra.server.config.JettraConfig.getProperty("app.theme");
         if (defaultConfigTheme == null) defaultConfigTheme = "3d";
+        defaultConfigTheme = defaultConfigTheme.trim();
 
         // Selector de Idioma (sin texto en trigger)
         SelectOneIcon langSelect = new SelectOneIcon("lang","");
@@ -120,7 +122,7 @@ public abstract class DashboardBasePage extends Page {
         langSelect.addOption("es", "", "🇪🇸");
         
         // Establecer selección inicial basada en config (o URL si existe)
-        String currentLang = params.getOrDefault("lang", defaultConfigLang);
+        String currentLang = params.getOrDefault("lang", defaultConfigLang).trim();
         if ("es".equals(currentLang)) {
             langSelect.setSelectedValue("es", "", "🇪🇸");
         } else {
@@ -178,7 +180,7 @@ public abstract class DashboardBasePage extends Page {
         animCB.setProperty("onchange", "toggleJettraAnimation(this.checked)");
         
         String animatedValue = com.jettra.server.config.JettraConfig.getProperty("app.animated");
-        boolean isAnimatedConfig = animatedValue == null || animatedValue.equalsIgnoreCase("true");
+        boolean isAnimatedConfig = animatedValue == null || animatedValue.trim().equalsIgnoreCase("true");
         if (isAnimatedConfig) {
             animCB.setProperty("checked", "checked");
         }
@@ -221,15 +223,32 @@ public abstract class DashboardBasePage extends Page {
         String hoverEvents = "onmouseover=\"this.style.background='rgba(0,255,255,0.1)'; this.style.borderLeftColor='#0ff'\" onmouseout=\"this.style.background='rgba(20,30,50,0.5)'; this.style.borderLeftColor='transparent'\"";
         String categoryStyle = "color:#0ff; margin:15px 0 8px 0; font-weight:600; text-transform:uppercase; font-size:12px; letter-spacing:1px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; opacity:0.8; transition:opacity 0.2s;";
         
+        // Dictionary
+        String currentLang = com.jettra.server.config.JettraConfig.getProperty("app.language");
+        if (currentLang != null) currentLang = currentLang.trim();
+        else currentLang = "en";
+        
+        boolean isEs = "es".equals(currentLang);
+        
+        String txtNav = isEs ? "Navegación" : "Navigation";
+        String txtMainDash = isEs ? "Panel Principal" : "Main Dashboard";
+        String txtAdmin = isEs ? "Administración" : "Administration";
+        String txtLogout = isEs ? "Cerrar Sesión" : "Logout";
+        String txtTypo = isEs ? "Tipografía" : "Typography";
+        String txtForms = isEs ? "Formularios" : "Forms";
+        String txtFeed = isEs ? "Retroalimentación" : "Feedback";
+        String txtLayout = isEs ? "Diseño de Página" : "Layout";
+        String txtMedia = isEs ? "Multimedia" : "Media";
+        
         // --- Navigation ---
-        menuHtml.append("<div style='").append(categoryStyle).append("' onclick='toggleCategory(this)'><span>Navigation</span> <span>▼</span></div>");
+        menuHtml.append("<div style='").append(categoryStyle).append("' onclick='toggleCategory(this)'><span>").append(txtNav).append("</span> <span>▼</span></div>");
         menuHtml.append("<div class='menu-category-content'>");
-        appendMenuItem(menuHtml, "Main Dashboard", "/dashboard", "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='4 17 10 11 4 5'></polyline><line x1='12' y1='19' x2='20' y2='19'></line></svg>", menuClass, hoverEvents);
+        appendMenuItem(menuHtml, txtMainDash, "/dashboard", "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='4 17 10 11 4 5'></polyline><line x1='12' y1='19' x2='20' y2='19'></line></svg>", menuClass, hoverEvents);
         menuHtml.append("</div>");
 
         // --- Administration ---
         if ("admin".equals(username) || "demo".equals(username) || "avbravo".equals(username)) {
-            menuHtml.append("<div style='").append(categoryStyle).append("' onclick='toggleCategory(this)'><span>Administration</span> <span>▼</span></div>");
+            menuHtml.append("<div style='").append(categoryStyle).append("' onclick='toggleCategory(this)'><span>").append(txtAdmin).append("</span> <span>▼</span></div>");
             menuHtml.append("<div class='menu-category-content'>");
             appendMenuItem(menuHtml, "Persona CRUD", "/persona", "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'></path><circle cx='9' cy='7' r='4'></circle></svg>", menuClass, hoverEvents);
             appendMenuItem(menuHtml, "Pais CRUD (MVC)", "/pais", "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'></circle><line x1='2' y1='12' x2='22' y2='12'></line></svg>", menuClass, hoverEvents);
@@ -241,16 +260,16 @@ public abstract class DashboardBasePage extends Page {
         // --- Categories and Components ---
         String compIcon = "<svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' style='opacity:0.7;'><path d='M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z'></path></svg>";
         
-        addCategory(menuHtml, "Typography", new String[]{"Header", "Paragraph", "Span", "Label", "Separator", "Icon", "Typography"}, menuClass, hoverEvents, categoryStyle, compIcon);
-        addCategory(menuHtml, "Forms", new String[]{"Button", "CheckBox", "Form", "Forms", "RadioButton", "SelectOne", "SelectOneIcon", "Spinner", "TextBox", "TextArea", "ToggleSwitch"}, menuClass, hoverEvents, categoryStyle, compIcon);
-        addCategory(menuHtml, "Navigation", new String[]{"Link", "Menu", "MenuBar", "Navigation"}, menuClass, hoverEvents, categoryStyle, compIcon);
-        addCategory(menuHtml, "Feedback", new String[]{"Alert", "Modal", "Notification", "SessionTimeout", "Feedback"}, menuClass, hoverEvents, categoryStyle, compIcon);
-        addCategory(menuHtml, "Layout", new String[]{"Avatar", "AvatarGroup", "Board", "Carousel", "Clock", "Div", "Divide", "FileUpload", "FolderSelector", "Grid", "Image", "LayoutDisplay", "LoginAdvanced", "Panel", "ProgressBar", "Table", "TabView", "Tree"}, menuClass, hoverEvents, categoryStyle, compIcon);
-        addCategory(menuHtml, "Media", new String[]{"Downloader", "PDFViewer", "ViewMedia"}, menuClass, hoverEvents, categoryStyle, compIcon);
+        addCategory(menuHtml, txtTypo, new String[]{"Header", "Paragraph", "Span", "Label", "Separator", "Icon", "Typography"}, menuClass, hoverEvents, categoryStyle, compIcon);
+        addCategory(menuHtml, txtForms, new String[]{"Button", "CheckBox", "Form", "Forms", "RadioButton", "SelectOne", "SelectOneIcon", "Spinner", "TextBox", "TextArea", "ToggleSwitch"}, menuClass, hoverEvents, categoryStyle, compIcon);
+        addCategory(menuHtml, txtNav, new String[]{"Link", "Menu", "MenuBar", "Navigation"}, menuClass, hoverEvents, categoryStyle, compIcon);
+        addCategory(menuHtml, txtFeed, new String[]{"Alert", "Modal", "Notification", "SessionTimeout", "Feedback"}, menuClass, hoverEvents, categoryStyle, compIcon);
+        addCategory(menuHtml, txtLayout, new String[]{"Avatar", "AvatarGroup", "Board", "Carousel", "Clock", "Div", "Divide", "FileUpload", "FolderSelector", "Grid", "Image", "LayoutDisplay", "LoginAdvanced", "Panel", "ProgressBar", "Table", "TabView", "Tree"}, menuClass, hoverEvents, categoryStyle, compIcon);
+        addCategory(menuHtml, txtMedia, new String[]{"Downloader", "PDFViewer", "ViewMedia"}, menuClass, hoverEvents, categoryStyle, compIcon);
 
         // Logout
         menuHtml.append("<div style='margin-top:20px;'></div>");
-        appendMenuItem(menuHtml, "Logout", "/logout", "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'></path><polyline points='16 17 21 12 16 7'></polyline></svg>", menuClass, hoverEvents);
+        appendMenuItem(menuHtml, txtLogout, "/logout", "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'></path><polyline points='16 17 21 12 16 7'></polyline></svg>", menuClass, hoverEvents);
 
         // Toggle Script
         menuHtml.append("<script>\n")

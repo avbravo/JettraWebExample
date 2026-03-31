@@ -82,10 +82,14 @@ public class WebDesignerPage extends DashboardBasePage {
         Header codeHeader = new Header(4, "Java Source Code");
         codeHeader.setStyle("color", "var(--jettra-accent)").setStyle("margin-bottom", "10px");
         
-        Div codeContainer = new Div();
+        Div codeContainerWrapper = new Div();
+        codeContainerWrapper.setStyle("flex", "1").setStyle("display", "flex").setStyle("flex-direction", "column");
+
+        TextArea codeContainer = new TextArea("generated-code-display", "// Drag components to start generating code...");
         codeContainer.setProperty("id", "generated-code-display");
-        codeContainer.setStyle("flex", "1").setStyle("background", "#050a10").setStyle("color", "#a9b7c6").setStyle("padding", "10px").setStyle("font-family", "monospace").setStyle("font-size", "11px").setStyle("white-space", "pre-wrap").setStyle("border-radius", "4px").setStyle("overflow-y", "auto").setStyle("border", "1px solid #333");
-        codeContainer.setContent("// Drag components to start generating code...");
+        codeContainer.setStyle("flex", "1").setStyle("background", "#050a10").setStyle("color", "#a9b7c6").setStyle("padding", "10px").setStyle("font-family", "monospace").setStyle("font-size", "11px").setStyle("white-space", "pre").setStyle("border-radius", "4px").setStyle("border", "1px solid #333").setStyle("overflow", "auto").setStyle("resize", "none").setStyle("outline", "none");
+        
+        codeContainerWrapper.add(codeContainer);
 
         // Hidden input to send code to server
         TextBox hiddenCode = new TextBox("generated-code-hidden", "");
@@ -95,21 +99,22 @@ public class WebDesignerPage extends DashboardBasePage {
         Div actions = new Div();
         actions.setStyle("margin-top", "10px").setStyle("display", "flex").setStyle("gap", "10px");
         
+        Button syncBtn = new Button("SYNC CANVAS");
+        syncBtn.addClass("j-btn-secondary");
+        syncBtn.setProperty("type", "button");
+        syncBtn.setProperty("onclick", "window.syncCodeToCanvas()");
+
         Button saveBtn = new Button("GENERATE CLASS");
         saveBtn.addClass("j-btn-primary");
         saveBtn.setProperty("type", "submit");
         
-        Button openBtn = new Button("OPEN FILE");
-        openBtn.addClass("j-btn-secondary");
-        openBtn.setProperty("type", "button");
-
         Button clearBtn = new Button("CLEAR ALL");
         clearBtn.addClass("j-btn-danger");
         clearBtn.setProperty("type", "button");
         clearBtn.setProperty("onclick", "window.clearDesigner()");
         
-        actions.add(saveBtn).add(openBtn).add(clearBtn);
-        codeView.add(codeHeader).add(codeContainer).add(hiddenCode).add(actions);
+        actions.add(syncBtn).add(saveBtn).add(clearBtn);
+        codeView.add(codeHeader).add(codeContainerWrapper).add(hiddenCode).add(actions);
 
         // 4. Property Inspector (Floating/Right Sidebar)
         Div inspector = new Div();
@@ -387,17 +392,34 @@ public class WebDesignerPage extends DashboardBasePage {
                 const canvas = document.getElementById('canvas-area');
                 if (!canvas) return;
                 
-                canvas.ondragover = function(ev) {
-                    ev.preventDefault();
-                    ev.dataTransfer.dropEffect = "move";
+                // Ensure event listeners are attached correctly for capturing drop inside ANY container
+                document.body.ondragover = function(ev) {
+                    if (ev.target.closest('#canvas-area')) {
+                        ev.preventDefault();
+                        ev.dataTransfer.dropEffect = "move";
+                    }
                 };
 
-                canvas.ondrop = function(ev) {
+                document.body.ondrop = function(ev) {
+                    const canvasSection = ev.target.closest('#canvas-area');
+                    if (!canvasSection) return;
+                    
                     ev.preventDefault();
+                    ev.stopPropagation();
+                    
                     const type = ev.dataTransfer.getData("type");
-                    if (!type) return; 
-                    const target = ev.target.closest('.canvas-container');
-                    window.addComponentToCanvas(type, target || canvas);
+                    const moveId = ev.dataTransfer.getData("move-id");
+                    const target = ev.target.closest('.canvas-container') || canvasSection;
+                    
+                    if (moveId) {
+                        const el = document.getElementById(moveId);
+                        if (el && target !== el && !el.contains(target)) {
+                            target.appendChild(el);
+                            window.updateGeneratedCode();
+                        }
+                    } else if (type) {
+                        window.addComponentToCanvas(type, target);
+                    }
                 };
             }
 
@@ -417,8 +439,16 @@ public class WebDesignerPage extends DashboardBasePage {
 
                 const wrapper = document.createElement('div');
                 wrapper.className = 'canvas-item';
+                wrapper.id = 'ci_' + Date.now() + Math.floor(Math.random()*1000); // Important for inner dnd
                 wrapper.setAttribute('data-type', type);
                 wrapper.setAttribute('data-props', JSON.stringify({text: type, columns: 2, events: {}, binding: ""}));
+                wrapper.setAttribute('draggable', 'true');
+                
+                wrapper.ondragstart = function(ev) {
+                    ev.dataTransfer.setData("move-id", ev.target.id);
+                    ev.dataTransfer.effectAllowed = "move";
+                    ev.stopPropagation(); // Stop parent from reacting
+                };
                 
                 wrapper.onclick = (e) => { e.stopPropagation(); selectElement(wrapper); };
                 wrapper.oncontextmenu = (e) => { e.preventDefault(); e.stopPropagation(); selectElement(wrapper); showInspector(); };
@@ -781,7 +811,7 @@ public class WebDesignerPage extends DashboardBasePage {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const content = e.target.result;
-                    document.getElementById('generated-code-display').innerText = content;
+                    document.getElementById('generated-code-display').value = content;
                     document.getElementById('generated-code-hidden').value = content;
                     
                         window.show3DMessage("Page Loaded", "Page content loaded into source view: " + path);
@@ -998,7 +1028,7 @@ public class WebDesignerPage extends DashboardBasePage {
                         if (!canvas) return;
                         canvas.innerHTML = '<div class="canvas-placeholder">Start dragging components here to design</div>';
                         
-                        document.getElementById('generated-code-display').innerText = "// Designer Cleared";
+                        document.getElementById('generated-code-display').value = "// Designer Cleared";
                         document.getElementById('generated-code-hidden').value = "";
                         
                         selectedItem = null;
@@ -1108,8 +1138,56 @@ public class WebDesignerPage extends DashboardBasePage {
                 code += walk(document.querySelectorAll('#canvas-area > .canvas-item'), "center");
                 code += `    }\\n}`;
                 
-                display.innerText = code;
+                display.value = code;
                 hidden.value = code;
+            };
+
+            window.syncCodeToCanvas = function() {
+                const display = document.getElementById('generated-code-display');
+                if (!display) return;
+                const code = display.value;
+                const canvas = document.getElementById('canvas-area');
+                
+                // Simplistic RegExp to find UI elements
+                const regex = /new\\s+(Header|Paragraph|Divide|Button|TextBox|TextArea|Panel|Grid|Modal|Board|Avatar|ProgressBar|Table|TabView|Image)\\s*\\((.*?)\\)/g;
+                
+                canvas.innerHTML = '';
+                let match;
+                let foundAny = false;
+                
+                while((match = regex.exec(code)) !== null) {
+                    foundAny = true;
+                    let type = match[1];
+                    let args = match[2];
+                    
+                    window.addComponentToCanvas(type, canvas);
+                    let el = canvas.lastElementChild;
+                    if(!el) continue;
+                    
+                    let props = JSON.parse(el.getAttribute('data-props') || "{}");
+                    if (args && args.trim().length > 0) {
+                        let cleanParams = args.replace(/"/g, '').split(',');
+                        if (cleanParams.length > 0) {
+                            if (type === 'Header' || type === 'Paragraph' || type === 'Button') props.text = cleanParams.length > 1 ? cleanParams[1].trim() : cleanParams[0].trim();
+                            if (type === 'Panel' || type === 'Grid') props.columns = parseInt(cleanParams[0].trim()) || 2;
+                            if (type === 'ProgressBar') { props.value = parseInt(cleanParams[0])||0; props.max = parseInt(cleanParams[1])||100; }
+                        }
+                    }
+                    el.setAttribute('data-props', JSON.stringify(props));
+                    
+                    // Force visual update on component
+                    if (props.text) {
+                        const inner = el.querySelector('h2, p, button, label, .j-avatar');
+                        if(inner) inner.innerText = props.text;
+                    }
+                }
+                
+                if (!foundAny) {
+                    canvas.innerHTML = '<div class="canvas-placeholder">Start dragging components here to design</div>';
+                }
+                
+                document.getElementById('generated-code-hidden').value = code;
+                window.show3DMessage("Sync Complete", "Canvas has been rebuilt from the generated source code.");
             };
 
         """);
