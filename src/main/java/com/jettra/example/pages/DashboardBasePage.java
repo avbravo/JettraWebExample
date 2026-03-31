@@ -234,6 +234,7 @@ public abstract class DashboardBasePage extends Page {
             appendMenuItem(menuHtml, "Persona CRUD", "/persona", "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'></path><circle cx='9' cy='7' r='4'></circle></svg>", menuClass, hoverEvents);
             appendMenuItem(menuHtml, "Pais CRUD (MVC)", "/pais", "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'></circle><line x1='2' y1='12' x2='22' y2='12'></line></svg>", menuClass, hoverEvents);
             appendMenuItem(menuHtml, "Web Designer", "/webdesigner", "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='18' height='18' rx='2' ry='2'></rect><line x1='3' y1='9' x2='21' y2='9'></line><line x1='9' y1='21' x2='9' y2='9'></line></svg>", menuClass, hoverEvents);
+            appendMenuItem(menuHtml, "Kanban Board", "/kanban", "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='18' height='18' rx='2' ry='2'></rect><line x1='3' y1='9' x2='21' y2='9'></line><line x1='9' y1='21' x2='9' y2='9'></line></svg>", menuClass, hoverEvents);
             menuHtml.append("</div>");
         }
 
@@ -244,7 +245,7 @@ public abstract class DashboardBasePage extends Page {
         addCategory(menuHtml, "Forms", new String[]{"Button", "CheckBox", "Form", "Forms", "RadioButton", "SelectOne", "SelectOneIcon", "Spinner", "TextBox", "TextArea", "ToggleSwitch"}, menuClass, hoverEvents, categoryStyle, compIcon);
         addCategory(menuHtml, "Navigation", new String[]{"Link", "Menu", "MenuBar", "Navigation"}, menuClass, hoverEvents, categoryStyle, compIcon);
         addCategory(menuHtml, "Feedback", new String[]{"Alert", "Modal", "Notification", "SessionTimeout", "Feedback"}, menuClass, hoverEvents, categoryStyle, compIcon);
-        addCategory(menuHtml, "Layout", new String[]{"Avatar", "AvatarGroup", "Board", "Carousel", "Clock", "Div", "Divide", "FileUpload", "FolderSelector", "Grid", "Image", "Kanban", "LayoutDisplay", "LoginAdvanced", "Panel", "ProgressBar", "Table", "TabView", "Tree"}, menuClass, hoverEvents, categoryStyle, compIcon);
+        addCategory(menuHtml, "Layout", new String[]{"Avatar", "AvatarGroup", "Board", "Carousel", "Clock", "Div", "Divide", "FileUpload", "FolderSelector", "Grid", "Image", "LayoutDisplay", "LoginAdvanced", "Panel", "ProgressBar", "Table", "TabView", "Tree"}, menuClass, hoverEvents, categoryStyle, compIcon);
 
         // Logout
         menuHtml.append("<div style='margin-top:20px;'></div>");

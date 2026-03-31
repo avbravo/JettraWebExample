@@ -236,14 +236,15 @@ public class KanbanPage extends DashboardBasePage {
         Modal modal = new Modal("kanban-modal");
         modal.setStyle("display", "none").setStyle("background", "var(--jettra-glass)").setStyle("backdrop-filter", "blur(20px)")
              .setStyle("padding", "30px").setStyle("border-radius", "20px").setStyle("width", "400px").setStyle("border", "1px solid var(--jettra-border)")
-             .setStyle("position", "fixed").setStyle("top", "50%").setStyle("left", "50%").setStyle("transform", "translate(-50%, -50%)").setStyle("z-index", "1000");
+             .setStyle("position", "fixed").setStyle("top", "15%").setStyle("left", "50%").setStyle("transform", "translate(-50%, 0)").setStyle("z-index", "1000")
+             .setStyle("max-height", "80vh").setStyle("overflow-y", "auto");
         
         Header mh = new Header(3, "Task details");
         mh.setId("modal-title");
         mh.setStyle("margin-top", "0").setStyle("color", "var(--jettra-accent)");
         modal.add(mh);
 
-        Form form = new Form("kanban-form", "/kanban");
+        Form form = new Form("kanban-form", com.jettra.server.JettraServer.resolvePath("/kanban"));
         form.add(new TextBox("action", "").setProperty("id", "form-action").setStyle("display", "none"));
         form.add(new TextBox("cardId", "").setProperty("id", "form-card-id").setStyle("display", "none"));
         form.add(new TextBox("column", "").setProperty("id", "form-column").setStyle("display", "none"));
@@ -268,14 +269,14 @@ public class KanbanPage extends DashboardBasePage {
         center.add(modal);
 
         // Hidden move form
-        Form moveForm = new Form("move-form", "/kanban");
+        Form moveForm = new Form("move-form", com.jettra.server.JettraServer.resolvePath("/kanban"));
         moveForm.add(new TextBox("action", "move").setStyle("display", "none"));
         moveForm.add(new TextBox("cardId", "").setProperty("id", "move-card-id").setStyle("display", "none"));
         moveForm.add(new TextBox("targetCol", "").setProperty("id", "move-target-col").setStyle("display", "none"));
         center.add(moveForm);
         
         // Hidden remove form
-        Form removeForm = new Form("remove-form", "/kanban");
+        Form removeForm = new Form("remove-form", com.jettra.server.JettraServer.resolvePath("/kanban"));
         removeForm.add(new TextBox("action", "remove").setStyle("display", "none"));
         removeForm.add(new TextBox("cardId", "").setProperty("id", "remove-card-id").setStyle("display", "none"));
         center.add(removeForm);

@@ -21,6 +21,12 @@ public class WebExampleMain {
         System.out.println("Levantando servidor de enrutamiento JettraServer empotrado...");
         JettraServer server = new JettraServer();
 
+        // IMPORTANTE / DOCUMENTACIÓN:
+        // Todas las páginas creadas deben registrarse obligatoriamente en este método main 
+        // usando server.addHandler(). Esto permite que JettraServer reconozca las rutas HTTP 
+        // y establezca el contexto correcto. Si se omite, se generarán errores de "404 Not Found"
+        // o "No context found" al intentar cargar la vista o manejar peticiones de Formularios.
+        
         // Register pages as classes to ensure a fresh, isolated instance per request
         server.addHandler("/", com.jettra.example.pages.LoginPage.class);
         server.addHandler("/alert", com.jettra.example.pages.AlertPage.class);
