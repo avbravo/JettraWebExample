@@ -245,14 +245,14 @@ public class KanbanPage extends DashboardBasePage {
         modal.add(mh);
 
         Form form = new Form("kanban-form", com.jettra.server.JettraServer.resolvePath("/kanban"));
-        form.add(new TextBox("action", "").setProperty("id", "form-action").setStyle("display", "none"));
-        form.add(new TextBox("cardId", "").setProperty("id", "form-card-id").setStyle("display", "none"));
-        form.add(new TextBox("column", "").setProperty("id", "form-column").setStyle("display", "none"));
+        form.add(new TextBox("hidden", "action").setProperty("id", "form-action"));
+        form.add(new TextBox("hidden", "cardId").setProperty("id", "form-card-id"));
+        form.add(new TextBox("hidden", "column").setProperty("id", "form-column"));
         
-        form.add(new Label("Title")).add(new TextBox("title", "").setProperty("id", "form-title").addClass("j-input"));
-        form.add(new Label("Description")).add(new TextArea("description", "").setProperty("id", "form-description").addClass("j-input").setStyle("height", "80px"));
-        form.add(new Label("Group")).add(new TextBox("group", "").setProperty("id", "form-group").addClass("j-input"));
-        form.add(new Label("Estimation")).add(new TextBox("estimation", "").setProperty("id", "form-estimation").addClass("j-input"));
+        form.add(new Label("Title")).add(new TextBox("text", "title").setProperty("id", "form-title").addClass("j-input"));
+        form.add(new Label("Description")).add(new TextArea("form-description", "").setProperty("name", "description").addClass("j-input").setStyle("height", "80px"));
+        form.add(new Label("Group")).add(new TextBox("text", "group").setProperty("id", "form-group").addClass("j-input"));
+        form.add(new Label("Estimation")).add(new TextBox("text", "estimation").setProperty("id", "form-estimation").addClass("j-input"));
 
         Div actions = new Div();
         actions.setStyle("display", "flex").setStyle("justify-content", "flex-end").setStyle("gap", "10px").setStyle("margin-top", "10px");
@@ -270,15 +270,15 @@ public class KanbanPage extends DashboardBasePage {
 
         // Hidden move form
         Form moveForm = new Form("move-form", com.jettra.server.JettraServer.resolvePath("/kanban"));
-        moveForm.add(new TextBox("action", "move").setStyle("display", "none"));
-        moveForm.add(new TextBox("cardId", "").setProperty("id", "move-card-id").setStyle("display", "none"));
-        moveForm.add(new TextBox("targetCol", "").setProperty("id", "move-target-col").setStyle("display", "none"));
+        moveForm.add(new TextBox("hidden", "action").setProperty("value", "move"));
+        moveForm.add(new TextBox("hidden", "cardId").setProperty("id", "move-card-id"));
+        moveForm.add(new TextBox("hidden", "targetCol").setProperty("id", "move-target-col"));
         center.add(moveForm);
         
         // Hidden remove form
         Form removeForm = new Form("remove-form", com.jettra.server.JettraServer.resolvePath("/kanban"));
-        removeForm.add(new TextBox("action", "remove").setStyle("display", "none"));
-        removeForm.add(new TextBox("cardId", "").setProperty("id", "remove-card-id").setStyle("display", "none"));
+        removeForm.add(new TextBox("hidden", "action").setProperty("value", "remove"));
+        removeForm.add(new TextBox("hidden", "cardId").setProperty("id", "remove-card-id"));
         center.add(removeForm);
     }
 

@@ -252,8 +252,10 @@ public class WebDesignerPage extends DashboardBasePage {
         addPaletteCategory(palette, "Navigation", new String[]{"Link", "Menu", "MenuBar"});
         // Feedback
         addPaletteCategory(palette, "Feedback", new String[]{"ProgressBar", "Spinner", "Alert", "Notification", "Clock"});
+        // Media & Files
+        addPaletteCategory(palette, "Media", new String[]{"Downloader", "PDFViewer", "ViewMedia"});
         // Layout & Display
-        addPaletteCategory(palette, "Layout & Display", new String[]{"Grid", "Panel", "Board", "Avatar", "Carousel", "Table", "TabView", "Modal", "Tree", "Div", "Image", "LayoutDisplay"});
+        addPaletteCategory(palette, "Layout", new String[]{"Grid", "Panel", "Board", "Avatar", "Carousel", "Table", "TabView", "Modal", "Tree", "Div", "Image", "LayoutDisplay"});
 
         return palette;
     }

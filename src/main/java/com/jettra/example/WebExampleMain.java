@@ -89,6 +89,9 @@ public class WebExampleMain {
         server.addHandler("/feedback", com.jettra.example.pages.FeedbackPage.class);
         server.addHandler("/icon", com.jettra.example.pages.IconPage.class);
         server.addHandler("/typography", com.jettra.example.pages.TypographyPage.class);
+        server.addHandler("/downloader", com.jettra.example.pages.DownloaderPage.class);
+        server.addHandler("/pdfviewer", com.jettra.example.pages.PDFViewerPage.class);
+        server.addHandler("/viewmedia", com.jettra.example.pages.ViewMediaPage.class);
 
         server.start();
     }
