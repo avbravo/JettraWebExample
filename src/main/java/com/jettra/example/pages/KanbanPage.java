@@ -235,7 +235,8 @@ public class KanbanPage extends DashboardBasePage {
         // Add/Edit Modal
         Modal modal = new Modal("kanban-modal");
         modal.setStyle("display", "none").setStyle("background", "var(--jettra-glass)").setStyle("backdrop-filter", "blur(20px)")
-             .setStyle("padding", "30px").setStyle("border-radius", "20px").setStyle("width", "400px").setStyle("border", "1px solid var(--jettra-border)");
+             .setStyle("padding", "30px").setStyle("border-radius", "20px").setStyle("width", "400px").setStyle("border", "1px solid var(--jettra-border)")
+             .setStyle("position", "fixed").setStyle("top", "50%").setStyle("left", "50%").setStyle("transform", "translate(-50%, -50%)").setStyle("z-index", "1000");
         
         Header mh = new Header(3, "Task details");
         mh.setId("modal-title");

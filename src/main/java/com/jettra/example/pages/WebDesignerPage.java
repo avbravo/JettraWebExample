@@ -133,6 +133,7 @@ public class WebDesignerPage extends DashboardBasePage {
         eventModal.setStyle("display", "none").setStyle("background", "linear-gradient(145deg, rgba(30, 50, 80, 0.98), rgba(15, 25, 45, 1))")
                  .setStyle("backdrop-filter", "blur(25px)").setStyle("padding", "40px").setStyle("border-radius", "30px")
                  .setStyle("width", "750px").setStyle("border", "1px solid rgba(0, 255, 255, 0.5)")
+                 .setStyle("position", "fixed").setStyle("top", "50%").setStyle("left", "50%").setStyle("transform", "translate(-50%, -50%)").setStyle("z-index", "1000")
                  .setStyle("box-shadow", "0 40px 100px -20px rgba(0, 0, 0, 0.8), inset 0 2px 2px 0 rgba(255, 255, 255, 0.2), 0 0 30px rgba(0, 255, 255, 0.3)");
         
         Header modalHeader = new Header(3, "⚡ Pro Event Handler Editor");
@@ -164,6 +165,7 @@ public class WebDesignerPage extends DashboardBasePage {
         confirmModal.setStyle("display", "none").setStyle("background", "linear-gradient(135deg, #1e293b, #0f172a)")
                    .setStyle("border", "2px solid rgba(0, 255, 255, 0.6)").setStyle("border-radius", "30px")
                    .setStyle("padding", "50px").setStyle("width", "500px")
+                   .setStyle("position", "fixed").setStyle("top", "50%").setStyle("left", "50%").setStyle("transform", "translate(-50%, -50%)").setStyle("z-index", "1000")
                    .setStyle("box-shadow", "0 50px 100px -20px rgba(0, 0, 0, 0.8), inset 0 2px 2px rgba(255, 255, 255, 0.1), 0 0 40px rgba(0, 255, 255, 0.2)");
         
         Header confirmTitle = new Header(3, "Confirm Action");
@@ -315,11 +317,11 @@ public class WebDesignerPage extends DashboardBasePage {
             @keyframes modalDeepAppear {
                 from { 
                     opacity: 0; 
-                    transform: translateY(50px) scale(0.8) rotateX(-25deg); 
+                    transform: translate(-50%, -30%) scale(0.8) rotateX(-25deg); 
                 }
                 to { 
                     opacity: 1; 
-                    transform: translateY(0) scale(1) rotateX(0); 
+                    transform: translate(-50%, -50%) scale(1) rotateX(0); 
                 }
             }
             
@@ -353,8 +355,8 @@ public class WebDesignerPage extends DashboardBasePage {
                 transform: translateY(2px) translateZ(10px);
             }
             @keyframes modalAppear {
-                from { opacity: 0; transform: translateY(-30px) scale(0.9) rotateX(-15deg); }
-                to { opacity: 1; transform: translateY(0) scale(1) rotateX(0); }
+                from { opacity: 0; transform: translate(-50%, -60%) scale(0.9) rotateX(-15deg); }
+                to { opacity: 1; transform: translate(-50%, -50%) scale(1) rotateX(0); }
             }
             .glass-panel {
                 background: linear-gradient(145deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
@@ -595,28 +597,26 @@ public class WebDesignerPage extends DashboardBasePage {
 
             window.openEventEditor = function(evName) {
                 if (!selectedItem) return;
+                activeEventProperty = evName;
                 const props = JSON.parse(selectedItem.getAttribute('data-props'));
                 const currentCode = props.events[evName] || "e -> { \\n    // Enter code here \\n}";
                 
-                const html = `
-                    <div style="display:flex; flex-direction:column; gap:10px;">
-                        <span style="font-size:12px; color:#aaa">Editing event handler for <b>${evName}</b></span>
-                        <textarea id="event-code-editor" style="width:100%; height:200px; background:#0f172a; color:#00ffff; border:1px solid #00ffff; border-radius:8px; padding:10px; font-family:monospace; font-size:12px; outline:none; resize:none;">${currentCode.replace(/\\\\n/g, '\\n')}</textarea>
-                        <div style="font-size:10px; color:#666">Supports Java Lambda syntax, e.g., e -> { ... }</div>
-                    </div>
-                `;
+                document.getElementById('event-code-input').value = currentCode.replace(/\\\\n/g, '\\n');
+                const modal = document.getElementById('event-editor-modal');
+                modal.style.display = 'block';
+                window.apply3DTracking(modal);
+            };
 
-                window.show3DConfirm(
-                    "Event Editor: " + evName,
-                    html,
-                    () => {
-                        const newCode = document.getElementById('event-code-editor').value;
-                        props.events[evName] = newCode.replace(/\\n/g, '\\\\n');
-                        selectedItem.setAttribute('data-props', JSON.stringify(props));
-                        window.updateGeneratedCode();
-                        window.updateInspector();
-                    }
-                );
+            window.saveEventHandler = function() {
+                if (!selectedItem || !activeEventProperty) return;
+                const props = JSON.parse(selectedItem.getAttribute('data-props'));
+                const newCode = document.getElementById('event-code-input').value;
+                props.events[activeEventProperty] = newCode.replace(/\\n/g, '\\\\n');
+                selectedItem.setAttribute('data-props', JSON.stringify(props));
+                
+                document.getElementById('event-editor-modal').style.display = 'none';
+                window.updateGeneratedCode();
+                window.updateInspector();
             };
 
             window.selectModel = function(name) {
@@ -625,8 +625,7 @@ public class WebDesignerPage extends DashboardBasePage {
                 if (model) {
                     currentModel = model;
                     window.parseModelFields(model.file);
-                    window.show3DConfirm("Model Attached", "Se ha vinculado el modelo " + name + " a la vista.", () => {});
-                    // Auto close after 2s if no action? No, user asked for dialog.
+                    window.show3DMessage("Model Attached", "Se ha vinculado el modelo " + name + " a la vista.");
                 } else {
                     modelFields = [];
                     window.updateInspector();
@@ -783,9 +782,7 @@ public class WebDesignerPage extends DashboardBasePage {
                     document.getElementById('generated-code-display').innerText = content;
                     document.getElementById('generated-code-hidden').value = content;
                     
-                    if (path.endsWith('Page.java')) {
-                        window.show3DConfirm("Page Loaded", "Page content loaded into source view: " + path, () => {});
-                    }
+                        window.show3DMessage("Page Loaded", "Page content loaded into source view: " + path);
                 };
                 reader.readAsText(file);
             };
@@ -795,9 +792,36 @@ public class WebDesignerPage extends DashboardBasePage {
                 document.getElementById('confirm-title').innerText = title;
                 document.getElementById('confirm-body').innerHTML = body;
                 const yesBtn = document.getElementById('confirm-yes-btn');
+                const noBtn = document.getElementById('confirm-no-btn') || modal.querySelector('.j-btn');
+                
+                yesBtn.style.display = 'inline-block';
+                yesBtn.innerText = 'Yes, Confirm';
+                if(noBtn) {
+                   noBtn.style.display = 'inline-block';
+                   noBtn.innerText = 'No, Cancel';
+                }
+                
                 yesBtn.onclick = () => {
                    window.close3DConfirm();
-                   yesAction();
+                   if (yesAction) yesAction();
+                };
+                modal.style.display = 'block';
+                window.apply3DTracking(modal);
+            };
+
+            window.show3DMessage = function(title, body) {
+                const modal = document.getElementById('confirm-3d-modal');
+                document.getElementById('confirm-title').innerText = title;
+                document.getElementById('confirm-body').innerHTML = body;
+                const yesBtn = document.getElementById('confirm-yes-btn');
+                const noBtn = document.getElementById('confirm-no-btn') || modal.querySelector('.j-btn');
+                
+                yesBtn.style.display = 'inline-block';
+                yesBtn.innerText = 'OK';
+                if(noBtn) noBtn.style.display = 'none';
+                
+                yesBtn.onclick = () => {
+                   window.close3DConfirm();
                 };
                 modal.style.display = 'block';
                 window.apply3DTracking(modal);
@@ -807,7 +831,7 @@ public class WebDesignerPage extends DashboardBasePage {
                 const modal = document.getElementById('confirm-3d-modal');
                 modal.style.display = 'none';
                 modal.onmousemove = null;
-                modal.style.transform = '';
+                modal.style.transform = 'translate(-50%, -50%)';
             };
 
             window.apply3DTracking = function(el) {
@@ -819,10 +843,10 @@ public class WebDesignerPage extends DashboardBasePage {
                     const yc = rect.height / 2;
                     const dx = x - xc;
                     const dy = y - yc;
-                    el.style.transform = `perspective(2000px) rotateX(${-dy / 20}deg) rotateY(${dx / 20}deg) translateZ(50px)`;
+                    el.style.transform = `translate(-50%, -50%) perspective(2000px) rotateX(${-dy / 20}deg) rotateY(${dx / 20}deg) translateZ(50px)`;
                 };
                 el.onmouseleave = () => {
-                    el.style.transform = `perspective(2000px) rotateX(0) rotateY(0) translateZ(0)`;
+                    el.style.transform = `translate(-50%, -50%) perspective(2000px) rotateX(0) rotateY(0) translateZ(0)`;
                 };
             };
 
@@ -886,7 +910,7 @@ public class WebDesignerPage extends DashboardBasePage {
                 const canvas = document.getElementById('canvas-area');
                 if (!canvas) return;
                 if (!currentModel) {
-                    window.show3DConfirm("Error", "Please select a View Model in the Project Explorer first.", () => {});
+                    window.show3DMessage("Error", "Please select a View Model in the Project Explorer first.");
                     return;
                 }
                 
@@ -950,16 +974,15 @@ public class WebDesignerPage extends DashboardBasePage {
 
                 window.addComponentToCanvas('Button', modalActions);
                 const saveBtn = modalActions.lastElementChild;
-                saveBtn.setAttribute('data-props', JSON.stringify({text: "Save " + currentModel.name, columns: 2, events: {onClick: "e -> { \\n    window.show3DConfirm('Data Saved', 'Saving " + currentModel.name + " to database...', () => {}); \\n    document.getElementById('" + modalId + "').style.display = 'none'; \\n}"}, binding: ""}));
+                saveBtn.setAttribute('data-props', JSON.stringify({text: "Save " + currentModel.name, columns: 2, events: {onClick: "e -> { \\n    window.show3DMessage('Data Saved', 'Saving " + currentModel.name + " to database...'); \\n    document.getElementById('" + modalId + "').style.display = 'none'; \\n}"}, binding: ""}));
                 
                 window.addComponentToCanvas('Button', modalActions);
                 const cancelBtn = modalActions.lastElementChild;
                 cancelBtn.setAttribute('data-props', JSON.stringify({text: "Cancel", columns: 2, events: {onClick: "e -> { \\n    document.getElementById('" + modalId + "').style.display = 'none'; \\n}"}, binding: ""}));
 
-                window.show3DConfirm(
+                window.show3DMessage(
                     "CRUD Generado", 
-                    "Se ha generado automáticamente el layout CRUD para " + currentModel.name + ". Hemos añadido " + modelFields.length + " campos vinculados al modelo.",
-                    () => {}
+                    "Se ha generado automáticamente el layout CRUD para " + currentModel.name + ". Hemos añadido " + modelFields.length + " campos vinculados al modelo."
                 );
                 window.updateGeneratedCode();
             };
@@ -979,7 +1002,7 @@ public class WebDesignerPage extends DashboardBasePage {
                         selectedItem = null;
                         currentModel = null;
                         window.updateInspector();
-                        window.show3DConfirm("Canvas Cleared", "Designer session has been reset.", () => {});
+                        window.show3DMessage("Canvas Cleared", "Designer session has been reset.");
                     }
                 );
             };
