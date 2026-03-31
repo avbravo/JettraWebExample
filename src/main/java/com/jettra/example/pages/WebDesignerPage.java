@@ -232,9 +232,20 @@ public class WebDesignerPage extends DashboardBasePage {
 
     private Div createProjectExplorer() {
         Div explorer = new Div();
+        
+        Div explorerHeaderWrap = new Div();
+        explorerHeaderWrap.setStyle("display", "flex").setStyle("justify-content", "space-between").setStyle("align-items", "center").setStyle("margin-bottom", "10px");
+        
         Header h = new Header(5, "Project Explorer");
-        h.setStyle("color", "var(--jettra-accent)").setStyle("margin-bottom", "10px");
-        explorer.add(h);
+        h.setStyle("color", "var(--jettra-accent)").setStyle("margin", "0");
+        
+        Span clearExplorerBtn = new Span("🗑️");
+        clearExplorerBtn.setStyle("cursor", "pointer").setStyle("font-size", "14px").setStyle("transition", "transform 0.2s").setStyle("opacity", "0.8");
+        clearExplorerBtn.setProperty("onclick", "window.clearProjectCache()");
+        clearExplorerBtn.setProperty("title", "Limpiar selección de proyecto");
+        
+        explorerHeaderWrap.add(h).add(clearExplorerBtn);
+        explorer.add(explorerHeaderWrap);
 
         FolderSelector folderSel = new FolderSelector("fs-explorer");
         folderSel.setReferenceLocation("/").setReferenceContent("Root");
@@ -433,9 +444,13 @@ public class WebDesignerPage extends DashboardBasePage {
             }
 
             if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', setupCanvasHandlers);
+                document.addEventListener('DOMContentLoaded', () => {
+                    setupCanvasHandlers();
+                    window.restoreFilesFromCache();
+                });
             } else {
                 setupCanvasHandlers();
+                window.restoreFilesFromCache();
             }
 
             window.addComponentToCanvas = function(type, parent) {
@@ -660,35 +675,29 @@ public class WebDesignerPage extends DashboardBasePage {
                 window.updateInspector();
             };
 
+            window.parseModelFieldsContent = function(content) {
+                const fieldRegex = /private\\s+\\w+\\s+(\\w+);/g;
+                let match;
+                modelFields = [];
+                while ((match = fieldRegex.exec(content)) !== null) {
+                    modelFields.push(match[1]);
+                }
+                window.updateInspector();
+                window.updateGeneratedCode();
+            };
+
             window.selectModel = function(name) {
                 viewModelName = name;
                 const model = availableModels.find(m => m.name === name);
                 if (model) {
                     currentModel = model;
-                    window.parseModelFields(model.file);
+                    window.parseModelFieldsContent(model.content);
                     window.show3DMessage("Model Attached", "Se ha vinculado el modelo " + name + " a la vista.");
                 } else {
                     modelFields = [];
                     window.updateInspector();
                     window.updateGeneratedCode();
                 }
-            };
-
-            window.parseModelFields = function(file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const content = e.target.result;
-                    // Simple Regex to find private fields
-                    const fieldRegex = /private\\s+\\w+\\s+(\\w+);/g;
-                    let match;
-                    modelFields = [];
-                    while ((match = fieldRegex.exec(content)) !== null) {
-                        modelFields.push(match[1]);
-                    }
-                    window.updateInspector();
-                    window.updateGeneratedCode();
-                };
-                reader.readAsText(file);
             };
 
             window.updateProp = function(key, value) {
@@ -742,7 +751,38 @@ public class WebDesignerPage extends DashboardBasePage {
                 window.updateGeneratedCode();
             };
 
-            var projectFilesMap = {};
+            window.jettraFileCache = {};
+
+            window.restoreFilesFromCache = function() {
+                const cachedTree = localStorage.getItem('jettra_designer_tree');
+                const cachedFilesStr = localStorage.getItem('jettra_designer_files');
+                
+                if (cachedTree && cachedFilesStr) {
+                    const viewer = document.getElementById('explorer-tree-view');
+                    if (viewer) viewer.innerHTML = cachedTree;
+                    try {
+                        window.jettraFileCache = JSON.parse(cachedFilesStr);
+                        availableModels = [];
+                        Object.keys(window.jettraFileCache).forEach(path => {
+                            if (path.endsWith('Model.java')) {
+                                const name = path.split('/').pop().replace('.java','');
+                                availableModels.push({ name: name, content: window.jettraFileCache[path] });
+                            }
+                        });
+                        window.updateModelSelect();
+                    } catch(e) {}
+                }
+            };
+
+            window.clearProjectCache = function() {
+                localStorage.removeItem('jettra_designer_tree');
+                localStorage.removeItem('jettra_designer_files');
+                window.jettraFileCache = {};
+                availableModels = [];
+                const viewer = document.getElementById('explorer-tree-view');
+                if (viewer) viewer.innerHTML = '';
+                window.updateModelSelect();
+            };
 
             window.loadFiles = function(input) {
                 const triggerLoad = () => {
@@ -754,8 +794,9 @@ public class WebDesignerPage extends DashboardBasePage {
                     const excludeTarget = input.getAttribute('data-exclude-target') === 'true';
                     
                     availableModels = [];
-                    projectFilesMap = {};
+                    window.jettraFileCache = {};
                     const tree = {};
+                    const readPromises = [];
 
                     for (let i = 0; i < files.length; i++) {
                         const f = files[i];
@@ -771,14 +812,22 @@ public class WebDesignerPage extends DashboardBasePage {
                             if (!curr[part]) curr[part] = { _children: {}, _file: null, _path: relPath };
                             if (j === parts.length - 1) {
                                 curr[part]._file = f;
-                                projectFilesMap[relPath] = f;
                             }
                             curr = curr[part]._children;
                         }
 
-                        if (f.name.endsWith('Model.java')) {
-                            availableModels.push({ name: f.name.replace('.java',''), file: f });
-                        }
+                        readPromises.push(new Promise((resolve) => {
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                const content = e.target.result;
+                                window.jettraFileCache[relPath] = content;
+                                if (f.name.endsWith('Model.java')) {
+                                    availableModels.push({ name: f.name.replace('.java',''), content: content });
+                                }
+                                resolve();
+                            };
+                            reader.readAsText(f);
+                        }));
                     }
 
                     function renderTree(node, name, depth = 0) {
@@ -799,11 +848,21 @@ public class WebDesignerPage extends DashboardBasePage {
                         return html;
                     }
 
-                    let finalHtml = "";
-                    for (const root in tree) finalHtml += renderTree(tree[root], root);
-                    viewer.innerHTML = finalHtml;
-                    window.updateModelSelect();
-                    window.updateInspector();
+                    Promise.all(readPromises).then(() => {
+                        let finalHtml = "";
+                        for (const root in tree) finalHtml += renderTree(tree[root], root);
+                        viewer.innerHTML = finalHtml;
+                        window.updateModelSelect();
+                        window.updateInspector();
+                        
+                        try {
+                            localStorage.setItem('jettra_designer_tree', finalHtml);
+                            localStorage.setItem('jettra_designer_files', JSON.stringify(window.jettraFileCache));
+                            window.show3DMessage("Proyecto Cargado", "El explorador ha procesado los archivos y se han cacheado localmente.");
+                        } catch(e) {
+                            console.warn("Could not cache files locally due to size limit", e);
+                        }
+                    });
                 };
 
                 window.show3DConfirm(
@@ -814,21 +873,16 @@ public class WebDesignerPage extends DashboardBasePage {
             };
 
             window.loadFileContent = function(path) {
-                const file = projectFilesMap[path];
-                if (!file) return;
+                const content = window.jettraFileCache[path];
+                if (!content) return;
 
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const content = e.target.result;
-                    document.getElementById('generated-code-display').value = content;
-                    document.getElementById('generated-code-hidden').value = content;
-                    
-                        window.show3DMessage("Page Loaded", "Page content loaded into source view: " + path);
-                    if (path.endsWith('Page.java')) {
-                        setTimeout(() => window.syncCodeToCanvas(), 200);
-                    }
-                };
-                reader.readAsText(file);
+                document.getElementById('generated-code-display').value = content;
+                document.getElementById('generated-code-hidden').value = content;
+                
+                window.show3DMessage("Page Loaded", "Page content loaded into source view: " + path);
+                if (path.endsWith('Page.java')) {
+                    setTimeout(() => window.syncCodeToCanvas(), 200);
+                }
             };
 
             window.show3DConfirm = function(title, body, yesAction) {
@@ -924,15 +978,15 @@ public class WebDesignerPage extends DashboardBasePage {
 
                 if (isPage) {
                     const items = canvas.querySelectorAll('.canvas-item');
-                    const fileObj = projectFilesMap[name];
+                    const content = window.jettraFileCache[name];
 
                     const doOpen = () => {
-                        if (fileObj) {
-                            window.loadFileContent(fileObj.webkitRelativePath);
+                        if (content) {
+                            window.loadFileContent(Object.keys(window.jettraFileCache).find(k => k.endsWith('/' + name) || k === name));
+                        } else {
+                            canvas.innerHTML = '<div class="canvas-placeholder">Start dragging components here to design ' + name + '</div>';
+                            window.updateGeneratedCode();
                         }
-                        // For demonstration, we clear the canvas since we don't have a real parser for the .java code yet
-                        canvas.innerHTML = '<div class="canvas-placeholder">Start dragging components here to design ' + name + '</div>';
-                        window.updateGeneratedCode();
                     };
 
                     if (items.length > 0) {
@@ -1181,6 +1235,8 @@ public class WebDesignerPage extends DashboardBasePage {
                         let cleanParams = args.replace(/"/g, '').split(',');
                         if (cleanParams.length > 0) {
                             if (type === 'Header' || type === 'Paragraph' || type === 'Button') props.text = cleanParams.length > 1 ? cleanParams[1].trim() : cleanParams[0].trim();
+                            if (type === 'Modal') props.text = cleanParams.length > 1 ? cleanParams[1].trim() : (cleanParams.length > 0 ? cleanParams[0].trim() : 'Modal Component');
+                            if (type === 'Board') props.text = cleanParams.length > 1 ? cleanParams[1].trim() : (cleanParams.length > 0 ? cleanParams[0].trim() : 'New Board');
                             if (type === 'Panel' || type === 'Grid') props.columns = parseInt(cleanParams[0].trim()) || 2;
                             if (type === 'ProgressBar') { props.value = parseInt(cleanParams[0])||0; props.max = parseInt(cleanParams[1])||100; }
                         }
@@ -1189,7 +1245,7 @@ public class WebDesignerPage extends DashboardBasePage {
                     
                     // Force visual update on component
                     if (props.text) {
-                        const inner = el.querySelector('h2, p, button, label, .j-avatar');
+                        const inner = el.querySelector('h3, h2, p, button, label, .j-avatar');
                         if(inner) inner.innerText = props.text;
                     }
                 }
