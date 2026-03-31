@@ -121,14 +121,23 @@ public class WebDesignerPage extends DashboardBasePage {
         inspector.setProperty("id", "property-inspector");
         inspector.setStyle("flex", "0 0 250px").setStyle("background", "rgba(20,35,55,0.9)").setStyle("border", "1px solid var(--jettra-accent)").setStyle("padding", "15px").setStyle("border-radius", "8px").setStyle("display", "none").setStyle("flex-direction", "column");
         
+        Div inspectorHeaderWrapper = new Div();
+        inspectorHeaderWrapper.setStyle("display", "flex").setStyle("justify-content", "space-between").setStyle("align-items", "center").setStyle("margin-bottom", "10px");
+        
         Header inspectorHeader = new Header(4, "Properties");
-        inspectorHeader.setStyle("color", "var(--jettra-accent)").setStyle("margin-bottom", "10px");
+        inspectorHeader.setStyle("color", "var(--jettra-accent)").setStyle("margin", "0");
+        
+        Span closeInspector = new Span("×");
+        closeInspector.setStyle("color", "#ff4444").setStyle("font-size", "24px").setStyle("cursor", "pointer").setStyle("line-height", "1").setStyle("font-weight", "bold");
+        closeInspector.setProperty("onclick", "document.getElementById('property-inspector').style.display='none'");
+        
+        inspectorHeaderWrapper.add(inspectorHeader).add(closeInspector);
         
         Div propList = new Div();
         propList.setProperty("id", "inspector-properties");
         propList.setStyle("flex", "1");
 
-        inspector.add(inspectorHeader).add(propList);
+        inspector.add(inspectorHeaderWrapper).add(propList);
 
         container.add(sidebar).add(canvasArea).add(codeView).add(inspector);
         
@@ -815,6 +824,9 @@ public class WebDesignerPage extends DashboardBasePage {
                     document.getElementById('generated-code-hidden').value = content;
                     
                         window.show3DMessage("Page Loaded", "Page content loaded into source view: " + path);
+                    if (path.endsWith('Page.java')) {
+                        setTimeout(() => window.syncCodeToCanvas(), 200);
+                    }
                 };
                 reader.readAsText(file);
             };
