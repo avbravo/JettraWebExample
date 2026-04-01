@@ -93,6 +93,22 @@ public class WebDesignerPage extends DashboardBasePage {
 
         canvasArea.add(canvasDropArea);
 
+        // --- NEW: Modal Tools Area ---
+        Div modalToolsArea = new Div();
+        modalToolsArea.setProperty("id", "modal-tools-area");
+        modalToolsArea.setStyle("margin-top", "15px").setStyle("border-top", "1px dashed rgba(0,255,255,0.3)").setStyle("padding-top", "15px").setStyle("display", "flex").setStyle("flex-direction", "column");
+        
+        Header modalToolsTitle = new Header(5, "Modal Tools");
+        modalToolsTitle.setStyle("color", "var(--jettra-accent)").setStyle("margin", "0 0 10px 0").setStyle("font-size", "12px").setStyle("text-transform", "uppercase");
+        
+        Div modalListContainer = new Div();
+        modalListContainer.setProperty("id", "modal-list-container");
+        modalListContainer.setStyle("display", "flex").setStyle("flex-wrap", "wrap").setStyle("gap", "15px").setStyle("min-height", "60px").setStyle("background", "rgba(0,0,0,0.2)").setStyle("border-radius", "8px").setStyle("padding", "10px").setStyle("border", "1px solid rgba(255,255,255,0.05)");
+        
+        modalToolsArea.add(modalToolsTitle).add(modalListContainer);
+        canvasArea.add(modalToolsArea);
+        // -----------------------------
+
         // 3. Code View
         Div codeView = new Div();
         codeView.setStyle("flex", "0 0 350px").setStyle("background", "rgba(10,20,30,0.9)").setStyle("border", "1px solid var(--jettra-accent)").setStyle("padding", "15px").setStyle("border-radius", "8px").setStyle("display", "flex").setStyle("flex-direction", "column");
@@ -448,6 +464,12 @@ public class WebDesignerPage extends DashboardBasePage {
                 ev.dataTransfer.effectAllowed = "move";
             };
 
+            setInterval(() => {
+                document.querySelectorAll('.live-clock').forEach(el => {
+                    el.innerText = new Date().toLocaleTimeString();
+                });
+            }, 1000);
+
             function setupCanvasHandlers() {
                 const canvas = document.getElementById('canvas-drop-area');
                 if (!canvas) return;
@@ -493,7 +515,7 @@ public class WebDesignerPage extends DashboardBasePage {
                 window.restoreFilesFromCache();
             }
 
-            window.addComponentToCanvas = function(type, parent) {
+            window.addComponentToCanvas = function(type, parent, externalProps) {
                 const canvas = document.getElementById('canvas-drop-area');
                 const targetParent = parent || canvas;
                 if (!targetParent) return;
@@ -501,11 +523,21 @@ public class WebDesignerPage extends DashboardBasePage {
                 const placeholder = document.querySelector('.canvas-placeholder');
                 if (placeholder) placeholder.style.display = 'none';
 
+                if (type === 'Modal' && targetParent.id !== 'modal-list-container' && !targetParent.closest('#modal-list-container')) {
+                    const modalIdGen = 'modal_' + Math.floor(Math.random()*10000);
+                    window.addComponentToCanvas('Button', targetParent, { text: "Open Modal", columns: 2, events: {onClick: `e -> { \\n    document.getElementById("${modalIdGen}").style.display = "block"; \\n}`}, binding: "" });
+                    const mt = document.getElementById('modal-list-container');
+                    if(mt) window.addComponentToCanvas('Modal', mt, Object.assign({idGen: modalIdGen}, externalProps || {}));
+                    return;
+                }
+
                 const wrapper = document.createElement('div');
                 wrapper.className = 'canvas-item';
                 wrapper.id = 'ci_' + Date.now() + Math.floor(Math.random()*1000); // Important for inner dnd
                 wrapper.setAttribute('data-type', type);
-                wrapper.setAttribute('data-props', JSON.stringify({text: type, columns: 2, events: {}, binding: ""}));
+                
+                let defaultProps = externalProps || {text: type, columns: 2, events: {}, binding: ""};
+                wrapper.setAttribute('data-props', JSON.stringify(defaultProps));
                 wrapper.setAttribute('draggable', 'true');
                 
                 wrapper.ondragstart = function(ev) {
@@ -519,6 +551,7 @@ public class WebDesignerPage extends DashboardBasePage {
                 
                 let content = '';
                 switch(type) {
+                    case 'Clock': content = '<div class="j-component live-clock" style="font-size: 20px; font-weight: bold; color: #0f0; background: #000; padding: 10px; border-radius: 8px; border: 2px solid #333; display:inline-block; font-family: monospace;">' + new Date().toLocaleTimeString() + '</div>'; break;
                     case 'Header': content = '<h2 style="margin:0; color:var(--jettra-text);">New Header</h2>'; break;
                     case 'Paragraph': content = '<p style="margin:0; color:var(--jettra-text);">Sample text...</p>'; break;
                     case 'Divide': content = '<div style="border-top:1px solid var(--jettra-border); margin:15px 0; width:100%"></div>'; break;
@@ -1039,7 +1072,6 @@ public class WebDesignerPage extends DashboardBasePage {
                             doOpen
                         );
                     } else {
-                        // Si no hay ningun elemento en el diseñador agregado se muestra el contenido del codigo y se muestra el diseño en el diseñador.
                         doOpen();
                     }
                 } else if (isModel) {
@@ -1089,9 +1121,10 @@ public class WebDesignerPage extends DashboardBasePage {
 
                 // 4. Modal with Form Fields
                 window.addComponentToCanvas('Modal', canvas);
-                const modal = canvas.lastElementChild;
+                const modalToolsArea = document.getElementById('modal-list-container');
+                const modal = modalToolsArea ? modalToolsArea.lastElementChild : canvas.lastElementChild;
                 modal.id = modalId;
-                modal.setAttribute('data-props', JSON.stringify({text: "Enter " + currentModel.name + " Details", columns: 2, events: {}, binding: ""}));
+                modal.setAttribute('data-props', JSON.stringify({text: "Enter " + currentModel.name + " Details", columns: 2, events: {}, binding: "", idGen: modalId}));
                 const modalContainer = modal.querySelector('.canvas-container') || modal;
                 
                 // Add fields from model
@@ -1141,6 +1174,9 @@ public class WebDesignerPage extends DashboardBasePage {
                         
                         document.getElementById('generated-code-display').value = "// Designer Cleared";
                         document.getElementById('generated-code-hidden').value = "";
+                        
+                        const mtArea = document.getElementById('modal-list-container');
+                        if (mtArea) mtArea.innerHTML = '';
                         
                         selectedItem = null;
                         currentModel = null;
@@ -1228,10 +1264,26 @@ public class WebDesignerPage extends DashboardBasePage {
                                 out += handleEvents(v);
                                 out += `        ${container}.add(${v});\\n`;
                                 break;
+                            case 'Clock':
+                                out += `        Clock ${v} = new Clock("${props.text || 'clock'}");\\n`;
+                                out += handleCommon(v);
+                                out += handleEvents(v);
+                                out += `        ${container}.add(${v});\\n`;
+                                break;
+                            case 'Modal':
+                                const mId = props.idGen || "modal_" + Math.floor(Math.random()*1000);
+                                out += `        Modal ${v} = new Modal("${mId}");\\n`;
+                                const kidsM = it.querySelectorAll(':scope > .canvas-container > .canvas-item');
+                                if (kidsM.length > 0) out += walk(kidsM, v);
+                                out += handleCommon(v);
+                                out += handleEvents(v);
+                                out += `        ${container}.add(${v});\\n`;
+                                break;
                             case 'Panel':
                             case 'Grid':
-                                out += `        ${type} ${v} = new ${type}(${props.columns});\\n`;
-                                const kids = it.querySelectorAll(':scope > .canvas-container > .canvas-item');
+                            case 'Board':
+                                out += `        ${type} ${v} = new ${type}(${props.columns || 2});\\n`;
+                                const kids = it.querySelectorAll(':scope > .canvas-container > .canvas-item, :scope > div > .canvas-container > .canvas-item');
                                 if (kids.length > 0) out += walk(kids, v);
                                 out += handleCommon(v);
                                 out += handleEvents(v);
@@ -1247,6 +1299,7 @@ public class WebDesignerPage extends DashboardBasePage {
                     return out;
                 }
                 code += walk(document.querySelectorAll('#canvas-drop-area > .canvas-item'), "center");
+                code += walk(document.querySelectorAll('#modal-list-container > .canvas-item'), "center");
                 code += `    }\\n}`;
                 
                 display.value = code;
@@ -1260,9 +1313,12 @@ public class WebDesignerPage extends DashboardBasePage {
                 const canvas = document.getElementById('canvas-drop-area');
                 
                 // Simplistic RegExp to find UI elements
-                const regex = /new\\s+(Header|Paragraph|Divide|Button|TextBox|TextArea|Panel|Grid|Modal|Board|Avatar|ProgressBar|Table|TabView|Image)\\s*\\((.*?)\\)/g;
+                const regex = /new\\s+(Header|Paragraph|Divide|Button|TextBox|TextArea|Panel|Grid|Modal|Board|Avatar|ProgressBar|Table|TabView|Image|Clock)\\s*\\((.*?)\\)/g;
                 
                 canvas.innerHTML = '';
+                const mtArea = document.getElementById('modal-list-container');
+                if (mtArea) mtArea.innerHTML = '';
+                
                 let match;
                 let foundAny = false;
                 
@@ -1279,8 +1335,12 @@ public class WebDesignerPage extends DashboardBasePage {
                     if (args && args.trim().length > 0) {
                         let cleanParams = args.replace(/"/g, '').split(',');
                         if (cleanParams.length > 0) {
-                            if (type === 'Header' || type === 'Paragraph' || type === 'Button') props.text = cleanParams.length > 1 ? cleanParams[1].trim() : cleanParams[0].trim();
-                            if (type === 'Modal') props.text = cleanParams.length > 1 ? cleanParams[1].trim() : (cleanParams.length > 0 ? cleanParams[0].trim() : 'Modal Component');
+                            if (type === 'Header' || type === 'Paragraph' || type === 'Button' || type === 'Clock') props.text = cleanParams.length > 1 ? cleanParams[1].trim() : cleanParams[0].trim();
+                            if (type === 'Modal') {
+                                let mName = cleanParams.length > 1 ? cleanParams[1].trim() : (cleanParams.length > 0 ? cleanParams[0].trim() : 'Modal Component');
+                                props.text = mName;
+                                props.idGen = cleanParams[0].trim();
+                            }
                             if (type === 'Board') props.text = cleanParams.length > 1 ? cleanParams[1].trim() : (cleanParams.length > 0 ? cleanParams[0].trim() : 'New Board');
                             if (type === 'Panel' || type === 'Grid') props.columns = parseInt(cleanParams[0].trim()) || 2;
                             if (type === 'ProgressBar') { props.value = parseInt(cleanParams[0])||0; props.max = parseInt(cleanParams[1])||100; }
