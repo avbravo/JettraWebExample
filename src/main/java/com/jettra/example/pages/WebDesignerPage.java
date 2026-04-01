@@ -58,7 +58,7 @@ public class WebDesignerPage extends DashboardBasePage {
         canvasHeader.setProperty("id", "canvas-header");
         canvasHeader.setStyle("display", "flex").setStyle("justify-content", "space-between").setStyle("align-items", "center").setStyle("margin-bottom", "15px").setStyle("border-bottom", "1px solid rgba(0,255,255,0.1)").setStyle("padding-bottom", "10px");
         
-        Header canvasTitle = new Header(4, "Visual Design Canvas");
+        Header canvasTitle = new Header(4, "View");
         canvasTitle.setProperty("id", "canvas-title-text");
         canvasTitle.setStyle("color", "var(--jettra-accent)").setStyle("margin", "0");
         
@@ -519,39 +519,39 @@ public class WebDesignerPage extends DashboardBasePage {
                 
                 let content = '';
                 switch(type) {
-                    case 'Header': content = '<h2>New Header</h2>'; break;
-                    case 'Paragraph': content = '<p style="color:#ccc">Sample text...</p>'; break;
-                    case 'Divide': content = '<div style="border-top:2px solid var(--jettra-accent); margin:15px 0; opacity:0.5; width:100%"></div>'; break;
-                    case 'Button': content = '<button class="j-btn-primary" type="button">Interactive Button</button>'; break;
-                    case 'TextBox': content = '<input type="text" placeholder="TextBox..." style="width:100%; padding:10px; background:#111; color:#fff; border:1px solid #444; border-radius:4px" onfocus="this.blur()">'; break;
+                    case 'Header': content = '<h2 style="margin:0; color:var(--jettra-text);">New Header</h2>'; break;
+                    case 'Paragraph': content = '<p style="margin:0; color:var(--jettra-text);">Sample text...</p>'; break;
+                    case 'Divide': content = '<div style="border-top:1px solid var(--jettra-border); margin:15px 0; width:100%"></div>'; break;
+                    case 'Button': content = '<button class="j-btn j-btn-primary" type="button">Interactive Button</button>'; break;
+                    case 'TextBox': content = '<input type="text" class="j-input" placeholder="TextBox..." onfocus="this.blur()">'; break;
+                    case 'TextArea': content = '<textarea class="j-input" placeholder="TextArea..." rows="3" onfocus="this.blur()"></textarea>'; break;
                     case 'Panel': 
+                        content = '<div class="j-component j-panel" style="padding:0; overflow:hidden;"><div class="j-panel-header" style="background:rgba(0,255,255,0.05); padding:10px 15px; border-bottom:1px solid var(--jettra-border); font-weight:bold; color:var(--jettra-accent)">Panel Title</div><div class="canvas-container j-panel-body" style="padding:15px; display:flex; flex-direction:column; gap:10px; min-height:50px;"></div></div>'; 
+                        break;
                     case 'Grid':
-                        content = '<div class="canvas-container" style="display:grid; grid-template-columns:1fr 1fr; gap:10px"></div>'; 
+                        content = '<div class="canvas-container" style="display:grid; grid-template-columns:1fr 1fr; gap:15px; min-height:50px;"></div>'; 
                         break;
                     case 'Modal':
-                        content = '<div class="canvas-container modal-container-mock" style="padding:20px; border-radius:15px; border:2px solid var(--jettra-accent); background:rgba(20,40,70,0.4)">' +
-                                  '<h3 style="margin-top:0; color:var(--jettra-accent)">Modal Component</h3>' +
-                                  '</div>';
+                        content = '<div class="canvas-container modal-container-mock j-component" style="padding:20px; border-radius:12px; min-height:100px; transform:translateZ(10px); box-shadow:0 15px 40px rgba(0,0,0,0.5);"><h3 style="margin-top:0; color:var(--jettra-accent); border-bottom:1px solid rgba(0,255,255,0.2); padding-bottom:10px;">Modal Component</h3></div>';
                         break;
                     case 'Board':
-                        content = '<div class="canvas-container board-container-mock" style="padding:20px; border-radius:20px; border:1px solid var(--jettra-accent); background:rgba(15,23,42,0.4)">' +
-                                  '<h2 style="margin-top:0; color:var(--jettra-accent); font-size:16px;">New Board</h2>' +
-                                  '<div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; min-height:80px;">' +
-                                  '<div class="canvas-container" style="border:1px dashed rgba(0,255,255,0.2); border-radius:8px;"></div>' +
-                                  '<div class="canvas-container" style="border:1px dashed rgba(0,255,255,0.2); border-radius:8px;"></div>' +
-                                  '<div class="canvas-container" style="border:1px dashed rgba(0,255,255,0.2); border-radius:8px;"></div>' +
-                                  '</div>' +
-                                  '</div>';
+                        content = '<div class="canvas-container board-container-mock j-component" style="padding:20px; background:rgba(15,23,42,0.4);"><h2 style="margin-top:0; color:var(--jettra-accent); font-size:18px; margin-bottom:15px;">New Board</h2><div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:15px; min-height:100px;"><div class="canvas-container j-component j-panel" style="padding:10px; min-height:80px; box-shadow:none;"></div><div class="canvas-container j-component j-panel" style="padding:10px; min-height:80px; box-shadow:none;"></div><div class="canvas-container j-component j-panel" style="padding:10px; min-height:80px; box-shadow:none;"></div></div></div>';
+                        break;
+                    case 'Table':
+                        content = '<div class="j-table-container j-component" style="padding:0; border-radius:12px; overflow:hidden;"><table style="width:100%; border-collapse:collapse; text-align:left; font-size:0.9rem;"><thead style="background:rgba(0,255,255,0.05); border-bottom:1px solid var(--jettra-accent);"><tr><th style="padding:12px; color:var(--jettra-text);">Col 1</th><th style="padding:12px; color:var(--jettra-text);">Col 2</th></tr></thead><tbody><tr style="border-bottom:1px solid var(--jettra-border);"><td style="padding:10px; color:var(--jettra-text);">Data 1</td><td style="padding:10px; color:var(--jettra-text);">Data 2</td></tr></tbody></table></div>';
+                        break;
+                    case 'Image':
+                        content = '<div class="j-component" style="padding:0; overflow:hidden; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.2); min-height:100px; border-radius:8px;"><span style="color:#666;">[Image Placeholder]</span></div>';
                         break;
                     case 'Avatar':
                         content = '<div class="j-avatar j-avatar-circle j-avatar-md" style="background:var(--jettra-accent); color:#000; display:flex; align-items:center; justify-content:center; font-weight:bold">AV</div>';
                         break;
                     case 'ProgressBar':
-                        content = '<div class="j-progressbar-container" style="width:100%; height:12px; background:rgba(255,255,255,0.05); border-radius:6px; overflow:hidden; border:1px solid rgba(255,255,255,0.1)">' +
+                        content = '<div class="j-progressbar-container" style="width:100%; height:12px; background:rgba(255,255,255,0.05); border-radius:6px; overflow:hidden; border:1px solid var(--jettra-border)">' +
                                   '<div class="j-progressbar-fill" style="width:60%; height:100%; background:var(--jettra-accent); box-shadow:0 0 10px var(--jettra-accent)"></div>' +
                                   '</div>';
                         break;
-                    default: content = `<div style="padding:10px; border:1px solid #444; color:#888">${type} Placeholder</div>`;
+                    default: content = `<div class="canvas-container j-component" style="padding:10px; text-align:center; color:#888;">${type} Component</div>`;
                 }
 
                 wrapper.innerHTML = content + '<div class="delete-tool" onclick="this.parentElement.remove(); window.updateGeneratedCode();">×</div>';
@@ -748,7 +748,7 @@ public class WebDesignerPage extends DashboardBasePage {
                 
                 const type = selectedItem.getAttribute('data-type');
                 if (key === 'text') {
-                    const el = selectedItem.querySelector('h2, p, button, label, .j-avatar');
+                    const el = selectedItem.querySelector('h3, h2, h1, p, button, label, .j-avatar, .j-panel-header, span');
                     if (el) el.innerText = value;
                     if (type === 'Avatar') {
                         props.icon = "";
@@ -1022,7 +1022,7 @@ public class WebDesignerPage extends DashboardBasePage {
 
                     const doOpen = () => {
                         const titleEl = document.getElementById('canvas-title-text');
-                        if (titleEl) titleEl.innerText = 'View - ' + name;
+                        if (titleEl) titleEl.innerText = 'View';
                         
                         if (content) {
                             window.loadFileContent(Object.keys(window.jettraFileCache).find(k => k.endsWith('/' + name) || k === name));
@@ -1136,7 +1136,7 @@ public class WebDesignerPage extends DashboardBasePage {
                         const canvas = document.getElementById('canvas-drop-area');
                         if (!canvas) return;
                         const titleEl = document.getElementById('canvas-title-text');
-                        if (titleEl) titleEl.innerText = 'Visual Design Canvas';
+                        if (titleEl) titleEl.innerText = 'View';
                         canvas.innerHTML = '<div class="canvas-placeholder">Start dragging components here to design</div>';
                         
                         document.getElementById('generated-code-display').value = "// Designer Cleared";
@@ -1290,7 +1290,7 @@ public class WebDesignerPage extends DashboardBasePage {
                     
                     // Force visual update on component
                     if (props.text) {
-                        const inner = el.querySelector('h3, h2, p, button, label, .j-avatar');
+                        const inner = el.querySelector('h3, h2, h1, p, button, label, .j-avatar, .j-panel-header, span');
                         if(inner) inner.innerText = props.text;
                     }
                 }
