@@ -55,18 +55,29 @@ public class WebDesignerPage extends DashboardBasePage {
         canvasArea.setStyle("flex", "1").setStyle("background", "rgba(0,0,0,0.3)").setStyle("border", "2px dashed var(--jettra-accent)").setStyle("border-radius", "8px").setStyle("padding", "20px").setStyle("position", "relative").setStyle("overflow-y", "auto").setStyle("display", "flex").setStyle("flex-direction", "column");
         
         Div canvasHeader = new Div();
+        canvasHeader.setProperty("id", "canvas-header");
         canvasHeader.setStyle("display", "flex").setStyle("justify-content", "space-between").setStyle("align-items", "center").setStyle("margin-bottom", "15px").setStyle("border-bottom", "1px solid rgba(0,255,255,0.1)").setStyle("padding-bottom", "10px");
         
         Header canvasTitle = new Header(4, "Visual Design Canvas");
         canvasTitle.setStyle("color", "var(--jettra-accent)").setStyle("margin", "0");
         
+        Div canvasHeaderActions = new Div();
+        canvasHeaderActions.setStyle("display", "flex").setStyle("gap", "10px");
+        
+        Button previewBtn = new Button("Preview 👁️");
+        previewBtn.addClass("j-btn-secondary");
+        previewBtn.setStyle("font-size", "11px").setStyle("padding", "5px 12px");
+        previewBtn.setProperty("type", "button");
+        previewBtn.setProperty("onclick", "window.previewInterface()");
+
         Button crudBtn = new Button("CRUD ⚡");
         crudBtn.addClass("j-btn-primary");
         crudBtn.setStyle("font-size", "11px").setStyle("padding", "5px 12px");
         crudBtn.setProperty("type", "button");
         crudBtn.setProperty("onclick", "generateCRUD()");
         
-        canvasHeader.add(canvasTitle).add(crudBtn);
+        canvasHeaderActions.add(previewBtn).add(crudBtn);
+        canvasHeader.add(canvasTitle).add(canvasHeaderActions);
         canvasArea.add(canvasHeader);
 
         Div canvasPlaceholder = new Div();
@@ -222,6 +233,28 @@ public class WebDesignerPage extends DashboardBasePage {
         // Wrap everything into the main center
         center.add(eventModal);
         center.add(confirmModal);
+
+        // 8. Preview Modal
+        Modal previewModal = new Modal("preview-modal");
+        previewModal.setStyle("display", "none").setStyle("background", "linear-gradient(135deg, #0f172a, #1e293b)").setStyle("position", "fixed").setStyle("top", "0").setStyle("left", "0").setStyle("width", "100vw").setStyle("height", "100vh").setStyle("z-index", "9999").setStyle("overflow-y", "auto");
+        
+        Div previewHeader = new Div();
+        previewHeader.setStyle("display", "flex").setStyle("justify-content", "space-between").setStyle("align-items", "center").setStyle("padding", "15px 30px").setStyle("background", "rgba(0,0,0,0.5)").setStyle("border-bottom", "1px solid rgba(0, 255, 255, 0.2)");
+        Header prevTitle = new Header(3, "Interface Preview");
+        prevTitle.setStyle("margin", "0").setStyle("color", "var(--jettra-accent)");
+        Button closePreviewBtn = new Button("Close Preview ×");
+        closePreviewBtn.addClass("j-btn-danger");
+        closePreviewBtn.setStyle("font-weight", "bold");
+        closePreviewBtn.setProperty("type", "button");
+        closePreviewBtn.setProperty("onclick", "document.getElementById('preview-modal').style.display = 'none'");
+        previewHeader.add(prevTitle).add(closePreviewBtn);
+
+        Div previewContent = new Div();
+        previewContent.setProperty("id", "preview-content-area");
+        previewContent.setStyle("padding", "40px").setStyle("max-width", "1200px").setStyle("margin", "0 auto");
+
+        previewModal.add(previewHeader).add(previewContent);
+        center.add(previewModal);
         
         saveForm.add(modelSelectionRow).add(container);
         center.add(saveForm);
@@ -1256,6 +1289,43 @@ public class WebDesignerPage extends DashboardBasePage {
                 
                 document.getElementById('generated-code-hidden').value = code;
                 window.show3DMessage("Sync Complete", "Canvas has been rebuilt from the generated source code.");
+            };
+
+            window.previewInterface = function() {
+                const canvas = document.getElementById('canvas-area');
+                const pcontent = document.getElementById('preview-content-area');
+                if (!canvas || !pcontent) return;
+                
+                pcontent.innerHTML = canvas.innerHTML;
+                
+                const draggables = pcontent.querySelectorAll('[draggable]');
+                draggables.forEach(d => {
+                    d.removeAttribute('draggable');
+                    d.oncontextmenu = null;
+                    d.onclick = null;
+                    d.classList.remove('selected');
+                });
+                
+                const placeholders = pcontent.querySelectorAll('.canvas-placeholder');
+                placeholders.forEach(p => p.remove());
+
+                const deleteTools = pcontent.querySelectorAll('.delete-tool');
+                deleteTools.forEach(d => d.remove());
+                
+                const items = pcontent.querySelectorAll('.canvas-item, .canvas-container, .board-container-mock, .modal-container-mock');
+                items.forEach(c => {
+                    c.classList.remove('canvas-item');
+                    c.classList.remove('canvas-container');
+                    c.classList.remove('selected');
+                    if (c.style.border && c.style.border.includes('dashed')) {
+                        c.style.border = 'none';
+                    }
+                });
+                
+                const header = pcontent.querySelector('#canvas-header');
+                if (header) header.style.display = 'none';
+
+                document.getElementById('preview-modal').style.display = 'block';
             };
 
         """);
