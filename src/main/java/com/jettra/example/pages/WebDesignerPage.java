@@ -669,6 +669,34 @@ public class WebDesignerPage extends DashboardBasePage {
                     `;
                 }
 
+                if (type === 'Button') {
+                    html += `
+                        <div class="inspector-row">
+                            <span class="inspector-label">Button Style</span>
+                            <select class="inspector-input" onchange="updateProp('btnStyle', this.value)">
+                                <option value="PRIMARY" ${props.btnStyle === 'PRIMARY' ? 'selected' : ''}>PRIMARY</option>
+                                <option value="SECONDARY" ${props.btnStyle === 'SECONDARY' ? 'selected' : ''}>SECONDARY</option>
+                                <option value="HELP" ${props.btnStyle === 'HELP' ? 'selected' : ''}>HELP</option>
+                                <option value="DANGER" ${props.btnStyle === 'DANGER' ? 'selected' : ''}>DANGER</option>
+                                <option value="INFO" ${props.btnStyle === 'INFO' ? 'selected' : ''}>INFO</option>
+                            </select>
+                        </div>
+                        <div class="inspector-row">
+                            <span class="inspector-label">Icon</span>
+                            <input type="text" class="inspector-input" value="${props.icon || ""}" placeholder="e.g. 💾" onchange="updateProp('icon', this.value)">
+                        </div>
+                    `;
+                }
+
+                if (type === 'SelectOneIcon') {
+                    html += `
+                        <div class="inspector-row">
+                            <span class="inspector-label">Icon</span>
+                            <input type="text" class="inspector-input" value="${props.icon || ""}" placeholder="e.g. 💾" onchange="updateProp('icon', this.value)">
+                        </div>
+                    `;
+                }
+
                 if (type === 'TextBox' || type === 'Label') {
                     html += `
                         <div class="inspector-row">
@@ -818,12 +846,58 @@ public class WebDesignerPage extends DashboardBasePage {
                 
                 const type = selectedItem.getAttribute('data-type');
                 if (key === 'text') {
-                    const el = selectedItem.querySelector('h3, h2, h1, p, button, label, .j-avatar, .j-panel-header, span');
-                    if (el) el.innerText = value;
+                    if (type === 'TextBox' || type === 'TextArea') {
+                        const inEl = selectedItem.querySelector('input, textarea');
+                        if (inEl) {
+                            inEl.placeholder = value;
+                            inEl.value = value;
+                        }
+                    } else if (type === 'Button') {
+                        const el = selectedItem.querySelector('button');
+                        if (el) el.innerHTML = (props.icon ? props.icon + ' ' : '') + value;
+                    } else {
+                        const el = selectedItem.querySelector('h3, h2, h1, p, label, .j-avatar, .j-panel-header, span');
+                        if (el) el.innerText = value;
+                        if (type === 'Avatar') {
+                            props.icon = "";
+                            selectedItem.setAttribute('data-props', JSON.stringify(props));
+                            setTimeout(window.updateInspector, 10);
+                        }
+                    }
+                }
+                
+                if (key === 'icon') {
                     if (type === 'Avatar') {
-                        props.icon = "";
+                        const el = selectedItem.querySelector('.j-avatar');
+                        if (el) el.innerHTML = value;
+                        props.text = "";
                         selectedItem.setAttribute('data-props', JSON.stringify(props));
                         setTimeout(window.updateInspector, 10);
+                    } else if (type === 'Button') {
+                        const el = selectedItem.querySelector('button');
+                        if (el) el.innerHTML = (value ? value + ' ' : '') + (props.text || 'Interactive Button');
+                    }
+                }
+
+                if (key === 'btnStyle' && type === 'Button') {
+                    const el = selectedItem.querySelector('button');
+                    if (el) {
+                        el.className = 'j-btn'; // reset
+                        el.classList.add('j-btn-' + value.toLowerCase());
+                    }
+                }
+
+                if ((key === 'options' || key === 'icon') && (type === 'SelectOne' || type === 'SelectOneIcon')) {
+                    const select = selectedItem.querySelector('select');
+                    if (select) {
+                        select.innerHTML = '';
+                        const opts = (props.options || '').split(',');
+                        opts.forEach(o => {
+                            const opt = document.createElement('option');
+                            const val = o.trim();
+                            opt.innerText = (type === 'SelectOneIcon' && props.icon) ? (props.icon + ' ' + val) : val;
+                            select.appendChild(opt);
+                        });
                     }
                 }
                 if (key === 'icon' && type === 'Avatar') {
@@ -1268,6 +1342,21 @@ public class WebDesignerPage extends DashboardBasePage {
                             case 'Paragraph': out += `        ${container}.add(new Paragraph("${props.text}"));\\n`; break;
                             case 'Span': out += `        ${container}.add(new Span("${props.text}"));\\n`; break;
                             case 'Label': out += `        ${container}.add(new Label("${props.text}"));\\n`; break;
+                            case 'Button': 
+                                out += `        ${type} ${v} = new ${type}("${props.text}");\\n`;
+                                if (props.btnStyle) out += `        ${v}.setStyle(${type}.Style.${props.btnStyle});\\n`;
+                                if (props.icon) out += `        ${v}.setIcon("${props.icon}");\\n`;
+                                out += handleCommon(v);
+                                out += handleEvents(v);
+                                out += `        ${container}.add(${v});\\n`;
+                                break;
+                            case 'TextBox':
+                            case 'TextArea':
+                                out += `        ${type} ${v} = new ${type}("${props.text || type}", "${props.text || type}");\\n`;
+                                out += handleCommon(v);
+                                out += handleEvents(v);
+                                out += `        ${container}.add(${v});\\n`;
+                                break;
                             case 'Avatar':
                                 out += `        Avatar ${v} = new Avatar();\\n`;
                                 if (props.text) out += `        ${v}.setText("${props.text}");\\n`;
@@ -1341,6 +1430,9 @@ public class WebDesignerPage extends DashboardBasePage {
                                     opts.forEach(o => {
                                         out += `        ${v}.addOption("${o.trim()}");\\n`;
                                     });
+                                }
+                                if (props.icon && type === 'SelectOneIcon') {
+                                    out += `        ${v}.setIcon("${props.icon}");\\n`;
                                 }
                                 out += handleCommon(v);
                                 out += handleEvents(v);
