@@ -77,7 +77,13 @@ public class WebDesignerPage extends DashboardBasePage {
         crudBtn.setProperty("type", "button");
         crudBtn.setProperty("onclick", "generateCRUD()");
         
-        canvasHeaderActions.add(previewBtn).add(crudBtn);
+        Button toggleCodeBtn = new Button("Code </>");
+        toggleCodeBtn.addClass("j-btn");
+        toggleCodeBtn.setStyle("font-size", "11px").setStyle("padding", "5px 12px");
+        toggleCodeBtn.setProperty("type", "button");
+        toggleCodeBtn.setProperty("onclick", "window.toggleCodeView()");
+        
+        canvasHeaderActions.add(previewBtn).add(crudBtn).add(toggleCodeBtn);
         canvasHeader.add(canvasTitle).add(canvasHeaderActions);
         canvasArea.add(canvasHeader);
 
@@ -111,6 +117,7 @@ public class WebDesignerPage extends DashboardBasePage {
 
         // 3. Code View
         Div codeView = new Div();
+        codeView.setProperty("id", "code-view-container");
         codeView.setStyle("flex", "0 0 350px").setStyle("background", "rgba(10,20,30,0.9)").setStyle("border", "1px solid var(--jettra-accent)").setStyle("padding", "15px").setStyle("border-radius", "8px").setStyle("display", "flex").setStyle("flex-direction", "column");
         
         Header codeHeader = new Header(4, "Java Source Code");
@@ -328,7 +335,7 @@ public class WebDesignerPage extends DashboardBasePage {
         // Typography
         addPaletteCategory(palette, "Typography", new String[]{"Header", "Paragraph", "Span", "Label", "Separator", "Divide"});
         // Forms
-        addPaletteCategory(palette, "Forms", new String[]{"Button", "CheckBox", "RadioButton", "SelectOne", "SelectOneIcon", "TextBox", "TextArea", "ToggleSwitch", "FileUpload", "FolderSelector"});
+        addPaletteCategory(palette, "Forms", new String[]{"Button", "CheckBox", "RadioButton", "RadioGroupButton", "SelectOne", "SelectOneIcon", "TextBox", "TextArea", "ToggleSwitch", "FileUpload", "FolderSelector"});
         // Navigation
         addPaletteCategory(palette, "Navigation", new String[]{"Link", "Menu", "MenuBar", "MenuItem"});
         // Feedback
@@ -471,6 +478,15 @@ public class WebDesignerPage extends DashboardBasePage {
                 });
             }, 1000);
 
+            window.toggleCodeView = function() {
+                const cv = document.getElementById('code-view-container');
+                if(cv.style.display === 'none') {
+                    cv.style.display = 'flex';
+                } else {
+                    cv.style.display = 'none';
+                }
+            };
+
             function setupCanvasHandlers() {
                 const canvas = document.getElementById('canvas-drop-area');
                 if (!canvas) return;
@@ -564,6 +580,7 @@ public class WebDesignerPage extends DashboardBasePage {
                     case 'TextArea': content = '<textarea class="j-input" placeholder="TextArea..." rows="3" onfocus="this.blur()"></textarea>'; break;
                     case 'CheckBox': content = '<div style="display:flex; align-items:center; gap:8px;"><input type="checkbox" checked onfocus="this.blur()"/><label>CheckBox</label></div>'; break;
                     case 'RadioButton': content = '<div style="display:flex; align-items:center; gap:8px;"><input type="radio" checked onfocus="this.blur()"/><label>RadioButton</label></div>'; break;
+                    case 'RadioGroupButton': content = '<div class="canvas-container" style="padding:10px; border:1px dashed var(--jettra-accent); min-height:60px;"><label style="font-weight:bold; color:var(--jettra-accent); display:block; margin-bottom:10px;">Radio Group</label></div>'; break;
                     case 'SelectOne': content = '<select class="j-input" onfocus="this.blur()"><option>Option 1...</option></select><span style="display:none">SelectOne</span>'; break;
                     case 'SelectOneIcon': content = '<select class="j-input" onfocus="this.blur()"><option>⭐ Option 1...</option></select><span style="display:none">SelectOneIcon</span>'; break;
                     case 'ToggleSwitch': content = '<div style="display:flex; align-items:center; gap:8px;"><div style="width:40px;height:20px;background:var(--jettra-accent);border-radius:10px;position:relative;"><div style="width:16px;height:16px;background:#fff;border-radius:50%;position:absolute;top:2px;right:2px;"></div></div><label>ToggleSwitch</label></div>'; break;
@@ -655,6 +672,10 @@ public class WebDesignerPage extends DashboardBasePage {
                         <div style="color:var(--jettra-accent); font-weight:bold">${type}</div>
                     </div>
                     <div class="inspector-row">
+                        <span class="inspector-label">ID (Variables)</span>
+                        <input type="text" class="inspector-input" value="${props.id || ""}" placeholder="Comp ID" onchange="updateProp('id', this.value)">
+                    </div>
+                    <div class="inspector-row">
                         <span class="inspector-label">Text Content</span>
                         <input type="text" class="inspector-input" value="${props.text || ""}" onchange="updateProp('text', this.value)">
                     </div>
@@ -669,6 +690,19 @@ public class WebDesignerPage extends DashboardBasePage {
                     `;
                 }
 
+                // Global icon picker
+                html += `
+                    <div class="inspector-row">
+                        <span class="inspector-label">Icon</span>
+                        <div style="display:grid; grid-template-columns: repeat(5, 1fr); gap:5px; margin-top:5px;">
+                            ${['👤','👥','🏠','⚙️','🔔','📧','📁','📊','🚀','🌙','☀️','➕','✏️','🗑️','✅'].map(icon => 
+                                `<div class="icon-preset" style="cursor:pointer; padding:5px; text-align:center; border:1px solid ${props.icon === icon ? 'var(--jettra-accent)' : 'rgba(255,255,255,0.1)'}" onclick="updateProp('icon', '${icon}')">${icon}</div>`
+                            ).join('')}
+                        </div>
+                        <input type="text" class="inspector-input" style="margin-top:5px" placeholder="Custom icon/unicode" value="${props.icon || ""}" onchange="updateProp('icon', this.value)">
+                    </div>
+                `;
+
                 if (type === 'Button') {
                     html += `
                         <div class="inspector-row">
@@ -680,19 +714,6 @@ public class WebDesignerPage extends DashboardBasePage {
                                 <option value="DANGER" ${props.btnStyle === 'DANGER' ? 'selected' : ''}>DANGER</option>
                                 <option value="INFO" ${props.btnStyle === 'INFO' ? 'selected' : ''}>INFO</option>
                             </select>
-                        </div>
-                        <div class="inspector-row">
-                            <span class="inspector-label">Icon</span>
-                            <input type="text" class="inspector-input" value="${props.icon || ""}" placeholder="e.g. 💾" onchange="updateProp('icon', this.value)">
-                        </div>
-                    `;
-                }
-
-                if (type === 'SelectOneIcon') {
-                    html += `
-                        <div class="inspector-row">
-                            <span class="inspector-label">Icon</span>
-                            <input type="text" class="inspector-input" value="${props.icon || ""}" placeholder="e.g. 💾" onchange="updateProp('icon', this.value)">
                         </div>
                     `;
                 }
@@ -733,15 +754,6 @@ public class WebDesignerPage extends DashboardBasePage {
                         <div class="inspector-row">
                             <span class="inspector-label">Avatar Text</span>
                             <input type="text" class="inspector-input" value="${props.text || ""}" onchange="updateProp('text', this.value)">
-                        </div>
-                        <div class="inspector-row">
-                            <span class="inspector-label">Avatar Icon</span>
-                            <div style="display:grid; grid-template-columns: repeat(5, 1fr); gap:5px; margin-top:5px;">
-                                ${['👤','👥','🏠','⚙️','🔔','📧','📁','📊','🚀','🌙','☀️','➕','✏️','🗑️','✅'].map(icon => 
-                                    `<div class="icon-preset" style="cursor:pointer; padding:5px; text-align:center; border:1px solid ${props.icon === icon ? 'var(--jettra-accent)' : 'rgba(255,255,255,0.1)'}" onclick="updateProp('icon', '${icon}')">${icon}</div>`
-                                ).join('')}
-                            </div>
-                            <input type="text" class="inspector-input" style="margin-top:5px" placeholder="Custom icon/unicode" value="${props.icon || ""}" onchange="updateProp('icon', this.value)">
                         </div>
                     `;
                 }
@@ -1318,7 +1330,7 @@ public class WebDesignerPage extends DashboardBasePage {
                     items.forEach(it => {
                         const type = it.getAttribute('data-type');
                         const props = JSON.parse(it.getAttribute('data-props'));
-                        const v = type.toLowerCase() + "_" + Math.floor(Math.random()*1000);
+                        const v = props.id && props.id.trim() !== "" ? props.id : (type.toLowerCase() + "_" + Math.floor(Math.random()*10000));
                         
                         const handleCommon = (compVar) => {
                             let out = "";
@@ -1442,13 +1454,16 @@ public class WebDesignerPage extends DashboardBasePage {
                             case 'Grid':
                             case 'Board':
                             case 'MenuBar':
+                            case 'RadioGroupButton':
                             case 'Tree':
                             case 'TabView':
                             case 'Div':
                             case 'LayoutDisplay':
-                                out += `        ${type} ${v} = new ${type}(${props.columns || 2});\\n`;
+                                out += `        ${type} ${v} = new ${type}("${v}");\\n`;
+                                if (props.columns && (type === 'Grid' || type === 'Panel')) out += `        ${v}.setColumns(${props.columns});\\n`;
                                 const kids = it.querySelectorAll(':scope > .canvas-container > .canvas-item, :scope > div > .canvas-container > .canvas-item');
                                 if (kids.length > 0) out += walk(kids, v);
+                                if (props.icon) out += `        // Try using icon property if supported for ${type}\\n        try { ${v}.getClass().getMethod("setIcon", String.class).invoke(${v}, "${props.icon}"); } catch(Exception ignored) {}\\n`;
                                 out += handleCommon(v);
                                 out += handleEvents(v);
                                 out += `        ${container}.add(${v});\\n`;
@@ -1458,8 +1473,9 @@ public class WebDesignerPage extends DashboardBasePage {
                                 if (props.text && props.text !== type && type !== 'Spinner') {
                                     out += `        ${type} ${v} = new ${type}("${props.text}");\\n`;
                                 } else {
-                                    out += `        ${type} ${v} = new ${type}();\\n`;
+                                    out += `        ${type} ${v} = new ${type}("${v}");\\n`;
                                 }
+                                if (props.icon) out += `        // Try using icon property if supported\\n        try { ${v}.getClass().getMethod("setIcon", String.class).invoke(${v}, "${props.icon}"); } catch(Exception ignored) {}\\n`;
                                 out += handleCommon(v);
                                 out += handleEvents(v);
                                 out += `        ${container}.add(${v});\\n`;

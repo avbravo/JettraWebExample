@@ -86,13 +86,33 @@ public class ButtonPage extends DashboardBasePage {
         Div row1 = new Div();
         row1.setStyle("display", "flex").setStyle("gap", "20px").setStyle("margin-bottom", "30px");
         
-        Button primary = new Button("Primary Button");
+        Button primary = new Button("Primary Button").setIcon("⭐");
         primary.addClass("j-btn j-btn-primary");
-        Button secondary = new Button("Secondary");
+        Button secondary = new Button("Secondary").setIcon("💾");
         secondary.addClass("j-btn j-btn-secondary");
         row1.add(primary).add(secondary);
         
         container.add(row1);
+        
+        container.add(new Header(4, "Icon Selection Example"));
+        Div row2 = new Div();
+        row2.setStyle("display", "flex").setStyle("gap", "20px").setStyle("align-items", "center").setStyle("margin-bottom", "30px");
+        
+        io.jettra.wui.components.SelectOne iconSelector = new io.jettra.wui.components.SelectOne("iconSel");
+        iconSelector.addOption("⭐", "⭐ Star");
+        iconSelector.addOption("💾", "💾 Save");
+        iconSelector.addOption("🚀", "🚀 Rocket");
+        iconSelector.addOption("🗑️", "🗑️ Trash");
+        iconSelector.addOption("✏️", "✏️ Edit");
+        iconSelector.addOption("✅", "✅ Check");
+        iconSelector.setProperty("onchange", "document.getElementById('dynBtn').querySelector('.j-btn-icon').innerText = this.value");
+        iconSelector.setStyle("width", "120px");
+        
+        Button dynamicBtn = new Button("Dynamic Icon").setIcon("⭐").id("dynBtn");
+        dynamicBtn.addClass("j-btn j-btn-info");
+        
+        row2.add(iconSelector).add(dynamicBtn);
+        container.add(row2);
         
         center.add(container);
     }

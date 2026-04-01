@@ -87,13 +87,17 @@ public class RadioButtonPage extends DashboardBasePage {
         Div row1 = new Div();
         row1.setStyle("display", "flex").setStyle("flex-direction", "column").setStyle("gap", "10px").setStyle("margin-bottom", "30px");
         
-        RadioButton opt1 = new RadioButton("opt1", "gender", "male");
+        io.jettra.wui.components.RadioGroupButton group = new io.jettra.wui.components.RadioGroupButton("genderGroup");
+        
+        RadioButton opt1 = new RadioButton("opt1", "male");
         io.jettra.wui.components.Label l1 = new io.jettra.wui.components.Label("opt1", "Male");
-        RadioButton opt2 = new RadioButton("opt2", "gender", "female");
+        RadioButton opt2 = new RadioButton("opt2", "female");
         io.jettra.wui.components.Label l2 = new io.jettra.wui.components.Label("opt2", "Female");
         
-        row1.add(new Div().setStyle("display", "flex").add(opt1).add(l1));
-        row1.add(new Div().setStyle("display", "flex").add(opt2).add(l2));
+        group.addRadio(new Div().setStyle("display", "flex").add(opt1).add(l1));
+        group.addRadio(new Div().setStyle("display", "flex").add(opt2).add(l2));
+        
+        row1.add(group);
         
         container.add(row1);
         
