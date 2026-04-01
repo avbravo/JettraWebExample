@@ -330,13 +330,13 @@ public class WebDesignerPage extends DashboardBasePage {
         // Forms
         addPaletteCategory(palette, "Forms", new String[]{"Button", "CheckBox", "RadioButton", "SelectOne", "SelectOneIcon", "TextBox", "TextArea", "ToggleSwitch", "FileUpload", "FolderSelector"});
         // Navigation
-        addPaletteCategory(palette, "Navigation", new String[]{"Link", "Menu", "MenuBar"});
+        addPaletteCategory(palette, "Navigation", new String[]{"Link", "Menu", "MenuBar", "MenuItem"});
         // Feedback
         addPaletteCategory(palette, "Feedback", new String[]{"ProgressBar", "Spinner", "Alert", "Notification", "Clock"});
         // Media & Files
         addPaletteCategory(palette, "Media", new String[]{"Downloader", "PDFViewer", "ViewMedia"});
         // Layout & Display
-        addPaletteCategory(palette, "Layout", new String[]{"Grid", "Panel", "Board", "Avatar", "Carousel", "Table", "TabView", "Modal", "Tree", "Div", "Image", "LayoutDisplay"});
+        addPaletteCategory(palette, "Layout", new String[]{"Grid", "Panel", "Board", "Avatar", "Carousel", "Table", "TabView", "Tab", "Modal", "Tree", "TreeItem", "Div", "LayoutDisplay"});
 
         return palette;
     }
@@ -571,16 +571,19 @@ public class WebDesignerPage extends DashboardBasePage {
                     case 'FolderSelector': content = '<div style="border:1px dashed var(--jettra-accent); padding:20px; text-align:center; border-radius:8px; color:var(--jettra-text);"><div style="font-size:24px; margin-bottom:10px;">📁</div><span>Select Directory</span></div>'; break;
                     case 'Link': content = '<a href="javascript:void(0)" style="color:var(--jettra-accent); text-decoration:underline;"><span>Link Text</span></a>'; break;
                     case 'Menu': content = '<div style="background:rgba(0,0,0,0.4); padding:10px; border-radius:4px; display:inline-block;"><div style="padding:8px 15px; cursor:pointer;"><span>Menu Item</span></div></div>'; break;
-                    case 'MenuBar': content = '<div style="background:rgba(0,0,0,0.4); padding:10px; border-radius:4px; display:flex; gap:15px;"><div style="cursor:pointer;"><span>Menu Bar Item</span></div></div>'; break;
-                    case 'Spinner': content = '<div style="display:flex; align-items:center; gap:10px;"><div style="width:30px;height:30px;border:3px solid rgba(0,255,255,0.2);border-top:3px solid var(--jettra-accent);border-radius:50%;animation:spin 1s linear infinite;"></div><span>Loading...</span></div>'; break;
+                    case 'MenuBar': content = '<div class="canvas-container" style="background:rgba(0,0,0,0.4); padding:10px; border-radius:4px; display:flex; gap:15px; min-height:45px; border:1px dashed rgba(255,255,255,0.2);"></div>'; break;
+                    case 'MenuItem': content = '<div class="j-component" style="padding:10px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,0.1); background:rgba(0,0,0,0.2);"><span>Menu Item</span></div>'; break;
+                    case 'Spinner': content = '<div style="display:flex; align-items:center; gap:10px;"><div style="width:30px;min-width:30px;height:30px;min-height:30px;border:3px solid rgba(0,255,255,0.2);border-top:3px solid var(--jettra-accent);border-radius:50%;box-sizing:border-box;animation:spin 1s linear infinite;"></div><span>Loading...</span></div>'; break;
                     case 'Alert': content = '<div style="background:rgba(255,0,0,0.1); border-left:4px solid #ff4444; padding:15px; border-radius:4px; color:#ff4444; display:flex; align-items:center; gap:10px;"><b>⚠️</b><span>Alert Message</span></div>'; break;
                     case 'Notification': content = '<div style="background:rgba(0,255,255,0.1); border:1px solid var(--jettra-accent); padding:15px; border-radius:8px; color:var(--jettra-text); max-width:300px; box-shadow:0 4px 12px rgba(0,0,0,0.3);"><span>Notification Message</span></div>'; break;
                     case 'Downloader': content = '<div style="display:inline-flex; align-items:center; gap:8px; padding:6px 12px; background:rgba(255,255,255,0.1); border-radius:4px; cursor:pointer;"><b>💾</b><span>Download File</span></div>'; break;
                     case 'PDFViewer': content = '<div style="border:1px solid #aaa; background:#eee; color:#333; height:200px; display:flex; align-items:center; justify-content:center; border-radius:4px;"><span>PDF Document Preview</span></div>'; break;
                     case 'ViewMedia': content = '<div style="background:#000; color:#fff; height:200px; display:flex; align-items:center; justify-content:center; border-radius:4px;"><span>▶ Media Player</span></div>'; break;
                     case 'Carousel': content = '<div style="display:flex; gap:10px; overflow:hidden; padding:10px; background:rgba(0,0,0,0.2); border-radius:8px;"><div style="width:150px; height:80px; background:rgba(0,255,255,0.1); border:1px solid rgba(0,255,255,0.3); border-radius:8px; display:flex; align-items:center; justify-content:center;"><span>Slide 1</span></div></div>'; break;
-                    case 'TabView': content = '<div style="border:1px solid rgba(0,255,255,0.2); border-radius:8px; overflow:hidden;"><div style="display:flex; background:rgba(0,0,0,0.3); border-bottom:1px solid rgba(0,255,255,0.2);"><div style="padding:10px 20px; border-bottom:2px solid var(--jettra-accent); color:var(--jettra-accent);"><span>Tab 1</span></div></div><div class="canvas-container" style="padding:20px; min-height:80px;"></div></div>'; break;
-                    case 'Tree': content = '<div style="padding:10px; border:1px solid rgba(255,255,255,0.1); border-radius:4px; background:rgba(0,0,0,0.2);"><div style="margin-bottom:5px;"><span>▶ Node 1</span></div></div>'; break;
+                    case 'TabView': content = '<div style="border:1px solid rgba(0,255,255,0.2); border-radius:8px; overflow:hidden;"><div style="display:flex; background:rgba(0,0,0,0.3); border-bottom:1px solid rgba(0,255,255,0.2);" class="tab-headers"><span style="padding:10px; color:#aaa; font-size:11px;">[Tab Headers]</span></div><div class="canvas-container" style="padding:10px; min-height:100px; background:rgba(0,255,255,0.02);"></div></div>'; break;
+                    case 'Tab': content = '<div class="canvas-container" style="border:1px dashed var(--jettra-accent); min-height:80px; padding:10px; position:relative; background:rgba(0,0,0,0.4); margin-bottom:10px;"><span style="position:absolute; top:-12px; left:10px; background:var(--jettra-accent); color:#000; padding:2px 8px; border-radius:4px; font-size:10px; font-weight:bold;">Tab Title</span></div>'; break;
+                    case 'Tree': content = '<div class="canvas-container" style="padding:10px; border:1px solid rgba(255,255,255,0.1); border-radius:4px; background:rgba(0,0,0,0.2); min-height:50px;"></div>'; break;
+                    case 'TreeItem': content = '<div class="canvas-container" style="padding-left:15px; border-left:1px dashed rgba(0,255,255,0.2); min-height:30px; margin-top:5px; position:relative;"><span style="position:absolute; left:-10px; top:5px; font-size:10px; color:var(--jettra-accent);">▶</span><span style="display:inline-block; margin-bottom:5px; color:#fff;">Tree Node</span></div>'; break;
                     case 'Div': content = '<div class="canvas-container" style="border:1px dashed rgba(255,255,255,0.2); min-height:50px; padding:10px; border-radius:4px; position:relative;"><span style="position:absolute;top:2px;left:5px;font-size:9px;color:rgba(255,255,255,0.3)">Div Container</span></div>'; break;
                     case 'LayoutDisplay': content = '<div class="canvas-container" style="border:2px solid rgba(0,255,255,0.2); min-height:100px; padding:15px; border-radius:8px; position:relative;"><span style="position:absolute;top:5px;left:10px;font-size:10px;color:rgba(0,255,255,0.5);font-weight:bold;">LayoutDisplay</span></div>'; break;
                     case 'Panel': 
@@ -656,6 +659,15 @@ public class WebDesignerPage extends DashboardBasePage {
                         <input type="text" class="inspector-input" value="${props.text || ""}" onchange="updateProp('text', this.value)">
                     </div>
                 `;
+
+                if (type === 'SelectOne' || type === 'SelectOneIcon') {
+                    html += `
+                        <div class="inspector-row">
+                            <span class="inspector-label">Options (comma separated)</span>
+                            <input type="text" class="inspector-input" value="${props.options || ""}" placeholder="Opt1, Opt2, Opt3..." onchange="updateProp('options', this.value)">
+                        </div>
+                    `;
+                }
 
                 if (type === 'TextBox' || type === 'Label') {
                     html += `
@@ -1307,9 +1319,38 @@ public class WebDesignerPage extends DashboardBasePage {
                                 out += handleEvents(v);
                                 out += `        ${container}.add(${v});\\n`;
                                 break;
+                            case 'MenuItem':
+                            case 'TreeItem':
+                            case 'Tab':
+                                out += `        ${type} ${v} = new ${type}("${props.text || type}");\\n`;
+                                const kidsNested = it.querySelectorAll(':scope > .canvas-container > .canvas-item, :scope > div > .canvas-container > .canvas-item, :scope > span > .canvas-container > .canvas-item');
+                                if (kidsNested.length > 0) out += walk(kidsNested, v);
+                                out += handleCommon(v);
+                                out += handleEvents(v);
+                                out += `        ${container}.add(${v});\\n`;
+                                break;
+                            case 'SelectOne':
+                            case 'SelectOneIcon':
+                                if (props.text && props.text !== type) {
+                                    out += `        ${type} ${v} = new ${type}("${props.text}");\\n`;
+                                } else {
+                                    out += `        ${type} ${v} = new ${type}();\\n`;
+                                }
+                                if (props.options) {
+                                    const opts = props.options.split(',');
+                                    opts.forEach(o => {
+                                        out += `        ${v}.addOption("${o.trim()}");\\n`;
+                                    });
+                                }
+                                out += handleCommon(v);
+                                out += handleEvents(v);
+                                out += `        ${container}.add(${v});\\n`;
+                                break;
                             case 'Panel':
                             case 'Grid':
                             case 'Board':
+                            case 'MenuBar':
+                            case 'Tree':
                             case 'TabView':
                             case 'Div':
                             case 'LayoutDisplay':
@@ -1371,14 +1412,14 @@ public class WebDesignerPage extends DashboardBasePage {
                     if (args && args.trim().length > 0) {
                         let cleanParams = args.replace(/"/g, '').split(',');
                         if (cleanParams.length > 0) {
-                            if (type === 'Header' || type === 'Paragraph' || type === 'Button' || type === 'Clock' || type === 'Span' || type === 'Label' || type === 'Alert' || type === 'Notification' || type === 'Link' || type === 'Downloader' || type === 'CheckBox' || type === 'RadioButton' || type === 'ToggleSwitch') props.text = cleanParams.length > 1 ? cleanParams[1].trim() : cleanParams[0].trim();
+                            if (type === 'Header' || type === 'Paragraph' || type === 'Button' || type === 'Clock' || type === 'Span' || type === 'Label' || type === 'Alert' || type === 'Notification' || type === 'Link' || type === 'Downloader' || type === 'CheckBox' || type === 'RadioButton' || type === 'ToggleSwitch' || type === 'MenuItem' || type === 'TreeItem' || type === 'Tab') props.text = cleanParams.length > 1 ? cleanParams[1].trim() : cleanParams[0].trim();
                             if (type === 'Modal') {
                                 let mName = cleanParams.length > 1 ? cleanParams[1].trim() : (cleanParams.length > 0 ? cleanParams[0].trim() : 'Modal Component');
                                 props.text = mName;
                                 props.idGen = cleanParams[0].trim();
                             }
                             if (type === 'Board') props.text = cleanParams.length > 1 ? cleanParams[1].trim() : (cleanParams.length > 0 ? cleanParams[0].trim() : 'New Board');
-                            if (type === 'Panel' || type === 'Grid' || type === 'Div' || type === 'LayoutDisplay' || type === 'TabView') props.columns = parseInt(cleanParams[0].trim()) || 2;
+                            if (type === 'Panel' || type === 'Grid' || type === 'Div' || type === 'LayoutDisplay' || type === 'TabView' || type === 'Tree' || type === 'MenuBar') props.columns = parseInt(cleanParams[0].trim()) || 2;
                             if (type === 'ProgressBar') { props.value = parseInt(cleanParams[0])||0; props.max = parseInt(cleanParams[1])||100; }
                         }
                     }
