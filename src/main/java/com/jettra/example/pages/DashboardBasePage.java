@@ -184,6 +184,20 @@ public abstract class DashboardBasePage extends Page {
         if (isAnimatedConfig) {
             animCB.setProperty("checked", "checked");
         }
+        io.jettra.wui.components.Script configScript = new io.jettra.wui.components.Script(
+            "if(" + !isAnimatedConfig + ") {\n" +
+            "  window.jettraAnimated = false;\n" +
+            "  localStorage.setItem('jettra-animated', 'false');\n" +
+            "}\n" +
+            "// Let JS toggle read the initial config from the checkbox if localStorage was set improperly\n" +
+            "window.addEventListener('DOMContentLoaded', () => {\n" +
+            "  if(" + !isAnimatedConfig + ") { \n" +
+            "     let cb = document.getElementById('anim-toggle');\n" +
+            "     if(cb) cb.checked = false;\n" +
+            "  }\n" +
+            "});\n"
+        );
+        top.add(configScript);
         
         animItem.add(animLabel).add(animCB);
         dropdown.add(animItem);

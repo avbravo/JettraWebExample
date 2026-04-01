@@ -59,6 +59,7 @@ public class WebDesignerPage extends DashboardBasePage {
         canvasHeader.setStyle("display", "flex").setStyle("justify-content", "space-between").setStyle("align-items", "center").setStyle("margin-bottom", "15px").setStyle("border-bottom", "1px solid rgba(0,255,255,0.1)").setStyle("padding-bottom", "10px");
         
         Header canvasTitle = new Header(4, "Visual Design Canvas");
+        canvasTitle.setProperty("id", "canvas-title-text");
         canvasTitle.setStyle("color", "var(--jettra-accent)").setStyle("margin", "0");
         
         Div canvasHeaderActions = new Div();
@@ -80,11 +81,17 @@ public class WebDesignerPage extends DashboardBasePage {
         canvasHeader.add(canvasTitle).add(canvasHeaderActions);
         canvasArea.add(canvasHeader);
 
+        Div canvasDropArea = new Div();
+        canvasDropArea.setProperty("id", "canvas-drop-area");
+        canvasDropArea.setStyle("flex", "1").setStyle("display", "flex").setStyle("flex-direction", "column");
+
         Div canvasPlaceholder = new Div();
         canvasPlaceholder.addClass("canvas-placeholder");
         canvasPlaceholder.setContent("Start dragging components here to design your page");
         canvasPlaceholder.setStyle("color", "rgba(0,255,255,0.2)").setStyle("text-align", "center").setStyle("margin-top", "100px");
-        canvasArea.add(canvasPlaceholder);
+        canvasDropArea.add(canvasPlaceholder);
+
+        canvasArea.add(canvasDropArea);
 
         // 3. Code View
         Div codeView = new Div();
@@ -442,19 +449,19 @@ public class WebDesignerPage extends DashboardBasePage {
             };
 
             function setupCanvasHandlers() {
-                const canvas = document.getElementById('canvas-area');
+                const canvas = document.getElementById('canvas-drop-area');
                 if (!canvas) return;
                 
                 // Ensure event listeners are attached correctly for capturing drop inside ANY container
                 document.body.ondragover = function(ev) {
-                    if (ev.target.closest('#canvas-area')) {
+                    if (ev.target.closest('#canvas-drop-area')) {
                         ev.preventDefault();
                         ev.dataTransfer.dropEffect = "move";
                     }
                 };
 
                 document.body.ondrop = function(ev) {
-                    const canvasSection = ev.target.closest('#canvas-area');
+                    const canvasSection = ev.target.closest('#canvas-drop-area');
                     if (!canvasSection) return;
                     
                     ev.preventDefault();
@@ -487,7 +494,7 @@ public class WebDesignerPage extends DashboardBasePage {
             }
 
             window.addComponentToCanvas = function(type, parent) {
-                const canvas = document.getElementById('canvas-area');
+                const canvas = document.getElementById('canvas-drop-area');
                 const targetParent = parent || canvas;
                 if (!targetParent) return;
 
@@ -995,7 +1002,7 @@ public class WebDesignerPage extends DashboardBasePage {
             };
 
             window.openClass = function(name) {
-                const canvas = document.getElementById('canvas-area');
+                const canvas = document.getElementById('canvas-drop-area');
                 if (!canvas) return;
 
                 // Validation for {nombre}Page.java
@@ -1014,6 +1021,9 @@ public class WebDesignerPage extends DashboardBasePage {
                     const content = window.jettraFileCache[name];
 
                     const doOpen = () => {
+                        const titleEl = document.getElementById('canvas-title-text');
+                        if (titleEl) titleEl.innerText = 'View - ' + name;
+                        
                         if (content) {
                             window.loadFileContent(Object.keys(window.jettraFileCache).find(k => k.endsWith('/' + name) || k === name));
                         } else {
@@ -1038,7 +1048,7 @@ public class WebDesignerPage extends DashboardBasePage {
             };
 
             window.generateCRUD = function() {
-                const canvas = document.getElementById('canvas-area');
+                const canvas = document.getElementById('canvas-drop-area');
                 if (!canvas) return;
                 if (!currentModel) {
                     window.show3DMessage("Error", "Please select a View Model in the Project Explorer first.");
@@ -1123,8 +1133,10 @@ public class WebDesignerPage extends DashboardBasePage {
                     "Clear Canvas", 
                     "Are you sure you want to delete all elements and start over?", 
                     () => {
-                        const canvas = document.getElementById('canvas-area');
+                        const canvas = document.getElementById('canvas-drop-area');
                         if (!canvas) return;
+                        const titleEl = document.getElementById('canvas-title-text');
+                        if (titleEl) titleEl.innerText = 'Visual Design Canvas';
                         canvas.innerHTML = '<div class="canvas-placeholder">Start dragging components here to design</div>';
                         
                         document.getElementById('generated-code-display').value = "// Designer Cleared";
@@ -1143,7 +1155,7 @@ public class WebDesignerPage extends DashboardBasePage {
                 const hidden = document.getElementById('generated-code-hidden');
                 if (!display || !hidden) return;
 
-                const canvasItems = document.querySelectorAll('#canvas-area > .canvas-item, .canvas-container > .canvas-item');
+                const canvasItems = document.querySelectorAll('#canvas-drop-area > .canvas-item, .canvas-container > .canvas-item');
                 if (canvasItems.length === 0) {
                     display.innerText = "// No components added yet";
                     return;
@@ -1234,7 +1246,7 @@ public class WebDesignerPage extends DashboardBasePage {
                     });
                     return out;
                 }
-                code += walk(document.querySelectorAll('#canvas-area > .canvas-item'), "center");
+                code += walk(document.querySelectorAll('#canvas-drop-area > .canvas-item'), "center");
                 code += `    }\\n}`;
                 
                 display.value = code;
@@ -1245,7 +1257,7 @@ public class WebDesignerPage extends DashboardBasePage {
                 const display = document.getElementById('generated-code-display');
                 if (!display) return;
                 const code = display.value;
-                const canvas = document.getElementById('canvas-area');
+                const canvas = document.getElementById('canvas-drop-area');
                 
                 // Simplistic RegExp to find UI elements
                 const regex = /new\\s+(Header|Paragraph|Divide|Button|TextBox|TextArea|Panel|Grid|Modal|Board|Avatar|ProgressBar|Table|TabView|Image)\\s*\\((.*?)\\)/g;
@@ -1292,7 +1304,7 @@ public class WebDesignerPage extends DashboardBasePage {
             };
 
             window.previewInterface = function() {
-                const canvas = document.getElementById('canvas-area');
+                const canvas = document.getElementById('canvas-drop-area');
                 const pcontent = document.getElementById('preview-content-area');
                 if (!canvas || !pcontent) return;
                 
