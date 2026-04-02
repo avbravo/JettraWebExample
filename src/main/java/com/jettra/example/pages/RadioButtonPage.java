@@ -48,7 +48,13 @@ public class RadioButtonPage extends DashboardBasePage {
                      .setStyle("border-radius", "4px").setStyle("overflow-x", "auto")
                      .setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
         
-        String javaCode = "RadioButton opt1 = new RadioButton(\"opt1\", \"gender\", \"male\");\nRadioButton opt2 = new RadioButton(\"opt2\", \"gender\", \"female\");";
+        String javaCode = "io.jettra.wui.components.RadioGroupButton group = new io.jettra.wui.components.RadioGroupButton(\"genderGroup\");\\n\\n" +
+                          "RadioButton opt1 = new RadioButton(\"opt1\", \"male\");\\n" +
+                          "io.jettra.wui.components.Label l1 = new io.jettra.wui.components.Label(\"opt1\", \"Male\");\\n" +
+                          "RadioButton opt2 = new RadioButton(\"opt2\", \"female\");\\n" +
+                          "io.jettra.wui.components.Label l2 = new io.jettra.wui.components.Label(\"opt2\", \"Female\");\\n\\n" +
+                          "group.addRadio(new Div().setStyle(\"display\", \"flex\").add(opt1).add(l1));\\n" +
+                          "group.addRadio(new Div().setStyle(\"display\", \"flex\").add(opt2).add(l2));";
                           
         io.jettra.wui.core.UIComponent pre = new io.jettra.wui.core.UIComponent("pre") {};
         pre.setStyle("margin", "0");
@@ -79,7 +85,7 @@ public class RadioButtonPage extends DashboardBasePage {
         container.add(codeModal);
         // --- End Modal Dialog ---
         
-        Paragraph p = new Paragraph("The RadioButton component for exclusive selections.");
+        Paragraph p = new Paragraph("The RadioButton component for exclusive selections. (Wrapped in a RadioGroupButton)");
         container.add(p);
 
         // --- Demo ---

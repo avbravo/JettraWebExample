@@ -456,7 +456,7 @@ public class WebDesignerPage extends DashboardBasePage {
             @keyframes spin { 100% { transform: rotate(360deg); } }
         """);
         
-        Script script = new Script("""
+        String scriptPart1 = """
             // Designer GLOBALS
             var selectedItem = null;
             var currentModel = null;
@@ -681,27 +681,37 @@ public class WebDesignerPage extends DashboardBasePage {
                     </div>
                 `;
 
-                if (type === 'SelectOne' || type === 'SelectOneIcon') {
+                if (type === 'SelectOne') {
                     html += `
                         <div class="inspector-row">
                             <span class="inspector-label">Options (comma separated)</span>
                             <input type="text" class="inspector-input" value="${props.options || ""}" placeholder="Opt1, Opt2, Opt3..." onchange="updateProp('options', this.value)">
                         </div>
                     `;
+                } else if (type === 'SelectOneIcon') {
+                    html += `
+                        <div class="inspector-row">
+                            <span class="inspector-label">Options (val|label|icon, ...)</span>
+                            <input type="text" class="inspector-input" value="${props.options || ""}" placeholder="en|English|🇺🇸, es|Spanish|🇪🇸..." onchange="updateProp('options', this.value)">
+                        </div>
+                    `;
                 }
 
                 // Global icon picker
-                html += `
-                    <div class="inspector-row">
-                        <span class="inspector-label">Icon</span>
-                        <div style="display:grid; grid-template-columns: repeat(5, 1fr); gap:5px; margin-top:5px;">
-                            ${['👤','👥','🏠','⚙️','🔔','📧','📁','📊','🚀','🌙','☀️','➕','✏️','🗑️','✅'].map(icon => 
-                                `<div class="icon-preset" style="cursor:pointer; padding:5px; text-align:center; border:1px solid ${props.icon === icon ? 'var(--jettra-accent)' : 'rgba(255,255,255,0.1)'}" onclick="updateProp('icon', '${icon}')">${icon}</div>`
-                            ).join('')}
+                const iconComponents = ['Button', 'SelectOneIcon', 'Menu', 'MenuItem', 'Avatar', 'Alert', 'Notification', 'Link', 'Tab', 'TreeItem'];
+                if (iconComponents.includes(type)) {
+                    html += `
+                        <div class="inspector-row">
+                            <span class="inspector-label">Icon</span>
+                            <div style="display:grid; grid-template-columns: repeat(5, 1fr); gap:5px; margin-top:5px;">
+                                ${['👤','👥','🏠','⚙️','🔔','📧','📁','📊','🚀','🌙','☀️','➕','✏️','🗑️','✅'].map(icon => 
+                                    `<div class="icon-preset" style="cursor:pointer; padding:5px; text-align:center; border:1px solid ${props.icon === icon ? 'var(--jettra-accent)' : 'rgba(255,255,255,0.1)'}" onclick="updateProp('icon', '${icon}')">${icon}</div>`
+                                ).join('')}
+                            </div>
+                            <input type="text" class="inspector-input" style="margin-top:5px" placeholder="Custom icon/unicode" value="${props.icon || ""}" onchange="updateProp('icon', this.value)">
                         </div>
-                        <input type="text" class="inspector-input" style="margin-top:5px" placeholder="Custom icon/unicode" value="${props.icon || ""}" onchange="updateProp('icon', this.value)">
-                    </div>
-                `;
+                    `;
+                }
 
                 if (type === 'Button') {
                     html += `
@@ -735,6 +745,27 @@ public class WebDesignerPage extends DashboardBasePage {
                         <div class="inspector-row">
                             <span class="inspector-label">Columns</span>
                             <input type="number" class="inspector-input" value="${props.columns || 2}" min="1" max="12" onchange="updateProp('columns', this.value)">
+                        </div>
+                    `;
+                }
+
+                if (type === 'Spinner') {
+                    html += `
+                        <div class="inspector-row">
+                            <span class="inspector-label">Value</span>
+                            <input type="number" step="0.1" class="inspector-input" value="${props.value || 0}" onchange="updateProp('value', this.value)">
+                        </div>
+                        <div class="inspector-row">
+                            <span class="inspector-label">Min</span>
+                            <input type="number" step="0.1" class="inspector-input" value="${props.min || 0}" onchange="updateProp('min', this.value)">
+                        </div>
+                        <div class="inspector-row">
+                            <span class="inspector-label">Max</span>
+                            <input type="number" step="0.1" class="inspector-input" value="${props.max || 100}" onchange="updateProp('max', this.value)">
+                        </div>
+                        <div class="inspector-row">
+                            <span class="inspector-label">Step</span>
+                            <input type="number" step="0.1" class="inspector-input" value="${props.step || 1}" onchange="updateProp('step', this.value)">
                         </div>
                     `;
                 }
@@ -907,7 +938,15 @@ public class WebDesignerPage extends DashboardBasePage {
                         opts.forEach(o => {
                             const opt = document.createElement('option');
                             const val = o.trim();
-                            opt.innerText = (type === 'SelectOneIcon' && props.icon) ? (props.icon + ' ' + val) : val;
+                            if (type === 'SelectOneIcon') {
+                                const parts = val.split('|');
+                                const optVal = parts[0] ? parts[0].trim() : 'val';
+                                const optLabel = parts[1] ? parts[1].trim() : optVal;
+                                const optIcon = parts[2] ? parts[2].trim() : (props.icon || '⭐');
+                                opt.innerText = optIcon + ' ' + optLabel;
+                            } else {
+                                opt.innerText = val;
+                            }
                             select.appendChild(opt);
                         });
                     }
@@ -979,6 +1018,9 @@ public class WebDesignerPage extends DashboardBasePage {
                 if (viewer) viewer.innerHTML = '';
                 window.updateModelSelect();
             };
+        """;
+        
+        String scriptPart2 = """
 
             window.loadFiles = function(input) {
                 const triggerLoad = () => {
@@ -1411,6 +1453,15 @@ public class WebDesignerPage extends DashboardBasePage {
                                 out += handleEvents(v);
                                 out += `        ${container}.add(${v});\\n`;
                                 break;
+                            case 'Spinner':
+                                out += `        Spinner ${v} = new Spinner("${v}", ${props.value || 0});\\n`;
+                                if (props.min !== undefined && props.min !== "") out += `        ${v}.setMin(${props.min});\\n`;
+                                if (props.max !== undefined && props.max !== "") out += `        ${v}.setMax(${props.max});\\n`;
+                                if (props.step !== undefined && props.step !== "") out += `        ${v}.setStep(${props.step});\\n`;
+                                out += handleCommon(v);
+                                out += handleEvents(v);
+                                out += `        ${container}.add(${v});\\n`;
+                                break;
                             case 'Modal':
                                 const mId = props.idGen || "modal_" + Math.floor(Math.random()*1000);
                                 out += `        Modal ${v} = new Modal("${mId}");\\n`;
@@ -1433,18 +1484,26 @@ public class WebDesignerPage extends DashboardBasePage {
                             case 'SelectOne':
                             case 'SelectOneIcon':
                                 if (props.text && props.text !== type) {
-                                    out += `        ${type} ${v} = new ${type}("${props.text}");\\n`;
+                                    out += `        ${type} ${v} = new ${type}("${v}", "${props.text}");\\n`;
                                 } else {
-                                    out += `        ${type} ${v} = new ${type}();\\n`;
+                                    out += `        ${type} ${v} = new ${type}("${v}", "${type}");\\n`;
                                 }
                                 if (props.options) {
                                     const opts = props.options.split(',');
                                     opts.forEach(o => {
-                                        out += `        ${v}.addOption("${o.trim()}");\\n`;
+                                        if (type === 'SelectOneIcon') {
+                                            const parts = o.trim().split('|');
+                                            const optVal = parts[0] ? parts[0].trim() : 'val';
+                                            const optLabel = parts[1] ? parts[1].trim() : optVal;
+                                            const optIcon = parts[2] ? parts[2].trim() : (props.icon || '⭐');
+                                            out += `        ${v}.addOption("${optVal}", "${optLabel}", "${optIcon}");\\n`;
+                                        } else {
+                                            const parts = o.trim().split('|');
+                                            const optVal = parts[0] ? parts[0].trim() : 'val';
+                                            const optLabel = parts[1] ? parts[1].trim() : optVal;
+                                            out += `        ${v}.addOption("${optVal}", "${optLabel}");\\n`;
+                                        }
                                     });
-                                }
-                                if (props.icon && type === 'SelectOneIcon') {
-                                    out += `        ${v}.setIcon("${props.icon}");\\n`;
                                 }
                                 out += handleCommon(v);
                                 out += handleEvents(v);
@@ -1585,7 +1644,9 @@ public class WebDesignerPage extends DashboardBasePage {
                 document.getElementById('preview-modal').style.display = 'block';
             };
 
-        """);
+        """;
+        
+        Script script = new Script(scriptPart1 + scriptPart2);
         
         center.add(style);
         center.add(script);
