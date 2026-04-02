@@ -510,6 +510,21 @@ public class WebDesignerPage extends DashboardBasePage {
                     const moveId = ev.dataTransfer.getData("move-id");
                     const target = ev.target.closest('.canvas-container') || canvasSection;
                     
+                    if (target) {
+                        const targetWrapper = target.closest('.canvas-item');
+                        if (targetWrapper && targetWrapper.getAttribute('data-type') === 'RadioGroupButton') {
+                            let drpType = type;
+                            if (moveId) {
+                                const el = document.getElementById(moveId);
+                                if (el) drpType = el.getAttribute('data-type');
+                            }
+                            if (drpType && drpType !== 'RadioButton') {
+                                window.show3DMessage("Invalid Action", "Only RadioButton components can be nested inside a RadioGroupButton.");
+                                return;
+                            }
+                        }
+                    }
+
                     if (moveId) {
                         const el = document.getElementById(moveId);
                         if (el && target !== el && !el.contains(target)) {
@@ -583,6 +598,7 @@ public class WebDesignerPage extends DashboardBasePage {
                     case 'RadioGroupButton': content = '<div class="canvas-container" style="padding:10px; border:1px dashed var(--jettra-accent); min-height:60px;"><label style="font-weight:bold; color:var(--jettra-accent); display:block; margin-bottom:10px;">Radio Group</label></div>'; break;
                     case 'SelectOne': content = '<select class="j-input" onfocus="this.blur()"><option>Option 1...</option></select><span style="display:none">SelectOne</span>'; break;
                     case 'SelectOneIcon': content = '<select class="j-input" onfocus="this.blur()"><option>⭐ Option 1...</option></select><span style="display:none">SelectOneIcon</span>'; break;
+                    case 'Spinner': content = '<div class="j-spinner-wrapper" style="display:inline-flex; align-items:center; border:1px solid var(--jettra-border); border-radius:8px; background:rgba(0,0,0,0.3); overflow:hidden;"><button class="j-spinner-btn j-spinner-minus" style="width:40px;height:40px;background:rgba(255,255,255,0.05);border:none;color:var(--jettra-accent);font-size:1.2rem;font-weight:bold;">-</button><div class="j-spinner-display" style="min-width:60px;text-align:center;font-family:monospace;font-size:1.1rem;color:var(--jettra-text);">0</div><button class="j-spinner-btn j-spinner-plus" style="width:40px;height:40px;background:rgba(255,255,255,0.05);border:none;color:var(--jettra-accent);font-size:1.2rem;font-weight:bold;">+</button></div>'; break;
                     case 'ToggleSwitch': content = '<div style="display:flex; align-items:center; gap:8px;"><div style="width:40px;height:20px;background:var(--jettra-accent);border-radius:10px;position:relative;"><div style="width:16px;height:16px;background:#fff;border-radius:50%;position:absolute;top:2px;right:2px;"></div></div><label>ToggleSwitch</label></div>'; break;
                     case 'FileUpload': content = '<div style="border:1px dashed var(--jettra-accent); padding:20px; text-align:center; border-radius:8px; color:var(--jettra-text);"><div style="font-size:24px; margin-bottom:10px;">☁️</div><span>Click or drag files here to upload</span></div>'; break;
                     case 'FolderSelector': content = '<div style="border:1px dashed var(--jettra-accent); padding:20px; text-align:center; border-radius:8px; color:var(--jettra-text);"><div style="font-size:24px; margin-bottom:10px;">📁</div><span>Select Directory</span></div>'; break;
@@ -590,7 +606,7 @@ public class WebDesignerPage extends DashboardBasePage {
                     case 'Menu': content = '<div style="background:rgba(0,0,0,0.4); padding:10px; border-radius:4px; display:inline-block;"><div style="padding:8px 15px; cursor:pointer;"><span>Menu Item</span></div></div>'; break;
                     case 'MenuBar': content = '<div class="canvas-container" style="background:rgba(0,0,0,0.4); padding:10px; border-radius:4px; display:flex; gap:15px; min-height:45px; border:1px dashed rgba(255,255,255,0.2);"></div>'; break;
                     case 'MenuItem': content = '<div class="j-component" style="padding:10px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,0.1); background:rgba(0,0,0,0.2);"><span>Menu Item</span></div>'; break;
-                    case 'Spinner': content = '<div style="display:flex; align-items:center; gap:10px;"><div style="width:30px;min-width:30px;height:30px;min-height:30px;border:3px solid rgba(0,255,255,0.2);border-top:3px solid var(--jettra-accent);border-radius:50%;box-sizing:border-box;animation:spin 1s linear infinite;"></div><span>Loading...</span></div>'; break;
+                    case 'Spinner': content = '<div class="..." ... ></div>'; break; // removed to fix parsing problem
                     case 'Alert': content = '<div style="background:rgba(255,0,0,0.1); border-left:4px solid #ff4444; padding:15px; border-radius:4px; color:#ff4444; display:flex; align-items:center; gap:10px;"><b>⚠️</b><span>Alert Message</span></div>'; break;
                     case 'Notification': content = '<div style="background:rgba(0,255,255,0.1); border:1px solid var(--jettra-accent); padding:15px; border-radius:8px; color:var(--jettra-text); max-width:300px; box-shadow:0 4px 12px rgba(0,0,0,0.3);"><span>Notification Message</span></div>'; break;
                     case 'Downloader': content = '<div style="display:inline-flex; align-items:center; gap:8px; padding:6px 12px; background:rgba(255,255,255,0.1); border-radius:4px; cursor:pointer;"><b>💾</b><span>Download File</span></div>'; break;
@@ -982,6 +998,10 @@ public class WebDesignerPage extends DashboardBasePage {
                 if (key === 'columns' && (type === 'Panel' || type === 'Grid')) {
                     const container = selectedItem.querySelector('.canvas-container');
                     if (container) container.style.gridTemplateColumns = `repeat(${value}, 1fr)`;
+                }
+                if (type === 'Spinner' && key === 'value') {
+                    const disp = selectedItem.querySelector('.j-spinner-display');
+                    if (disp) disp.innerText = value;
                 }
                 window.updateGeneratedCode();
             };
