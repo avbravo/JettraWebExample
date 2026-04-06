@@ -635,6 +635,13 @@ public class WebDesignerPage extends DashboardBasePage {
                     case 'TreeItem': content = '<div class="canvas-container" style="padding-left:15px; border-left:1px dashed rgba(0,255,255,0.2); min-height:30px; margin-top:5px; position:relative;"><span style="position:absolute; left:-10px; top:5px; font-size:10px; color:var(--jettra-accent);">▶</span><span style="display:inline-block; margin-bottom:5px; color:#fff;">Tree Node</span></div>'; break;
                     case 'Div': content = '<div class="canvas-container" style="border:1px dashed rgba(255,255,255,0.2); min-height:50px; padding:10px; border-radius:4px; position:relative;"><span style="position:absolute;top:2px;left:5px;font-size:9px;color:rgba(255,255,255,0.3)">Div Container</span></div>'; break;
                     case 'LayoutDisplay': content = '<div class="canvas-container" style="border:2px solid rgba(0,255,255,0.2); min-height:100px; padding:15px; border-radius:8px; position:relative;"><span style="position:absolute;top:5px;left:10px;font-size:10px;color:rgba(0,255,255,0.5);font-weight:bold;">LayoutDisplay</span></div>'; break;
+                    case 'DatePicker': content = '<div style="display:flex; flex-direction:column; gap:5px;"><label style="font-weight:500; font-size:0.9rem;">Date Selection</label><input type="date" class="j-input" onfocus="this.blur()"/></div>'; break;
+                    case 'Time': content = '<div style="display:flex; flex-direction:column; gap:5px;"><label style="font-weight:500; font-size:0.9rem;">Time Selection</label><input type="time" class="j-input" onfocus="this.blur()"/></div>'; break;
+                    case 'Map': content = '<div style="width:100%; height:200px; background:rgba(0,255,0,0.1); border:1px dashed #0f0; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#0f0;"><span>🗺️ Leaflet Map Area</span></div>'; break;
+                    case 'Calendar': content = '<div style="width:100%; min-height:150px; background:rgba(0,0,0,0.3); border:1px solid var(--jettra-border); border-radius:8px; padding:10px;"><div style="text-align:center; color:var(--jettra-accent); margin-bottom:5px;">[Month Calendar Placeholder]</div><div style="display:grid; grid-template-columns:repeat(7, 1fr); gap:2px; opacity:0.5;"><div style="background:#222;height:20px;"></div><div style="background:#222;height:20px;"></div><div style="background:#222;height:20px;"></div><div style="background:#222;height:20px;"></div><div style="background:#222;height:20px;"></div><div style="background:#222;height:20px;"></div><div style="background:#222;height:20px;"></div></div></div>'; break;
+                    case 'Schedule': content = '<div style="width:100%; min-height:100px; background:rgba(0,0,0,0.3); border:1px solid var(--jettra-border); border-radius:8px; padding:10px;"><div style="text-align:center; color:var(--jettra-accent); margin-bottom:5px;">[Weekly Schedule Placeholder]</div><div style="border-left:2px solid var(--jettra-border); padding-left:10px;"><div style="background:var(--jettra-accent); color:#000; font-size:10px; width:80px; padding:2px; margin-bottom:5px;">Event</div></div></div>'; break;
+                    case 'Timeline': content = '<div style="border-left:2px solid var(--jettra-border); padding-left:20px; position:relative; min-height:100px;"><div style="position:absolute; left:-6px; top:10px; width:10px; height:10px; border-radius:50%; background:var(--jettra-accent);"></div><div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:4px; margin-top:5px;">Timeline Node</div></div>'; break;
+                    case 'Organigram': content = '<div style="text-align:center; padding:10px;"><div style="display:inline-block; padding:10px; border:1px solid var(--jettra-accent); border-radius:6px; background:rgba(0,255,255,0.05);">Root Node</div><div style="border-left:1px dashed var(--jettra-border); height:20px; margin:0 auto; width:1px;"></div><div style="display:inline-block; padding:10px; border:1px solid var(--jettra-border); border-radius:6px; opacity:0.8;">Child Node</div></div>'; break;
                     case 'Panel': 
                         content = '<div class="j-component j-panel" style="padding:0; overflow:hidden;"><div class="j-panel-header" style="background:rgba(0,255,255,0.05); padding:10px 15px; border-bottom:1px solid var(--jettra-border); font-weight:bold; color:var(--jettra-accent)">Panel Title</div><div class="canvas-container j-panel-body" style="padding:15px; display:flex; flex-direction:column; gap:10px; min-height:50px;"></div></div>'; 
                         break;
@@ -1653,6 +1660,29 @@ public class WebDesignerPage extends DashboardBasePage {
                                 const kids = it.querySelectorAll(':scope > .canvas-container > .canvas-item, :scope > div > .canvas-container > .canvas-item');
                                 if (kids.length > 0) out += walk(kids, v);
                                 if (props.icon) out += `        // Try using icon property if supported for ${type}\\n        try { ${v}.getClass().getMethod("setIcon", String.class).invoke(${v}, "${props.icon}"); } catch(Exception ignored) {}\\n`;
+                                out += handleCommon(v);
+                                out += handleEvents(v);
+                                out += `        ${container}.add(${v});\\n`;
+                                break;
+                            case 'DatePicker':
+                            case 'Time':
+                                out += `        ${type} ${v} = new ${type}("${v}", "${props.text || type}");\\n`;
+                                out += handleCommon(v);
+                                out += handleEvents(v);
+                                out += `        ${container}.add(${v});\\n`;
+                                break;
+                            case 'Calendar':
+                            case 'Schedule':
+                            case 'Timeline':
+                            case 'Organigram':
+                                out += `        ${type} ${v} = new ${type}();\\n`;
+                                out += handleCommon(v);
+                                out += handleEvents(v);
+                                out += `        ${container}.add(${v});\\n`;
+                                break;
+                            case 'Map':
+                                out += `        Map ${v} = new Map("${v}");\\n`;
+                                out += `        ${v}.setCenter(0.0, 0.0, 13);\\n`;
                                 out += handleCommon(v);
                                 out += handleEvents(v);
                                 out += `        ${container}.add(${v});\\n`;

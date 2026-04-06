@@ -37,25 +37,36 @@ public class ChartsLinePage extends DashboardBasePage {
                          "     new String[]{\"rgba(75, 192, 192, 0.5)\"}, \\n" +
                          "     new String[]{\"rgba(75, 192, 192, 1)\"});";
         
-        TextArea codeArea = new TextArea("codeArea", "");
-        codeArea.setStyle("width", "100%").setStyle("height", "150px").setStyle("font-family", "monospace");
-        codeArea.setValue(codeStr.replace("\\n", "\n"));
+        Div codeContainer = new Div();
+        codeContainer.setStyle("background", "rgba(0,0,0,0.4)").setStyle("padding", "15px")
+                     .setStyle("border-radius", "4px").setStyle("overflow-x", "auto")
+                     .setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
+
+        io.jettra.wui.core.UIComponent pre = new io.jettra.wui.core.UIComponent("pre") {};
+        pre.setStyle("margin", "0");
+        io.jettra.wui.core.UIComponent codeTag = new io.jettra.wui.core.UIComponent("code") {};
+        codeTag.setProperty("id", "chartsline-java-code");
+        codeTag.setStyle("color", "#a5d6ff").setStyle("font-family", "monospace").setStyle("font-size", "0.9rem");
+        codeTag.setContent(codeStr.replace("<", "&lt;").replace(">", "&gt;").replace("\\n", "\n"));
         
-        Button copyBtn = new Button("Copiar codigo");
+        pre.add(codeTag);
+        codeContainer.add(pre);
+        codeModal.add(codeContainer);
+        
+        Div actions = new Div();
+        actions.setStyle("margin-top", "15px").setStyle("display", "flex").setStyle("justify-content", "flex-end").setStyle("gap", "10px");
+        
+        Button copyBtn = new Button("Copy");
         copyBtn.addClass("j-btn");
-        copyBtn.setStyle("background", "var(--jettra-accent)").setStyle("color", "#fff");
-        copyBtn.setProperty("onclick", "navigator.clipboard.writeText(`" + codeStr + "`).then(() => alert('Code copied!'))");
+        copyBtn.setProperty("onclick", "navigator.clipboard.writeText(document.getElementById('chartsline-java-code').innerText).then(() => { this.innerText='Copied!'; setTimeout(() => this.innerText='Copy', 2000); })");
         
         Button closeBtn = new Button("Close");
         closeBtn.addClass("j-btn");
         closeBtn.setStyle("background", "transparent").setStyle("border-color", "var(--jettra-border)");
         closeBtn.setProperty("onclick", "document.getElementById('code-modal').style.display='none'");
         
-        Div actions = new Div();
-        actions.setStyle("margin-top", "15px").setStyle("display", "flex").setStyle("gap", "10px");
-        actions.add(copyBtn).add(closeBtn);
-        
-        codeModal.add(codeArea).add(actions);
+        actions.add(closeBtn).add(copyBtn);
+        codeModal.add(actions);
         center.add(codeModal);
     }
 }

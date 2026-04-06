@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.Map;
 import io.jettra.wui.sync.JettraPageSincronized;
 import io.jettra.wui.sync.SyncType;
 import io.jettra.wui.sync.JettraSyncManager;
