@@ -795,7 +795,7 @@ public class WebDesignerPage extends DashboardBasePage {
                     `;
                 }
 
-                if (['ChartsBar', 'ChartsDoughnut', 'ChartsLine', 'ChartsPie', 'ChartsRadar'].includes(type)) {
+                if (type.startsWith('Chart')) {
                     html += `
                         <div class="inspector-row">
                             <span class="inspector-label">Labels (comma sep.)</span>
@@ -812,6 +812,19 @@ public class WebDesignerPage extends DashboardBasePage {
                         <div class="inspector-row">
                             <span class="inspector-label">Bg Color</span>
                             <input type="color" class="inspector-input" value="${props.bgColor || "#00ffff"}" onchange="updateProp('bgColor', this.value)">
+                        </div>
+                    `;
+                }
+
+                if (type === 'ScheduleControl') {
+                    html += `
+                        <div class="inspector-row" style="display:flex; justify-content:space-between; align-items:center;">
+                            <span class="inspector-label">Show Remaining Time</span>
+                            <input type="checkbox" ${props.showTimeRemaining ? 'checked' : ''} onchange="updateProp('showTimeRemaining', this.checked)">
+                        </div>
+                        <div class="inspector-row">
+                            <span class="inspector-label">On Time Reached (JS)</span>
+                            <input type="text" class="inspector-input" value="${props.onTimeReached || ""}" placeholder="alert('Time is up!');" onchange="updateProp('onTimeReached', this.value)">
                         </div>
                     `;
                 }
@@ -1032,6 +1045,11 @@ public class WebDesignerPage extends DashboardBasePage {
                 if (type === 'Spinner' && key === 'value') {
                     const disp = selectedItem.querySelector('.j-spinner-display');
                     if (disp) disp.innerText = value;
+                }
+                if (type.startsWith('Chart') && key === 'bgColor') {
+                    selectedItem.style.borderColor = value;
+                    const span = selectedItem.querySelector('span');
+                    if (span) span.style.color = value;
                 }
                 window.updateGeneratedCode();
             };
@@ -1512,18 +1530,21 @@ public class WebDesignerPage extends DashboardBasePage {
                                 out += handleEvents(v);
                                 out += `        ${container}.add(${v});\\n`;
                                 break;
-                            case 'ScheduleControl':
+                            case 'ScheduleControl': {
                                 out += `        ScheduleControl ${v} = new ScheduleControl("${v}");\\n`;
                                 if (props.binding) out += `        ${v}.setValue(model.get${props.binding.charAt(0).toUpperCase() + props.binding.slice(1)}());\\n`;
+                                if (props.showTimeRemaining) out += `        ${v}.setShowTimeRemaining(true);\\n`;
+                                if (props.onTimeReached) out += `        ${v}.setOnTimeReached("${props.onTimeReached}");\\n`;
                                 out += handleCommon(v);
                                 out += handleEvents(v);
                                 out += `        ${container}.add(${v});\\n`;
                                 break;
+                            }
                             case 'ChartsBar':
                             case 'ChartsDoughnut':
                             case 'ChartsLine':
                             case 'ChartsPie':
-                            case 'ChartsRadar':
+                            case 'ChartsRadar': {
                                 out += `        ${type} ${v} = new ${type}("${v}");\\n`;
                                 const lArg = props.labels ? `"${props.labels.split(',').map(s => s.trim()).join('", "')}"` : '"Label 1", "Label 2"';
                                 const dLabel = props.datasetLabel ? props.datasetLabel : "Data";
@@ -1535,6 +1556,7 @@ public class WebDesignerPage extends DashboardBasePage {
                                 out += handleEvents(v);
                                 out += `        ${container}.add(${v});\\n`;
                                 break;
+                            }
                             case 'Loading':
                                 out += `        Loading ${v} = new Loading();\\n`;
                                 if (props.size) out += `        ${v}.setSize(Loading.Size.${props.size});\\n`;
@@ -1543,7 +1565,7 @@ public class WebDesignerPage extends DashboardBasePage {
                                 out += handleEvents(v);
                                 out += `        ${container}.add(${v});\\n`;
                                 break;
-                            case 'Modal':
+                            case 'Modal': {
                                 const mId = props.idGen || "modal_" + Math.floor(Math.random()*1000);
                                 out += `        Modal ${v} = new Modal("${mId}");\\n`;
                                 const kidsM = it.querySelectorAll(':scope > .canvas-container > .canvas-item');
@@ -1552,6 +1574,7 @@ public class WebDesignerPage extends DashboardBasePage {
                                 out += handleEvents(v);
                                 out += `        ${container}.add(${v});\\n`;
                                 break;
+                            }
                             case 'MenuItem':
                             case 'TreeItem':
                             case 'Tab':

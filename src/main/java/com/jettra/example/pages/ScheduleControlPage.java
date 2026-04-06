@@ -16,7 +16,8 @@ public class ScheduleControlPage extends DashboardBasePage {
         center.add(h1).add(subtitle).add(new Divide());
 
         ScheduleControl schedule = new ScheduleControl("mySchedule");
-        schedule.setValue("2026-04-10T12:00:00");
+        schedule.setValue("2026-04-10T12:00:00").setShowTimeRemaining(true);
+        schedule.setOnTimeReached("window.show3DMessage('Event started!', 'The selected time has arrived.');");
 
         Button codeBtn = new Button("Code");
         codeBtn.addClass("j-btn");
