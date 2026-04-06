@@ -335,7 +335,7 @@ public class WebDesignerPage extends DashboardBasePage {
         // Typography
         addPaletteCategory(palette, "Typography", new String[]{"Header", "Paragraph", "Span", "Label", "Separator", "Divide"});
         // Forms
-        addPaletteCategory(palette, "Forms", new String[]{"Button", "CheckBox", "RadioButton", "RadioGroupButton", "ScheduleControl", "SelectOne", "SelectOneIcon", "TextBox", "TextArea", "ToggleSwitch", "FileUpload", "FolderSelector"});
+        addPaletteCategory(palette, "Forms", new String[]{"Button", "CheckBox", "CheckBoxGroup", "RadioButton", "RadioGroupButton", "ScheduleControl", "SelectOne", "SelectOneIcon", "TextBox", "TextArea", "ToggleSwitch", "FileUpload", "FolderSelector"});
         // Navigation
         addPaletteCategory(palette, "Navigation", new String[]{"Link", "Menu", "MenuBar", "MenuItem"});
         // Feedback
@@ -525,6 +525,17 @@ public class WebDesignerPage extends DashboardBasePage {
                                 return;
                             }
                         }
+                        if (targetWrapper && targetWrapper.getAttribute('data-type') === 'CheckBoxGroup') {
+                            let drpType = type;
+                            if (moveId) {
+                                const el = document.getElementById(moveId);
+                                if (el) drpType = el.getAttribute('data-type');
+                            }
+                            if (drpType && drpType !== 'CheckBox') {
+                                window.show3DMessage("Invalid Action", "Only CheckBox components can be nested inside a CheckBoxGroup.");
+                                return;
+                            }
+                        }
                     }
 
                     if (moveId) {
@@ -598,6 +609,7 @@ public class WebDesignerPage extends DashboardBasePage {
                     case 'CheckBox': content = '<div style="display:flex; align-items:center; gap:8px;"><input type="checkbox" checked onfocus="this.blur()"/><label>CheckBox</label></div>'; break;
                     case 'RadioButton': content = '<div style="display:flex; align-items:center; gap:8px;"><input type="radio" checked onfocus="this.blur()"/><label>RadioButton</label></div>'; break;
                     case 'RadioGroupButton': content = '<div class="canvas-container" style="padding:10px; border:1px dashed var(--jettra-accent); min-height:60px;"><label style="font-weight:bold; color:var(--jettra-accent); display:block; margin-bottom:10px;">Radio Group</label></div>'; break;
+                    case 'CheckBoxGroup': content = '<div class="canvas-container" style="padding:10px; border:1px dashed var(--jettra-accent); min-height:60px;"><label style="font-weight:bold; color:var(--jettra-accent); display:block; margin-bottom:10px;">CheckBox Group</label></div>'; break;
                     case 'ScheduleControl': content = '<input type="datetime-local" class="j-input" onfocus="this.blur()"/>'; break;
                     case 'SelectOne': content = '<select class="j-input" onfocus="this.blur()"><option>Option 1...</option></select><span style="display:none">SelectOne</span>'; break;
                     case 'SelectOneIcon': content = '<select class="j-input" onfocus="this.blur()"><option>⭐ Option 1...</option></select><span style="display:none">SelectOneIcon</span>'; break;
@@ -791,6 +803,15 @@ public class WebDesignerPage extends DashboardBasePage {
                         <div class="inspector-row">
                             <span class="inspector-label">Step</span>
                             <input type="number" step="0.1" class="inspector-input" value="${props.step || 1}" onchange="updateProp('step', this.value)">
+                        </div>
+                    `;
+                }
+
+                if (type === 'RadioGroupButton' || type === 'CheckBoxGroup') {
+                    html += `
+                        <div class="inspector-row">
+                            <span class="inspector-label">Group Name</span>
+                            <input type="text" class="inspector-input" value="${props.name || (type === "CheckBoxGroup" ? "checkboxGroup1" : "radioGroup1")}" onchange="updateProp('name', this.value)">
                         </div>
                     `;
                 }
@@ -1618,11 +1639,16 @@ public class WebDesignerPage extends DashboardBasePage {
                             case 'Board':
                             case 'MenuBar':
                             case 'RadioGroupButton':
+                            case 'CheckBoxGroup':
                             case 'Tree':
                             case 'TabView':
                             case 'Div':
                             case 'LayoutDisplay':
-                                out += `        ${type} ${v} = new ${type}("${v}");\\n`;
+                                if (type === 'RadioGroupButton' || type === 'CheckBoxGroup') {
+                                    out += `        ${type} ${v} = new ${type}("${props.name || v}");\\n`;
+                                } else {
+                                    out += `        ${type} ${v} = new ${type}("${v}");\\n`;
+                                }
                                 if (props.columns && (type === 'Grid' || type === 'Panel')) out += `        ${v}.setColumns(${props.columns});\\n`;
                                 const kids = it.querySelectorAll(':scope > .canvas-container > .canvas-item, :scope > div > .canvas-container > .canvas-item');
                                 if (kids.length > 0) out += walk(kids, v);

@@ -40,6 +40,7 @@ public class WebExampleMain {
 
         server.addHandler("/button", com.jettra.example.pages.ButtonPage.class);
         server.addHandler("/checkbox", com.jettra.example.pages.CheckBoxPage.class);
+        server.addHandler("/checkboxgroup", com.jettra.example.pages.CheckBoxGroupPage.class);
         server.addHandler("/clock", com.jettra.example.pages.ClockPage.class);
         server.addHandler("/dashboard", com.jettra.example.pages.DashboardPage.class);
     server.addHandler("/header", com.jettra.example.pages.HeaderPage.class);
