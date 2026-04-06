@@ -335,13 +335,15 @@ public class WebDesignerPage extends DashboardBasePage {
         // Typography
         addPaletteCategory(palette, "Typography", new String[]{"Header", "Paragraph", "Span", "Label", "Separator", "Divide"});
         // Forms
-        addPaletteCategory(palette, "Forms", new String[]{"Button", "CheckBox", "RadioButton", "RadioGroupButton", "SelectOne", "SelectOneIcon", "TextBox", "TextArea", "ToggleSwitch", "FileUpload", "FolderSelector"});
+        addPaletteCategory(palette, "Forms", new String[]{"Button", "CheckBox", "RadioButton", "RadioGroupButton", "ScheduleControl", "SelectOne", "SelectOneIcon", "TextBox", "TextArea", "ToggleSwitch", "FileUpload", "FolderSelector"});
         // Navigation
         addPaletteCategory(palette, "Navigation", new String[]{"Link", "Menu", "MenuBar", "MenuItem"});
         // Feedback
         addPaletteCategory(palette, "Feedback", new String[]{"ProgressBar", "Spinner", "Loading", "Alert", "Notification", "Clock"});
         // Media & Files
         addPaletteCategory(palette, "Media", new String[]{"Downloader", "PDFViewer", "ViewMedia"});
+        // Charts
+        addPaletteCategory(palette, "Charts", new String[]{"ChartsBar", "ChartsDoughnut", "ChartsLine", "ChartsPie", "ChartsRadar"});
         // Layout & Display
         addPaletteCategory(palette, "Layout", new String[]{"Grid", "Panel", "Board", "Avatar", "Carousel", "Table", "TabView", "Tab", "Modal", "Tree", "TreeItem", "Div", "LayoutDisplay"});
 
@@ -596,6 +598,7 @@ public class WebDesignerPage extends DashboardBasePage {
                     case 'CheckBox': content = '<div style="display:flex; align-items:center; gap:8px;"><input type="checkbox" checked onfocus="this.blur()"/><label>CheckBox</label></div>'; break;
                     case 'RadioButton': content = '<div style="display:flex; align-items:center; gap:8px;"><input type="radio" checked onfocus="this.blur()"/><label>RadioButton</label></div>'; break;
                     case 'RadioGroupButton': content = '<div class="canvas-container" style="padding:10px; border:1px dashed var(--jettra-accent); min-height:60px;"><label style="font-weight:bold; color:var(--jettra-accent); display:block; margin-bottom:10px;">Radio Group</label></div>'; break;
+                    case 'ScheduleControl': content = '<input type="datetime-local" class="j-input" onfocus="this.blur()"/>'; break;
                     case 'SelectOne': content = '<select class="j-input" onfocus="this.blur()"><option>Option 1...</option></select><span style="display:none">SelectOne</span>'; break;
                     case 'SelectOneIcon': content = '<select class="j-input" onfocus="this.blur()"><option>⭐ Option 1...</option></select><span style="display:none">SelectOneIcon</span>'; break;
                     case 'Spinner': content = '<div class="j-spinner-wrapper" style="display:inline-flex; align-items:center; border:1px solid var(--jettra-border); border-radius:8px; background:rgba(0,0,0,0.3); overflow:hidden;"><button type="button" class="j-spinner-btn j-spinner-minus" style="width:40px;height:40px;background:rgba(255,255,255,0.05);border:none;color:var(--jettra-accent);font-size:1.2rem;font-weight:bold;">-</button><div class="j-spinner-display" style="min-width:60px;text-align:center;font-family:monospace;font-size:1.1rem;color:var(--jettra-text);">0</div><button type="button" class="j-spinner-btn j-spinner-plus" style="width:40px;height:40px;background:rgba(255,255,255,0.05);border:none;color:var(--jettra-accent);font-size:1.2rem;font-weight:bold;">+</button></div>'; break;
@@ -646,6 +649,11 @@ public class WebDesignerPage extends DashboardBasePage {
                                   '<div class="j-progressbar-fill" style="width:60%; height:100%; background:var(--jettra-accent); box-shadow:0 0 10px var(--jettra-accent)"></div>' +
                                   '</div>';
                         break;
+                    case 'ChartsBar': content = '<div class="j-component" style="display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.2);min-height:100px;border-radius:8px;border:1px solid #36a2eb"><span style="color:#36a2eb;font-size:2rem;">📊 Bar Chart</span></div>'; break;
+                    case 'ChartsDoughnut': content = '<div class="j-component" style="display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.2);min-height:100px;border-radius:50%;border:2px dashed #ff6384;width:100px;margin:auto;"><span style="color:#ff6384;font-size:2rem;">🍩</span></div>'; break;
+                    case 'ChartsLine': content = '<div class="j-component" style="display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.2);min-height:100px;border-radius:8px;border:1px solid #4bc0c0"><span style="color:#4bc0c0;font-size:2rem;">📈 Line Chart</span></div>'; break;
+                    case 'ChartsPie': content = '<div class="j-component" style="display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.2);min-height:100px;border-radius:50%;border:1px solid #ffcd56;width:100px;margin:auto;"><span style="color:#ffcd56;font-size:2rem;">🥧</span></div>'; break;
+                    case 'ChartsRadar': content = '<div class="j-component" style="display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.2);min-height:100px;border-radius:8px;border:1px solid #9966ff"><span style="color:#9966ff;font-size:2rem;">🕸️ Radar Chart</span></div>'; break;
                     default: content = `<div class="canvas-container j-component" style="padding:10px; text-align:center; color:#888;">${type} Component</div>`;
                 }
 
@@ -783,6 +791,27 @@ public class WebDesignerPage extends DashboardBasePage {
                         <div class="inspector-row">
                             <span class="inspector-label">Step</span>
                             <input type="number" step="0.1" class="inspector-input" value="${props.step || 1}" onchange="updateProp('step', this.value)">
+                        </div>
+                    `;
+                }
+
+                if (['ChartsBar', 'ChartsDoughnut', 'ChartsLine', 'ChartsPie', 'ChartsRadar'].includes(type)) {
+                    html += `
+                        <div class="inspector-row">
+                            <span class="inspector-label">Labels (comma sep.)</span>
+                            <input type="text" class="inspector-input" value="${props.labels || "Label 1, Label 2"}" onchange="updateProp('labels', this.value)">
+                        </div>
+                        <div class="inspector-row">
+                            <span class="inspector-label">Dataset Label</span>
+                            <input type="text" class="inspector-input" value="${props.datasetLabel || "Data"}" onchange="updateProp('datasetLabel', this.value)">
+                        </div>
+                        <div class="inspector-row">
+                            <span class="inspector-label">Data (comma sep. numbers)</span>
+                            <input type="text" class="inspector-input" value="${props.data || "10, 20"}" onchange="updateProp('data', this.value)">
+                        </div>
+                        <div class="inspector-row">
+                            <span class="inspector-label">Bg Color</span>
+                            <input type="color" class="inspector-input" value="${props.bgColor || "#00ffff"}" onchange="updateProp('bgColor', this.value)">
                         </div>
                     `;
                 }
@@ -1479,6 +1508,29 @@ public class WebDesignerPage extends DashboardBasePage {
                                 if (props.min !== undefined && props.min !== "") out += `        ${v}.setMin(${props.min});\\n`;
                                 if (props.max !== undefined && props.max !== "") out += `        ${v}.setMax(${props.max});\\n`;
                                 if (props.step !== undefined && props.step !== "") out += `        ${v}.setStep(${props.step});\\n`;
+                                out += handleCommon(v);
+                                out += handleEvents(v);
+                                out += `        ${container}.add(${v});\\n`;
+                                break;
+                            case 'ScheduleControl':
+                                out += `        ScheduleControl ${v} = new ScheduleControl("${v}");\\n`;
+                                if (props.binding) out += `        ${v}.setValue(model.get${props.binding.charAt(0).toUpperCase() + props.binding.slice(1)}());\\n`;
+                                out += handleCommon(v);
+                                out += handleEvents(v);
+                                out += `        ${container}.add(${v});\\n`;
+                                break;
+                            case 'ChartsBar':
+                            case 'ChartsDoughnut':
+                            case 'ChartsLine':
+                            case 'ChartsPie':
+                            case 'ChartsRadar':
+                                out += `        ${type} ${v} = new ${type}("${v}");\\n`;
+                                const lArg = props.labels ? `"${props.labels.split(',').map(s => s.trim()).join('", "')}"` : '"Label 1", "Label 2"';
+                                const dLabel = props.datasetLabel ? props.datasetLabel : "Data";
+                                const dData = props.data ? props.data : "10, 20";
+                                const dBg = props.bgColor ? props.bgColor : "#00ffff";
+                                out += `        ${v}.setLabels(${lArg});\\n`;
+                                out += `        ${v}.addDataset("${dLabel}", new Number[]{${dData}}, new String[]{"${dBg}"}, new String[]{"${dBg}"});\\n`;
                                 out += handleCommon(v);
                                 out += handleEvents(v);
                                 out += `        ${container}.add(${v});\\n`;

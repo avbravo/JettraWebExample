@@ -94,6 +94,12 @@ public class WebExampleMain {
         server.addHandler("/downloader", com.jettra.example.pages.DownloaderPage.class);
         server.addHandler("/pdfviewer", com.jettra.example.pages.PDFViewerPage.class);
         server.addHandler("/viewmedia", com.jettra.example.pages.ViewMediaPage.class);
+        server.addHandler("/chartsdoughnut", com.jettra.example.pages.ChartsDoughnutPage.class);
+        server.addHandler("/chartsbar", com.jettra.example.pages.ChartsBarPage.class);
+        server.addHandler("/chartspie", com.jettra.example.pages.ChartsPiePage.class);
+        server.addHandler("/chartsradar", com.jettra.example.pages.ChartsRadarPage.class);
+        server.addHandler("/chartsline", com.jettra.example.pages.ChartsLinePage.class);
+        server.addHandler("/schedulecontrol", com.jettra.example.pages.ScheduleControlPage.class);
 
         server.start();
     }
