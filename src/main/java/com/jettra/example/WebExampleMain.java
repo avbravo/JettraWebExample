@@ -48,8 +48,7 @@ public class WebExampleMain {
         server.addHandler("/layoutdisplay", com.jettra.example.pages.LayoutDisplayPage.class);
         server.addHandler("/login", com.jettra.example.pages.LoginPage.class);
         server.addHandler("/logout", com.jettra.example.pages.LoginPage.class);
-
-
+        server.addHandler("/loading", com.jettra.example.pages.LoadingPage.class);
         server.addHandler("/persona", com.jettra.example.pages.PersonaPage.class);
 
     

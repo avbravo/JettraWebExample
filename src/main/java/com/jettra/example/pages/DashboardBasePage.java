@@ -278,7 +278,7 @@ public abstract class DashboardBasePage extends Page {
         addCategory(menuHtml, txtForms, new String[]{"Button", "CheckBox", "Form", "Forms", "RadioButton", "SelectOne", "SelectOneIcon", "Spinner", "TextBox", "TextArea", "ToggleSwitch"}, menuClass, hoverEvents, categoryStyle, compIcon);
         addCategory(menuHtml, txtNav, new String[]{"Link", "Menu", "MenuBar", "Navigation"}, menuClass, hoverEvents, categoryStyle, compIcon);
         addCategory(menuHtml, txtFeed, new String[]{"Alert", "Modal", "Notification", "SessionTimeout", "Feedback"}, menuClass, hoverEvents, categoryStyle, compIcon);
-        addCategory(menuHtml, txtLayout, new String[]{"Avatar", "AvatarGroup", "Board", "Carousel", "Clock", "Div", "Divide", "FileUpload", "FolderSelector", "Grid", "Icon", "Image", "LayoutDisplay", "LoginAdvanced", "Panel", "ProgressBar", "Spinner", "Table", "TabView", "Tree"}, menuClass, hoverEvents, categoryStyle, compIcon);
+        addCategory(menuHtml, txtLayout, new String[]{"Avatar", "AvatarGroup", "Board", "Carousel", "Clock", "Div", "Divide", "FileUpload", "FolderSelector", "Grid", "Icon", "Image", "LayoutDisplay", "Loading", "LoginAdvanced", "Panel", "ProgressBar", "Spinner", "Table", "TabView", "Tree"}, menuClass, hoverEvents, categoryStyle, compIcon);
         addCategory(menuHtml, txtMedia, new String[]{"Downloader", "PDFViewer", "ViewMedia"}, menuClass, hoverEvents, categoryStyle, compIcon);
 
         // Logout
