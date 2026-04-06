@@ -20,6 +20,7 @@ public class WebExampleMain {
 
         System.out.println("Levantando servidor de enrutamiento JettraServer empotrado...");
         JettraServer server = new JettraServer();
+        server.setErrorPage("/error");
 
         // IMPORTANTE / DOCUMENTACIÓN:
         // Todas las páginas creadas deben registrarse obligatoriamente en este método main 
@@ -28,6 +29,7 @@ public class WebExampleMain {
         // o "No context found" al intentar cargar la vista o manejar peticiones de Formularios.
         
         // Register pages as classes to ensure a fresh, isolated instance per request
+        server.addHandler("/error", io.jettra.wui.complex.ErrorPage.class);
         server.addHandler("/", com.jettra.example.pages.LoginPage.class);
         server.addHandler("/alert", com.jettra.example.pages.AlertPage.class);
         server.addHandler("/avatar", com.jettra.example.pages.AvatarPage.class);
