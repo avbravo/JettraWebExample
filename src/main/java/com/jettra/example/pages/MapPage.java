@@ -47,7 +47,11 @@ public class MapPage extends DashboardBasePage {
         
         String javaCode = "Map locationMap = new Map(\"hq_map\");\\n" +
                           "locationMap.setCenter(40.7128, -74.0060, 13);\\n" +
-                          "locationMap.setMarker(\"Our Headquarters\");";
+                          "locationMap.setMarker(\"Our Headquarters\");\\n" +
+                          "locationMap.setEnableSearch(true);\\n" +
+                          "locationMap.addWaypoint(40.7308, -73.9973, \"Park\");\\n" +
+                          "locationMap.addRoute(40.7128, -74.0060, 40.7308, -73.9973);\\n" +
+                          "locationMap.setOnMapClick(\"console.log(lat, lng);\");";
                           
         io.jettra.wui.core.UIComponent pre = new io.jettra.wui.core.UIComponent("pre") {};
         pre.setStyle("margin", "0");
@@ -88,6 +92,10 @@ public class MapPage extends DashboardBasePage {
         Map locationMap = new Map("hq_map");
         locationMap.setCenter(40.7128, -74.0060, 13);
         locationMap.setMarker("Our Headquarters - NY");
+        locationMap.setEnableSearch(true);
+        locationMap.addWaypoint(40.7308, -73.9973, "Washington Square Park");
+        locationMap.addRoute(40.7128, -74.0060, 40.7308, -73.9973);
+        locationMap.setOnMapClick("alert('Map clicked! Lat: ' + lat + ', Lng: ' + lng);");
         
         container.add(locationMap);
         

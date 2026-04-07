@@ -48,7 +48,7 @@ public class OrganigramPage extends DashboardBasePage {
         String javaCode = "Organigram org = new Organigram();\\n" +
                           "org.setRoot(\"CEO\", \"Alice\");\\n" +
                           "Organigram.OrgNode dev = org.getRoot().addChild(\"Head Dev\", \"Bob\");\\n" +
-                          "dev.addChild(\"Frontend\", \"Charlie\");\\n" +
+                          "dev.addChild(\"Frontend\", \"Charlie\", \"alert('FE')\");\\n" +
                           "dev.addChild(\"Backend\", \"David\");";
                           
         io.jettra.wui.core.UIComponent pre = new io.jettra.wui.core.UIComponent("pre") {};
@@ -89,11 +89,11 @@ public class OrganigramPage extends DashboardBasePage {
         org.setRoot("CEO", "JettraStack Founder");
         
         Organigram.OrgNode tech = org.getRoot().addChild("CTO", "Tech Lead");
-        tech.addChild("Frontend Dev", "React/Java");
-        tech.addChild("Backend Dev", "Spring/Java");
+        tech.addChild("Frontend Dev", "React/Java", "alert('Frontend focused on UI/UX')");
+        tech.addChild("Backend Dev", "Spring/Java", "alert('Backend focused on APIs and Logic')");
         
         Organigram.OrgNode ops = org.getRoot().addChild("COO", "Operations");
-        ops.addChild("HR", "Recruitment");
+        ops.addChild("HR", "Recruitment", "alert('Managing company culture and hiring')");
         
         container.add(org);
         

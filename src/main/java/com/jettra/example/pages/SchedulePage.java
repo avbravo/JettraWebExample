@@ -46,7 +46,7 @@ public class SchedulePage extends DashboardBasePage {
                      .setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
         
         String javaCode = "Schedule s = new Schedule();\\n" +
-                          "s.addEvent(\"Daily Standup\", \"Mon\", \"9:00\");\\n" +
+                          "s.addEvent(\"Daily Standup\", \"Mon\", \"9:00\", \"alert('Hi')\");\\n" +
                           "s.addEvent(\"Product Sync\", \"Mon\", \"11:00\");\\n" +
                           "s.addEvent(\"Review Session\", \"Thu\", \"14:00\");";
                           
@@ -85,10 +85,10 @@ public class SchedulePage extends DashboardBasePage {
         container.add(new Header(3, "Demo"));
         
         Schedule sched = new Schedule();
-        sched.addEvent("Daily Sync", "Mon", "9:00");
-        sched.addEvent("Client Meeting", "Mon", "13:00");
-        sched.addEvent("Review", "Wed", "10:00");
-        sched.addEvent("Deploy", "Fri", "16:00");
+        sched.addEvent("Daily Sync", "Mon", "9:00", "alert('Joining Daily Sync...')");
+        sched.addEvent("Client Meeting", "Mon", "13:00", "alert('Meeting with stakeholders')");
+        sched.addEvent("Review", "Wed", "10:00", "alert('Reviewing latest PRs')");
+        sched.addEvent("Deploy", "Fri", "16:00", "alert('Deploying directly to production 🚀')");
         
         container.add(sched);
         
