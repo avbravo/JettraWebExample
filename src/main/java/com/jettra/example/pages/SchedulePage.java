@@ -46,7 +46,7 @@ public class SchedulePage extends DashboardBasePage {
                      .setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
         
         String javaCode = "Schedule s = new Schedule();\\n" +
-                          "s.addEvent(\"Daily Standup\", \"Mon\", \"9:00\", \"alert('Hi')\");\\n" +
+                          "s.addEvent(\"Daily Standup\", \"Mon\", \"9:00\", \"window.show3DMessage('Sync', 'Hi')\");\\n" +
                           "s.addEvent(\"Product Sync\", \"Mon\", \"11:00\");\\n" +
                           "s.addEvent(\"Review Session\", \"Thu\", \"14:00\");";
                           
@@ -85,12 +85,66 @@ public class SchedulePage extends DashboardBasePage {
         container.add(new Header(3, "Demo"));
         
         Schedule sched = new Schedule();
-        sched.addEvent("Daily Sync", "Mon", "9:00", "alert('Joining Daily Sync...')");
-        sched.addEvent("Client Meeting", "Mon", "13:00", "alert('Meeting with stakeholders')");
-        sched.addEvent("Review", "Wed", "10:00", "alert('Reviewing latest PRs')");
-        sched.addEvent("Deploy", "Fri", "16:00", "alert('Deploying directly to production 🚀')");
+        sched.addEvent("Daily Sync", "Mon", "9:00", "document.getElementById('eventTitle').value='Daily Sync'; document.getElementById('edit-event-modal').style.display='block'; window.show3DMessage('Event Editing', 'Opening Daily Sync for editing');");
+        sched.addEvent("Client Meeting", "Mon", "13:00", "document.getElementById('eventTitle').value='Client Meeting'; document.getElementById('edit-event-modal').style.display='block'; window.show3DMessage('Event Editing', 'Opening Client Meeting for editing');");
+        sched.addEvent("Review", "Wed", "10:00", "document.getElementById('eventTitle').value='Review'; document.getElementById('edit-event-modal').style.display='block'; window.show3DMessage('Event Editing', 'Opening Review for editing');");
+        sched.addEvent("Deploy", "Fri", "16:00", "document.getElementById('eventTitle').value='Deploy'; document.getElementById('edit-event-modal').style.display='block'; window.show3DMessage('Event Editing', 'Deploying to prod 🚀');");
         
         container.add(sched);
+        
+        Button addEventBtn = new Button("⚡ Add Event");
+        addEventBtn.addClass("j-btn-primary");
+        addEventBtn.setProperty("onclick", "document.getElementById('eventTitle').value=''; document.getElementById('edit-event-modal').style.display='block'");
+        
+        container.add(new Div().setStyle("margin-top", "20px").add(addEventBtn));
+
+        // Edit Event Modal
+        Modal editModal = new Modal("edit-event-modal");
+        editModal.setStyle("display", "none").setStyle("background", "var(--jettra-glass)")
+                 .setStyle("backdrop-filter", "blur(10px)")
+                 .setStyle("padding", "20px").setStyle("border-radius", "8px")
+                 .setStyle("width", "90%").setStyle("max-width", "400px")
+                 .setStyle("border", "1px solid var(--jettra-border)");
+                 
+        editModal.add(new Header(3, "Add / Edit Event").setStyle("color", "var(--jettra-accent)").setStyle("margin-top", "0"));
+        
+        Div formLayout = new Div();
+        formLayout.setStyle("display", "flex").setStyle("flex-direction", "column").setStyle("gap", "15px");
+        
+        TextBox titleBox = new TextBox("eventTitle", "Event Title");
+        titleBox.setProperty("id", "eventTitle");
+        formLayout.add(titleBox);
+        
+        SelectOne daySelect = new SelectOne("eventDay");
+        daySelect.addOption("Mon", "Mon");
+        daySelect.addOption("Tue", "Tue");
+        daySelect.addOption("Wed", "Wed");
+        daySelect.addOption("Thu", "Thu");
+        daySelect.addOption("Fri", "Fri");
+        formLayout.add(daySelect);
+        
+        Time evtTime = new Time("eventTime", "Time");
+        evtTime.setEditable(true);
+        evtTime.setType("time");
+        formLayout.add(evtTime);
+        
+        editModal.add(formLayout);
+        
+        Div editActions = new Div();
+        editActions.setStyle("display", "flex").setStyle("justify-content", "flex-end").setStyle("gap", "10px").setStyle("margin-top", "20px");
+        
+        Button cancelEditBtn = new Button("Cancel");
+        cancelEditBtn.addClass("j-btn");
+        cancelEditBtn.setProperty("onclick", "document.getElementById('edit-event-modal').style.display='none'");
+        
+        Button saveEditBtn = new Button("Save Event");
+        saveEditBtn.addClass("j-btn-primary");
+        saveEditBtn.setProperty("onclick", "document.getElementById('edit-event-modal').style.display='none'; window.show3DMessage('Event Saved', 'The event has been securely saved to the schedule.');");
+        
+        editActions.add(cancelEditBtn).add(saveEditBtn);
+        editModal.add(editActions);
+        
+        container.add(editModal);
         
         center.add(container);
     }

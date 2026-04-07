@@ -46,7 +46,8 @@ public class DatePickerPage extends DashboardBasePage {
                      .setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
         
         String javaCode = "DatePicker fp = new DatePicker(\"startDate\", \"Start Date\");\\n" +
-                          "fp.setMin(\"2026-01-01\").setMax(\"2026-12-31\");";
+                          "fp.setType(\"datetime-local\").setFormat(\"yyyy-MM-dd HH:mm\");\\n" +
+                          "fp.setEditable(true).setMin(\"2026-01-01\").setMax(\"2026-12-31\");";
                           
         io.jettra.wui.core.UIComponent pre = new io.jettra.wui.core.UIComponent("pre") {};
         pre.setStyle("margin", "0");
@@ -86,7 +87,11 @@ public class DatePickerPage extends DashboardBasePage {
         block.setStyle("display", "flex").setStyle("gap", "20px");
         
         DatePicker dp = new DatePicker("dob", "Date of Birth");
-        dp.setValue("2026-04-06");
+        dp.setType("datetime-local");
+        dp.setFormat("yyyy-MM-dd HH:mm");
+        dp.setEditable(true);
+        dp.setValue("2026-04-06T10:30");
+        dp.setOnChange("window.show3DMessage('Selected Date', 'You selected: ' + this.value)");
         
         block.add(dp);
         container.add(block);

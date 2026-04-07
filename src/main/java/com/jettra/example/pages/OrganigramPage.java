@@ -48,7 +48,7 @@ public class OrganigramPage extends DashboardBasePage {
         String javaCode = "Organigram org = new Organigram();\\n" +
                           "org.setRoot(\"CEO\", \"Alice\");\\n" +
                           "Organigram.OrgNode dev = org.getRoot().addChild(\"Head Dev\", \"Bob\");\\n" +
-                          "dev.addChild(\"Frontend\", \"Charlie\", \"alert('FE')\");\\n" +
+                          "dev.addChild(\"Frontend\", \"Charlie\", \"window.show3DMessage('Team', 'Frontend')\");\\n" +
                           "dev.addChild(\"Backend\", \"David\");";
                           
         io.jettra.wui.core.UIComponent pre = new io.jettra.wui.core.UIComponent("pre") {};
@@ -89,13 +89,64 @@ public class OrganigramPage extends DashboardBasePage {
         org.setRoot("CEO", "JettraStack Founder");
         
         Organigram.OrgNode tech = org.getRoot().addChild("CTO", "Tech Lead");
-        tech.addChild("Frontend Dev", "React/Java", "alert('Frontend focused on UI/UX')");
-        tech.addChild("Backend Dev", "Spring/Java", "alert('Backend focused on APIs and Logic')");
+        tech.addChild("Frontend Dev", "React/Java", "document.getElementById('nodeTitle').value='Frontend Dev'; document.getElementById('nodeName').value='React/Java'; document.getElementById('edit-node-modal').style.display='block'; window.show3DMessage('Frontend Team', 'Frontend focused on UI/UX');");
+        tech.addChild("Backend Dev", "Spring/Java", "document.getElementById('nodeTitle').value='Backend Dev'; document.getElementById('nodeName').value='Spring/Java'; document.getElementById('edit-node-modal').style.display='block'; window.show3DMessage('Backend Team', 'Backend focused on APIs and Logic');");
         
         Organigram.OrgNode ops = org.getRoot().addChild("COO", "Operations");
-        ops.addChild("HR", "Recruitment", "alert('Managing company culture and hiring')");
+        ops.addChild("HR", "Recruitment", "document.getElementById('nodeTitle').value='HR'; document.getElementById('nodeName').value='Recruitment'; document.getElementById('edit-node-modal').style.display='block'; window.show3DMessage('Human Resources', 'Managing company culture and hiring');");
         
         container.add(org);
+        
+        Button addNodeBtn = new Button("⚡ Add Node");
+        addNodeBtn.addClass("j-btn-primary");
+        addNodeBtn.setProperty("onclick", "document.getElementById('nodeTitle').value=''; document.getElementById('nodeName').value=''; document.getElementById('edit-node-modal').style.display='block'");
+        
+        container.add(new Div().setStyle("margin-top", "20px").add(addNodeBtn));
+
+        // Edit Node Modal
+        Modal editModal = new Modal("edit-node-modal");
+        editModal.setStyle("display", "none").setStyle("background", "var(--jettra-glass)")
+                 .setStyle("backdrop-filter", "blur(10px)")
+                 .setStyle("padding", "20px").setStyle("border-radius", "8px")
+                 .setStyle("width", "90%").setStyle("max-width", "400px")
+                 .setStyle("border", "1px solid var(--jettra-border)");
+                 
+        editModal.add(new Header(3, "Add / Edit Node").setStyle("color", "var(--jettra-accent)").setStyle("margin-top", "0"));
+        
+        Div formLayout = new Div();
+        formLayout.setStyle("display", "flex").setStyle("flex-direction", "column").setStyle("gap", "15px");
+        
+        TextBox titleBox = new TextBox("nodeTitle", "Title / Role");
+        titleBox.setProperty("id", "nodeTitle");
+        formLayout.add(titleBox);
+        
+        TextBox nameBox = new TextBox("nodeName", "Person Name");
+        nameBox.setProperty("id", "nodeName");
+        formLayout.add(nameBox);
+        
+        SelectOne parentSelect = new SelectOne("parentNode");
+        parentSelect.addOption("CEO", "CEO");
+        parentSelect.addOption("CTO", "CTO");
+        parentSelect.addOption("COO", "COO");
+        formLayout.add(parentSelect);
+        
+        editModal.add(formLayout);
+        
+        Div editActions = new Div();
+        editActions.setStyle("display", "flex").setStyle("justify-content", "flex-end").setStyle("gap", "10px").setStyle("margin-top", "20px");
+        
+        Button cancelEditBtn = new Button("Cancel");
+        cancelEditBtn.addClass("j-btn");
+        cancelEditBtn.setProperty("onclick", "document.getElementById('edit-node-modal').style.display='none'");
+        
+        Button saveEditBtn = new Button("Save Node");
+        saveEditBtn.addClass("j-btn-primary");
+        saveEditBtn.setProperty("onclick", "document.getElementById('edit-node-modal').style.display='none'; window.show3DMessage('Node Saved', 'Node added securely to Organigram.');");
+        
+        editActions.add(cancelEditBtn).add(saveEditBtn);
+        editModal.add(editActions);
+        
+        container.add(editModal);
         
         center.add(container);
     }

@@ -2,7 +2,6 @@ package com.jettra.example.pages;
 
 import com.jettra.server.JettraServer;
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import io.jettra.wui.complex.Center;
 import io.jettra.wui.complex.Dashboard;
 import io.jettra.wui.complex.Footer;
@@ -14,7 +13,6 @@ import io.jettra.wui.components.SelectOneIcon;
 import io.jettra.wui.core.Page;
 import io.jettra.wui.core.UIComponent;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public abstract class DashboardBasePage extends Page {
@@ -36,8 +34,8 @@ public abstract class DashboardBasePage extends Page {
         if ("Guest".equals(loggedUser) || loggedUser.isEmpty()) {
             try {
                 redirect(currentExchange, JettraServer.resolvePath("/"));
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                // Ignore
             }
             return;
         }
@@ -337,7 +335,7 @@ public abstract class DashboardBasePage extends Page {
     }
 
     private void appendMenuItem(StringBuilder html, String text, String path, String icon, String menuClass, String hoverEvents) {
-        html.append("<div style='").append(menuClass).append("' ").append(hoverEvents).append(" onclick='window.location.href=\"" + JettraServer.resolvePath(path) + "\"'>")
+        html.append("<div style='").append(menuClass).append("' ").append(hoverEvents).append(" onclick='window.location.href=\"").append(JettraServer.resolvePath(path)).append("\"'>")
             .append("<div style='margin-right:10px;'>").append(icon).append("</div>")
             .append("<span>").append(text).append("</span></div>");
     }
@@ -350,6 +348,34 @@ public abstract class DashboardBasePage extends Page {
         String timeoutValue = com.jettra.server.config.JettraConfig.getProperty("server.session.timeout");
         int timeoutMinutes = (timeoutValue != null && !timeoutValue.isBlank()) ? Integer.parseInt(timeoutValue.trim()) : 0;
         add(new io.jettra.wui.components.SessionTimeoutDialog(timeoutMinutes, 60));
+
+        // Add Global 3D Message Dialog
+        Div globalModal = new Div();
+        globalModal.setProperty("id", "global-3d-message-modal");
+        globalModal.setStyle("display", "none")
+                   .setStyle("position", "fixed")
+                   .setStyle("z-index", "10000")
+                   .setStyle("left", "0")
+                   .setStyle("top", "0")
+                   .setStyle("width", "100%")
+                   .setStyle("height", "100%")
+                   .setStyle("background-color", "rgba(0,0,0,0.5)")
+                   .setStyle("backdrop-filter", "blur(10px)");
+        
+        String modalHtml = "<div style='position:absolute; top:50%; left:50%; transform:translate(-50%, -50%) perspective(1000px) rotateX(10deg); background:linear-gradient(145deg, var(--jettra-surface), rgba(0,0,0,0.8)); border:1px solid var(--jettra-accent); padding:20px; border-radius:10px; min-width:300px; box-shadow:0 20px 50px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1); color:#fff;'>" +
+                           "<h3 id='global-3d-title' style='margin-top:0; color:var(--jettra-accent);text-shadow:0 2px 4px rgba(0,0,0,0.5);'>Message</h3>" +
+                           "<p id='global-3d-body' style='margin-bottom:20px;'></p>" +
+                           "<div style='text-align:right;'><button class='j-btn' style='background:rgba(255,255,255,0.1); border:1px solid var(--jettra-accent); color:var(--jettra-accent); padding:5px 15px;' onclick='document.getElementById(\"global-3d-message-modal\").style.display=\"none\"'>Aceptar</button></div>" +
+                           "</div>" +
+                           "<script>" +
+                           " window.show3DMessage = function(title, body) {" +
+                           "   document.getElementById('global-3d-title').innerText = title;" +
+                           "   document.getElementById('global-3d-body').innerText = body;" +
+                           "   document.getElementById('global-3d-message-modal').style.display = 'block';" +
+                           " };" +
+                           "</script>";
+        globalModal.setContent(modalHtml);
+        add(globalModal);
     }
 
     protected abstract void initCenter(Center center, String username);

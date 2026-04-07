@@ -51,7 +51,7 @@ public class MapPage extends DashboardBasePage {
                           "locationMap.setEnableSearch(true);\\n" +
                           "locationMap.addWaypoint(40.7308, -73.9973, \"Park\");\\n" +
                           "locationMap.addRoute(40.7128, -74.0060, 40.7308, -73.9973);\\n" +
-                          "locationMap.setOnMapClick(\"console.log(lat, lng);\");";
+                          "locationMap.setOnMapClick(\"window.show3DMessage('Map Interaction', 'Coords: '+lat+', '+lng);\");";
                           
         io.jettra.wui.core.UIComponent pre = new io.jettra.wui.core.UIComponent("pre") {};
         pre.setStyle("margin", "0");
@@ -95,7 +95,7 @@ public class MapPage extends DashboardBasePage {
         locationMap.setEnableSearch(true);
         locationMap.addWaypoint(40.7308, -73.9973, "Washington Square Park");
         locationMap.addRoute(40.7128, -74.0060, 40.7308, -73.9973);
-        locationMap.setOnMapClick("alert('Map clicked! Lat: ' + lat + ', Lng: ' + lng);");
+        locationMap.setOnMapClick("window.show3DMessage('Map Interaction', 'Map clicked! Lat: ' + lat + ', Lng: ' + lng);");
         
         container.add(locationMap);
         

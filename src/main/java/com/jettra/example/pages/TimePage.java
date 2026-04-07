@@ -46,7 +46,8 @@ public class TimePage extends DashboardBasePage {
                      .setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
         
         String javaCode = "Time tp = new Time(\"startTime\", \"Start Time\");\\n" +
-                          "tp.setMin(\"08:00\").setMax(\"17:00\");";
+                          "tp.setType(\"time\").setFormat(\"HH:mm\");\\n" +
+                          "tp.setEditable(true).setMin(\"08:00\").setMax(\"17:00\");";
                           
         io.jettra.wui.core.UIComponent pre = new io.jettra.wui.core.UIComponent("pre") {};
         pre.setStyle("margin", "0");
@@ -86,7 +87,11 @@ public class TimePage extends DashboardBasePage {
         block.setStyle("display", "flex").setStyle("gap", "20px");
         
         Time tp = new Time("meetingTime", "Meeting Time");
-        tp.setValue("10:30");
+        tp.setType("time");
+        tp.setFormat("HH:mm:ss");
+        tp.setEditable(true);
+        tp.setValue("10:30:00");
+        tp.setOnChange("window.show3DMessage('Selected Time', 'You selected: ' + this.value)");
         
         block.add(tp);
         container.add(block);

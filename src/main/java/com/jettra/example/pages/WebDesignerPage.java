@@ -848,6 +848,44 @@ public class WebDesignerPage extends DashboardBasePage {
 
                 if (type === 'ScheduleControl') {
                     html += `
+                        <div class="inspector-row">
+                            <span class="inspector-label">Initial View</span>
+                            <select class="inspector-input" onchange="updateProp('view', this.value)">
+                                <option value="day" ${props.view === 'day' ? 'selected' : ''}>Day</option>
+                                <option value="week" ${props.view === 'week' ? 'selected' : ''}>Week</option>
+                                <option value="month" ${props.view === 'month' ? 'selected' : ''}>Month</option>
+                            </select>
+                        </div>
+                    `;
+                }
+
+                if (type === 'Map') {
+                    html += `
+                        <div class="inspector-row">
+                            <span class="inspector-label">Center Lat</span>
+                            <input type="number" step="any" class="inspector-input" value="${props.lat || 0}" onchange="updateProp('lat', this.value)">
+                        </div>
+                        <div class="inspector-row">
+                            <span class="inspector-label">Center Lng</span>
+                            <input type="number" step="any" class="inspector-input" value="${props.lng || 0}" onchange="updateProp('lng', this.value)">
+                        </div>
+                        <div class="inspector-row">
+                            <span class="inspector-label">Zoom</span>
+                            <input type="number" class="inspector-input" value="${props.zoom || 13}" onchange="updateProp('zoom', this.value)">
+                        </div>
+                        <div class="inspector-row">
+                            <span class="inspector-label">Marker Title</span>
+                            <input type="text" class="inspector-input" value="${props.markerTitle || 'Location'}" onchange="updateProp('markerTitle', this.value)">
+                        </div>
+                        <div class="inspector-row">
+                            <span class="inspector-label">Enable Search</span>
+                            <select class="inspector-input" onchange="updateProp('enableSearch', this.value === 'true')">
+                                <option value="false" ${!props.enableSearch ? 'selected' : ''}>False</option>
+                                <option value="true" ${props.enableSearch ? 'selected' : ''}>True</option>
+                            </select>
+                        </div>
+                    `;
+                }
                         <div class="inspector-row" style="display:flex; justify-content:space-between; align-items:center;">
                             <span class="inspector-label">Show Remaining Time</span>
                             <input type="checkbox" ${props.showTimeRemaining ? 'checked' : ''} onchange="updateProp('showTimeRemaining', this.checked)">
@@ -1684,7 +1722,9 @@ public class WebDesignerPage extends DashboardBasePage {
                                 break;
                             case 'Map':
                                 out += `        Map ${v} = new Map("${v}");\\n`;
-                                out += `        ${v}.setCenter(0.0, 0.0, 13);\\n`;
+                                out += `        ${v}.setCenter(${props.lat || 0.0}, ${props.lng || 0.0}, ${props.zoom || 13});\\n`;
+                                if (props.markerTitle) out += `        ${v}.setMarker("${props.markerTitle}");\\n`;
+                                if (props.enableSearch) out += `        ${v}.setEnableSearch(true);\\n`;
                                 out += handleCommon(v);
                                 out += handleEvents(v);
                                 out += `        ${container}.add(${v});\\n`;
