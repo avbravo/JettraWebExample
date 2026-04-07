@@ -46,7 +46,7 @@ public class TimePage extends DashboardBasePage {
                      .setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
         
         String javaCode = "Time tp = new Time(\"startTime\", \"Start Time\");\\n" +
-                          "tp.setType(\"time\").setFormat(\"HH:mm\");\\n" +
+                          "tp.setType(\"time\").setMilitaryFormat(true);\\n" +
                           "tp.setEditable(true).setMin(\"08:00\").setMax(\"17:00\");";
                           
         io.jettra.wui.core.UIComponent pre = new io.jettra.wui.core.UIComponent("pre") {};
@@ -77,24 +77,36 @@ public class TimePage extends DashboardBasePage {
         
         container.add(codeModal);
         
-        Paragraph p = new Paragraph("The Time component leverages native time picker UI from the underlying browser.");
+        Paragraph p = new Paragraph("The Time component leverages native time picker UI. You can configure format representations.");
         container.add(p);
         container.add(new Divide());
 
         container.add(new Header(3, "Demo"));
         
+        Div layout = new Div();
+        layout.setStyle("display", "flex").setStyle("flex-direction", "column").setStyle("gap", "20px");
+        
         Div block = new Div();
-        block.setStyle("display", "flex").setStyle("gap", "20px");
+        block.setStyle("display", "flex").setStyle("gap", "20px").setStyle("align-items", "center");
         
         Time tp = new Time("meetingTime", "Meeting Time");
         tp.setType("time");
-        tp.setFormat("HH:mm:ss");
+        tp.setMilitaryFormat(true);
         tp.setEditable(true);
-        tp.setValue("10:30:00");
+        tp.setValue("10:30");
+        tp.setProperty("onclick", "this.showPicker()");
         tp.setOnChange("window.show3DMessage('Selected Time', 'You selected: ' + this.value)");
         
-        block.add(tp);
-        container.add(block);
+        SelectOne formatSelect = new SelectOne("formatSel");
+        formatSelect.addOption("Format: Time 24h (Military)", "time-24h");
+        formatSelect.addOption("Format: Time 12h (AM/PM)", "time-12h");
+        formatSelect.addOption("Format: Date + Time", "datetime-local");
+        formatSelect.setProperty("onchange", "var e = document.getElementById('meetingTime'); if(this.value === 'datetime-local') { e.setAttribute('type', 'datetime-local'); } else { e.setAttribute('type', 'time'); e.setAttribute('lang', this.value === 'time-24h' ? 'en-GB' : 'en-US'); } window.show3DMessage('Format Changed', 'Changed picker format to ' + this.value);");
+        
+        block.add(tp).add(formatSelect);
+        layout.add(block);
+        
+        container.add(layout);
         
         center.add(container);
     }

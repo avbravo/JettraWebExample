@@ -46,7 +46,7 @@ public class DatePickerPage extends DashboardBasePage {
                      .setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
         
         String javaCode = "DatePicker fp = new DatePicker(\"startDate\", \"Start Date\");\\n" +
-                          "fp.setType(\"datetime-local\").setFormat(\"yyyy-MM-dd HH:mm\");\\n" +
+                          "fp.setType(\"datetime-local\");\\n" +
                           "fp.setEditable(true).setMin(\"2026-01-01\").setMax(\"2026-12-31\");";
                           
         io.jettra.wui.core.UIComponent pre = new io.jettra.wui.core.UIComponent("pre") {};
@@ -83,18 +83,30 @@ public class DatePickerPage extends DashboardBasePage {
 
         container.add(new Header(3, "Demo"));
         
+        Div layout = new Div();
+        layout.setStyle("display", "flex").setStyle("flex-direction", "column").setStyle("gap", "20px");
+        
         Div block = new Div();
-        block.setStyle("display", "flex").setStyle("gap", "20px");
+        block.setStyle("display", "flex").setStyle("gap", "20px").setStyle("align-items", "center");
         
         DatePicker dp = new DatePicker("dob", "Date of Birth");
         dp.setType("datetime-local");
         dp.setFormat("yyyy-MM-dd HH:mm");
         dp.setEditable(true);
         dp.setValue("2026-04-06T10:30");
+        dp.setProperty("onclick", "this.showPicker()");
         dp.setOnChange("window.show3DMessage('Selected Date', 'You selected: ' + this.value)");
         
-        block.add(dp);
-        container.add(block);
+        SelectOne formatSelect = new SelectOne("dtFormatSel");
+        formatSelect.addOption("Format: datetime-local", "datetime-local");
+        formatSelect.addOption("Format: date", "date");
+        formatSelect.addOption("Format: month", "month");
+        formatSelect.setProperty("onchange", "document.getElementById('dob').setAttribute('type', this.value); window.show3DMessage('Format Changed', 'Switched DatePicker to ' + this.value + ' format.');");
+        
+        block.add(dp).add(formatSelect);
+        layout.add(block);
+        
+        container.add(layout);
         
         center.add(container);
     }

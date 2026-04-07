@@ -362,10 +362,33 @@ public abstract class DashboardBasePage extends Page {
                    .setStyle("background-color", "rgba(0,0,0,0.5)")
                    .setStyle("backdrop-filter", "blur(10px)");
         
-        String modalHtml = "<div style='position:absolute; top:50%; left:50%; transform:translate(-50%, -50%) perspective(1000px) rotateX(10deg); background:linear-gradient(145deg, var(--jettra-surface), rgba(0,0,0,0.8)); border:1px solid var(--jettra-accent); padding:20px; border-radius:10px; min-width:300px; box-shadow:0 20px 50px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1); color:#fff;'>" +
-                           "<h3 id='global-3d-title' style='margin-top:0; color:var(--jettra-accent);text-shadow:0 2px 4px rgba(0,0,0,0.5);'>Message</h3>" +
-                           "<p id='global-3d-body' style='margin-bottom:20px;'></p>" +
-                           "<div style='text-align:right;'><button class='j-btn' style='background:rgba(255,255,255,0.1); border:1px solid var(--jettra-accent); color:var(--jettra-accent); padding:5px 15px;' onclick='document.getElementById(\"global-3d-message-modal\").style.display=\"none\"'>Aceptar</button></div>" +
+        String modalHtml = "<style>" +
+                           "  @keyframes dashModalAppear {" +
+                           "    from { opacity:0; transform:translate(-50%,-30%) scale(0.8) rotateX(-25deg); }" +
+                           "    to { opacity:1; transform:translate(-50%,-50%) scale(1) rotateX(0); }" +
+                           "  }" +
+                           "  .dash-modal-3d {" +
+                           "    transform-style: preserve-3d;" +
+                           "    perspective: 2000px;" +
+                           "    animation: dashModalAppear 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);" +
+                           "    background: linear-gradient(135deg, rgba(30,50,80,0.98), rgba(15,25,45,1));" +
+                           "    backdrop-filter: blur(25px);" +
+                           "    border: 1px solid rgba(0,255,255,0.5);" +
+                           "    border-radius: 20px;" +
+                           "    box-shadow: 0 40px 100px -20px rgba(0,0,0,0.8), inset 0 2px 2px 0 rgba(255,255,255,0.2), 0 0 30px rgba(0,255,255,0.3);" +
+                           "  }" +
+                           "  .dash-btn-3d {" +
+                           "    background: linear-gradient(135deg, var(--jettra-accent), #0891b2);" +
+                           "    color: #000; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer;" +
+                           "    box-shadow: 0 4px 0 #044e5e, 0 8px 15px rgba(0,0,0,0.4);" +
+                           "    transform: translateZ(20px); transition: all 0.1s;" +
+                           "  }" +
+                           "  .dash-btn-3d:active { box-shadow: 0 2px 0 #044e5e, 0 4px 8px rgba(0,0,0,0.4); transform: translateY(2px) translateZ(10px); }" +
+                           "</style>" +
+                           "<div class='dash-modal-3d' style='position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); padding:30px; min-width:350px; color:#fff; text-align:center;'>" +
+                           "<h3 id='global-3d-title' style='margin-top:0; color:var(--jettra-accent); text-shadow:0 0 15px rgba(0,255,255,0.6); font-weight:800; transform:translateZ(30px);'>Message</h3>" +
+                           "<p id='global-3d-body' style='margin-bottom:30px; font-size:16px; color:#cbd5e1; transform:translateZ(20px);'></p>" +
+                           "<div style='text-align:center;'><button class='dash-btn-3d' onclick='document.getElementById(\"global-3d-message-modal\").style.display=\"none\"'>Aceptar</button></div>" +
                            "</div>" +
                            "<script>" +
                            " window.show3DMessage = function(title, body) {" +

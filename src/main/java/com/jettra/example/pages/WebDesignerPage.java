@@ -637,7 +637,7 @@ public class WebDesignerPage extends DashboardBasePage {
                     case 'TreeItem': content = '<div class="canvas-container" style="padding-left:15px; border-left:1px dashed rgba(0,255,255,0.2); min-height:30px; margin-top:5px; position:relative;"><span style="position:absolute; left:-10px; top:5px; font-size:10px; color:var(--jettra-accent);">▶</span><span style="display:inline-block; margin-bottom:5px; color:#fff;">Tree Node</span></div>'; break;
                     case 'Div': content = '<div class="canvas-container" style="border:1px dashed rgba(255,255,255,0.2); min-height:50px; padding:10px; border-radius:4px; position:relative;"><span style="position:absolute;top:2px;left:5px;font-size:9px;color:rgba(255,255,255,0.3)">Div Container</span></div>'; break;
                     case 'LayoutDisplay': content = '<div class="canvas-container" style="border:2px solid rgba(0,255,255,0.2); min-height:100px; padding:15px; border-radius:8px; position:relative;"><span style="position:absolute;top:5px;left:10px;font-size:10px;color:rgba(0,255,255,0.5);font-weight:bold;">LayoutDisplay</span></div>'; break;
-                    case 'DatePicker': content = '<div style="display:flex; flex-direction:column; gap:5px;"><label style="font-weight:500; font-size:0.9rem;">Date Selection</label><input type="date" class="j-input" onfocus="this.blur()"/></div>'; break;
+                    case 'DatePicker': content = '<div style="display:flex; flex-direction:column; gap:5px;"><label style="font-weight:500; font-size:0.9rem;">Date Selection</label><input type="datetime-local" class="j-input" onfocus="this.blur()"/></div>'; break;
                     case 'Time': content = '<div style="display:flex; flex-direction:column; gap:5px;"><label style="font-weight:500; font-size:0.9rem;">Time Selection</label><input type="time" class="j-input" onfocus="this.blur()"/></div>'; break;
                     case 'Map': content = '<div style="width:100%; height:200px; background:rgba(0,255,0,0.1); border:1px dashed #0f0; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#0f0;"><span>🗺️ Leaflet Map Area</span></div>'; break;
                     case 'Calendar': content = '<div style="width:100%; min-height:150px; background:rgba(0,0,0,0.3); border:1px solid var(--jettra-border); border-radius:8px; padding:10px;"><div style="text-align:center; color:var(--jettra-accent); margin-bottom:5px;">[Month Calendar Placeholder]</div><div style="display:grid; grid-template-columns:repeat(7, 1fr); gap:2px; opacity:0.5;"><div style="background:#222;height:20px;"></div><div style="background:#222;height:20px;"></div><div style="background:#222;height:20px;"></div><div style="background:#222;height:20px;"></div><div style="background:#222;height:20px;"></div><div style="background:#222;height:20px;"></div><div style="background:#222;height:20px;"></div></div></div>'; break;
@@ -795,6 +795,34 @@ public class WebDesignerPage extends DashboardBasePage {
                     `;
                 }
 
+                if (type === 'Map') {
+                    html += `
+                        <div class="inspector-row">
+                            <span class="inspector-label">Initial Latitude (lat)</span>
+                            <input type="number" step="0.0001" class="inspector-input" value="${props.lat || 40.7128}" placeholder="e.g. 40.7128" onchange="updateProp('lat', this.value)">
+                        </div>
+                        <div class="inspector-row">
+                            <span class="inspector-label">Initial Longitude (lng)</span>
+                            <input type="number" step="0.0001" class="inspector-input" value="${props.lng || -74.0060}" placeholder="e.g. -74.0060" onchange="updateProp('lng', this.value)">
+                        </div>
+                        <div class="inspector-row">
+                            <span class="inspector-label">Zoom Level</span>
+                            <input type="number" class="inspector-input" value="${props.zoom || 13}" min="1" max="25" onchange="updateProp('zoom', this.value)">
+                        </div>
+                        <div class="inspector-row">
+                            <span class="inspector-label">Marker Title</span>
+                            <input type="text" class="inspector-input" value="${props.marker || ''}" placeholder="Main Location" onchange="updateProp('marker', this.value)">
+                        </div>
+                        <div class="inspector-row">
+                            <span class="inspector-label">Enable Search</span>
+                            <select class="inspector-input" onchange="updateProp('enableSearch', this.value === 'true')">
+                                <option value="false" ${props.enableSearch ? '' : 'selected'}>False</option>
+                                <option value="true" ${props.enableSearch ? 'selected' : ''}>True</option>
+                            </select>
+                        </div>
+                    `;
+                }
+
                 if (type === 'Spinner') {
                     html += `
                         <div class="inspector-row">
@@ -859,33 +887,8 @@ public class WebDesignerPage extends DashboardBasePage {
                     `;
                 }
 
-                if (type === 'Map') {
+                if (type === 'Clock') {
                     html += `
-                        <div class="inspector-row">
-                            <span class="inspector-label">Center Lat</span>
-                            <input type="number" step="any" class="inspector-input" value="${props.lat || 0}" onchange="updateProp('lat', this.value)">
-                        </div>
-                        <div class="inspector-row">
-                            <span class="inspector-label">Center Lng</span>
-                            <input type="number" step="any" class="inspector-input" value="${props.lng || 0}" onchange="updateProp('lng', this.value)">
-                        </div>
-                        <div class="inspector-row">
-                            <span class="inspector-label">Zoom</span>
-                            <input type="number" class="inspector-input" value="${props.zoom || 13}" onchange="updateProp('zoom', this.value)">
-                        </div>
-                        <div class="inspector-row">
-                            <span class="inspector-label">Marker Title</span>
-                            <input type="text" class="inspector-input" value="${props.markerTitle || 'Location'}" onchange="updateProp('markerTitle', this.value)">
-                        </div>
-                        <div class="inspector-row">
-                            <span class="inspector-label">Enable Search</span>
-                            <select class="inspector-input" onchange="updateProp('enableSearch', this.value === 'true')">
-                                <option value="false" ${!props.enableSearch ? 'selected' : ''}>False</option>
-                                <option value="true" ${props.enableSearch ? 'selected' : ''}>True</option>
-                            </select>
-                        </div>
-                    `;
-                }
                         <div class="inspector-row" style="display:flex; justify-content:space-between; align-items:center;">
                             <span class="inspector-label">Show Remaining Time</span>
                             <input type="checkbox" ${props.showTimeRemaining ? 'checked' : ''} onchange="updateProp('showTimeRemaining', this.checked)">

@@ -104,17 +104,17 @@ public class OrganigramPage extends DashboardBasePage {
         container.add(new Div().setStyle("margin-top", "20px").add(addNodeBtn));
 
         // Edit Node Modal
+        // Edit Node Modal
         Modal editModal = new Modal("edit-node-modal");
-        editModal.setStyle("display", "none").setStyle("background", "var(--jettra-glass)")
-                 .setStyle("backdrop-filter", "blur(10px)")
-                 .setStyle("padding", "20px").setStyle("border-radius", "8px")
-                 .setStyle("width", "90%").setStyle("max-width", "400px")
-                 .setStyle("border", "1px solid var(--jettra-border)");
+        editModal.addClass("dash-modal-3d");
+        editModal.setStyle("display", "none").setStyle("padding", "30px")
+                 .setStyle("width", "90%").setStyle("max-width", "450px")
+                 .setStyle("position", "absolute").setStyle("top", "50%").setStyle("left", "50%").setStyle("transform", "translate(-50%, -50%)");
                  
-        editModal.add(new Header(3, "Add / Edit Node").setStyle("color", "var(--jettra-accent)").setStyle("margin-top", "0"));
+        editModal.add(new Header(3, "Add / Edit Node").setStyle("color", "var(--jettra-accent)").setStyle("margin-top", "0").setStyle("transform", "translateZ(30px)").setStyle("font-weight", "800"));
         
         Div formLayout = new Div();
-        formLayout.setStyle("display", "flex").setStyle("flex-direction", "column").setStyle("gap", "15px");
+        formLayout.setStyle("display", "flex").setStyle("flex-direction", "column").setStyle("gap", "15px").setStyle("transform", "translateZ(20px)");
         
         TextBox titleBox = new TextBox("nodeTitle", "Title / Role");
         titleBox.setProperty("id", "nodeTitle");
@@ -133,15 +133,21 @@ public class OrganigramPage extends DashboardBasePage {
         editModal.add(formLayout);
         
         Div editActions = new Div();
-        editActions.setStyle("display", "flex").setStyle("justify-content", "flex-end").setStyle("gap", "10px").setStyle("margin-top", "20px");
+        editActions.setStyle("display", "flex").setStyle("justify-content", "flex-end").setStyle("gap", "10px").setStyle("margin-top", "20px").setStyle("transform", "translateZ(30px)");
         
         Button cancelEditBtn = new Button("Cancel");
         cancelEditBtn.addClass("j-btn");
+        cancelEditBtn.setStyle("background", "rgba(255,255,255,0.1)").setStyle("border", "1px solid var(--jettra-border)");
         cancelEditBtn.setProperty("onclick", "document.getElementById('edit-node-modal').style.display='none'");
         
         Button saveEditBtn = new Button("Save Node");
-        saveEditBtn.addClass("j-btn-primary");
-        saveEditBtn.setProperty("onclick", "document.getElementById('edit-node-modal').style.display='none'; window.show3DMessage('Node Saved', 'Node added securely to Organigram.');");
+        saveEditBtn.addClass("dash-btn-3d");
+        saveEditBtn.setProperty("onclick", "document.getElementById('edit-node-modal').style.display='none'; "
+            + "var t=document.getElementById('nodeTitle').value; "
+            + "var n=document.createElement('div'); n.style='display:inline-block;padding:10px;border:1px solid var(--jettra-border);border-radius:6px;opacity:0.8;margin-top:10px;margin-left:10px;'; n.innerText=t; "
+            + "var o=document.querySelector('.j-organigram') || document.body; "
+            + "if(o) o.appendChild(n); "
+            + "window.show3DMessage('Node Saved', 'Node \\''+t+'\\' added securely to Organigram.');");
         
         editActions.add(cancelEditBtn).add(saveEditBtn);
         editModal.add(editActions);

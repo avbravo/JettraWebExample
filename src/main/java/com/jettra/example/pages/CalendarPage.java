@@ -87,6 +87,56 @@ public class CalendarPage extends DashboardBasePage {
         
         container.add(mp);
         
+        Button addEventBtn = new Button("⚡ Add Event");
+        addEventBtn.addClass("dash-btn-3d");
+        addEventBtn.setProperty("onclick", "document.getElementById('edit-cal-event-modal').style.display='block'");
+        
+        container.add(new Div().setStyle("margin-top", "20px").add(addEventBtn));
+
+        // Add Event Modal (3D)
+        Modal editModal = new Modal("edit-cal-event-modal");
+        editModal.addClass("dash-modal-3d");
+        editModal.setStyle("display", "none").setStyle("padding", "30px")
+                 .setStyle("width", "90%").setStyle("max-width", "450px")
+                 .setStyle("position", "absolute").setStyle("top", "50%").setStyle("left", "50%").setStyle("transform", "translate(-50%, -50%)");
+                 
+        editModal.add(new Header(3, "Add Event").setStyle("color", "var(--jettra-accent)").setStyle("margin-top", "0").setStyle("transform", "translateZ(30px)").setStyle("font-weight", "800"));
+        
+        Div formLayout = new Div();
+        formLayout.setStyle("display", "flex").setStyle("flex-direction", "column").setStyle("gap", "15px").setStyle("transform", "translateZ(20px)");
+        
+        TextBox titleBox = new TextBox("calEventTitle", "Event Title");
+        titleBox.setProperty("id", "calEventTitle");
+        formLayout.add(titleBox);
+        
+        DatePicker dp = new DatePicker("calEventDate", "Date");
+        dp.setType("date");
+        formLayout.add(dp);
+        
+        editModal.add(formLayout);
+        
+        Div editActions = new Div();
+        editActions.setStyle("display", "flex").setStyle("justify-content", "flex-end").setStyle("gap", "10px").setStyle("margin-top", "20px").setStyle("transform", "translateZ(30px)");
+        
+        Button cancelEditBtn = new Button("Cancel");
+        cancelEditBtn.addClass("j-btn");
+        cancelEditBtn.setStyle("background", "rgba(255,255,255,0.1)").setStyle("border", "1px solid var(--jettra-border)");
+        cancelEditBtn.setProperty("onclick", "document.getElementById('edit-cal-event-modal').style.display='none'");
+        
+        Button saveEditBtn = new Button("Save Event");
+        saveEditBtn.addClass("dash-btn-3d");
+        saveEditBtn.setProperty("onclick", "document.getElementById('edit-cal-event-modal').style.display='none'; "
+            + "var t=document.getElementById('calEventTitle').value; "
+            + "var d=document.createElement('div'); d.style='background:var(--jettra-accent);color:#000;font-size:10px;padding:2px;margin-top:2px;border-radius:2px;'; d.innerText=t; "
+            + "var cells=document.querySelectorAll('.calendar-day'); "
+            + "if(cells.length > 0) { cells[Math.floor(Math.random()*cells.length)].appendChild(d); } "
+            + "window.show3DMessage('Calendar Event', 'Event \\''+t+'\\' added to the calendar successfully!');");
+        
+        editActions.add(cancelEditBtn).add(saveEditBtn);
+        editModal.add(editActions);
+        
+        container.add(editModal);
+        
         center.add(container);
     }
 }
