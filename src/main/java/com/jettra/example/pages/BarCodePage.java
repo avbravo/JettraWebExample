@@ -90,9 +90,7 @@ public class BarCodePage extends DashboardBasePage {
         
         BarCode bc = new BarCode("product_barcode");
         bc.setText("9876543210");
-        bc.setFormat("CODE128"); 
-        bc.setLineColor("var(--jettra-accent)");
-        bc.setBackground("transparent");
+        bc.setLineColor("#00ffff");
         bc.setDisplayValue(true);
         
         container.add(bc);
