@@ -275,12 +275,12 @@ public abstract class DashboardBasePage extends Page {
         String compIcon = "<svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' style='opacity:0.7;'><path d='M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z'></path></svg>";
         
         addCategory(menuHtml, txtTypo, new String[]{"Header", "Paragraph", "Span", "Label", "Separator", "Icon", "Typography"}, menuClass, hoverEvents, categoryStyle, compIcon);
-        addCategory(menuHtml, txtForms, new String[]{"Button", "CheckBox", "CheckBoxGroup", "Form", "Forms", "RadioButton", "RadioGroupButton", "ScheduleControl", "SelectOne", "SelectOneIcon", "Spinner", "TextBox", "TextArea", "ToggleSwitch"}, menuClass, hoverEvents, categoryStyle, compIcon);
+        addCategory(menuHtml, txtForms, new String[]{"Button", "Catcha", "CheckBox", "CheckBoxGroup", "Form", "Forms", "OTPValidator", "RadioButton", "RadioGroupButton", "ScheduleControl", "SelectOne", "SelectOneIcon", "Spinner", "TextBox", "TextArea", "ToggleSwitch"}, menuClass, hoverEvents, categoryStyle, compIcon);
         addCategory(menuHtml, txtDate, new String[]{"Calendar", "DatePicker", "Organigram", "Schedule", "Time", "Timeline"}, menuClass, hoverEvents, categoryStyle, compIcon);
         addCategory(menuHtml, txtNav, new String[]{"Link", "Menu", "MenuBar", "Navigation"}, menuClass, hoverEvents, categoryStyle, compIcon);
         addCategory(menuHtml, txtFeed, new String[]{"Alert", "Modal", "Notification", "SessionTimeout", "Feedback"}, menuClass, hoverEvents, categoryStyle, compIcon);
         addCategory(menuHtml, txtLayout, new String[]{"Avatar", "AvatarGroup", "Board", "Carousel", "Clock", "Div", "Divide", "FileUpload", "FolderSelector", "Grid", "Icon", "Image", "LayoutDisplay", "Loading", "LoginAdvanced", "Map", "Panel", "ProgressBar", "Spinner", "Table", "TabView", "Tree"}, menuClass, hoverEvents, categoryStyle, compIcon);
-        addCategory(menuHtml, txtMedia, new String[]{"Downloader", "PDFViewer", "ViewMedia"}, menuClass, hoverEvents, categoryStyle, compIcon);
+        addCategory(menuHtml, txtMedia, new String[]{"BarCode", "Downloader", "PDFViewer", "QR", "ViewMedia"}, menuClass, hoverEvents, categoryStyle, compIcon);
         addCategory(menuHtml, "Charts", new String[]{"ChartsBar", "ChartsDoughnut", "ChartsLine", "ChartsPie", "ChartsRadar"}, menuClass, hoverEvents, categoryStyle, compIcon);
 
         // Logout

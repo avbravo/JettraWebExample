@@ -111,6 +111,10 @@ public class WebExampleMain {
         server.addHandler("/chartsradar", com.jettra.example.pages.ChartsRadarPage.class);
         server.addHandler("/chartsline", com.jettra.example.pages.ChartsLinePage.class);
         server.addHandler("/schedulecontrol", com.jettra.example.pages.ScheduleControlPage.class);
+        server.addHandler("/qr", com.jettra.example.pages.QRPage.class);
+        server.addHandler("/barcode", com.jettra.example.pages.BarCodePage.class);
+        server.addHandler("/otpvalidator", com.jettra.example.pages.OTPValidatorPage.class);
+        server.addHandler("/catcha", com.jettra.example.pages.CatchaPage.class);
 
         server.start();
     }

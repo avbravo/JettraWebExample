@@ -4,10 +4,10 @@ import io.jettra.wui.complex.Center;
 import io.jettra.wui.complex.Modal;
 import io.jettra.wui.components.*;
 
-public class MapPage extends DashboardBasePage {
+public class OTPValidatorPage extends DashboardBasePage {
 
-    public MapPage() {
-        super("Map Component");
+    public OTPValidatorPage() {
+        super("OTPValidator Component Showcase");
     }
 
     @Override
@@ -18,20 +18,20 @@ public class MapPage extends DashboardBasePage {
         Div headerRow = new Div();
         headerRow.setStyle("display", "flex").setStyle("justify-content", "space-between").setStyle("align-items", "center").setStyle("margin-bottom", "15px");
         
-        Header h1 = new Header(1, "Map Component Showcase");
+        Header h1 = new Header(1, "OTPValidator Component Showcase");
         h1.setStyle("margin", "0");
         headerRow.add(h1);
         
         Button codeBtn = new Button("Code");
         codeBtn.addClass("j-btn");
         codeBtn.setStyle("border-color", "var(--jettra-accent)").setStyle("color", "var(--jettra-accent)");
-        codeBtn.setProperty("onclick", "document.getElementById('map-code-modal').style.display = 'block'");
+        codeBtn.setProperty("onclick", "document.getElementById('otp-code-modal').style.display = 'block'");
         headerRow.add(codeBtn);
         
         container.add(headerRow);
         
         // --- Modal Dialog for Java Code ---
-        Modal codeModal = new Modal("map-code-modal");
+        Modal codeModal = new Modal("otp-code-modal");
         codeModal.setStyle("display", "none").setStyle("background", "var(--jettra-glass)")
                  .setStyle("backdrop-filter", "blur(10px)")
                  .setStyle("padding", "20px").setStyle("border-radius", "8px")
@@ -45,19 +45,14 @@ public class MapPage extends DashboardBasePage {
                      .setStyle("border-radius", "4px").setStyle("overflow-x", "auto")
                      .setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
         
-        String javaCode = "Map locationMap = new Map(\"hq_map\");\\n" +
-                          "locationMap.setCenter(40.7128, -74.0060, 13);\\n" +
-                          "locationMap.setMarker(\"Our Headquarters\");\\n" +
-                          "locationMap.setEnableSearch(true);\\n" +
-                          "locationMap.setEnableRelief(true);\\n" +
-                          "locationMap.addWaypoint(40.7308, -73.9973, \"Park\");\\n" +
-                          "locationMap.addRoute(40.7128, -74.0060, 40.7308, -73.9973);\\n" +
-                          "locationMap.setOnMapClick(\"L.marker([lat, lng]).addTo(window['map_hq_map']); window.show3DMessage('Map Interaction', 'Marker: '+lat+', '+lng);\");";
+        String javaCode = "OTPValidator otp = new OTPValidator(\"login_otp\");\\n" +
+                          "otp.setAmountOfDigits(6);\\n" +
+                          "otp.setOnComplete(\"window.show3DMessage('OTP', 'Token completado: ' + otpStr);\");";
                           
         io.jettra.wui.core.UIComponent pre = new io.jettra.wui.core.UIComponent("pre") {};
         pre.setStyle("margin", "0");
         io.jettra.wui.core.UIComponent codeTag = new io.jettra.wui.core.UIComponent("code") {};
-        codeTag.setProperty("id", "map-java-code");
+        codeTag.setProperty("id", "otp-java-code");
         codeTag.setStyle("color", "#a5d6ff").setStyle("font-family", "monospace").setStyle("font-size", "0.9rem");
         codeTag.setContent(javaCode.replace("<", "&lt;").replace(">", "&gt;").replace("\\n", "\n"));
         
@@ -70,12 +65,12 @@ public class MapPage extends DashboardBasePage {
         
         Button copyBtn = new Button("Copy");
         copyBtn.addClass("j-btn");
-        copyBtn.setProperty("onclick", "navigator.clipboard.writeText(document.getElementById('map-java-code').innerText).then(() => { this.innerText='Copied!'; setTimeout(() => this.innerText='Copy', 2000); })");
+        copyBtn.setProperty("onclick", "navigator.clipboard.writeText(document.getElementById('otp-java-code').innerText).then(() => { this.innerText='Copied!'; setTimeout(() => this.innerText='Copy', 2000); })");
         
         Button closeBtn = new Button("Close");
         closeBtn.addClass("j-btn");
         closeBtn.setStyle("background", "transparent").setStyle("border-color", "var(--jettra-border)");
-        closeBtn.setProperty("onclick", "document.getElementById('map-code-modal').style.display = 'none'");
+        closeBtn.setProperty("onclick", "document.getElementById('otp-code-modal').style.display = 'none'");
         
         modalActions.add(closeBtn).add(copyBtn);
         codeModal.add(modalActions);
@@ -83,23 +78,18 @@ public class MapPage extends DashboardBasePage {
         container.add(codeModal);
         // --- End Modal Dialog ---
         
-        Paragraph p = new Paragraph("The Map component integrates Leaflet.js to render interactive geographic maps natively in JettraWUI.");
+        Paragraph p = new Paragraph("The OTPValidator produces an auto-advancing array of inputs for Multi Factor Auth tokens.");
         container.add(p);
         container.add(new Divide());
 
         // --- Demo ---
         container.add(new Header(3, "Demo"));
         
-        Map locationMap = new Map("hq_map");
-        locationMap.setCenter(40.7128, -74.0060, 13);
-        locationMap.setMarker("Our Headquarters - NY");
-        locationMap.setEnableSearch(true);
-        locationMap.setEnableRelief(true);
-        locationMap.addWaypoint(40.7308, -73.9973, "Washington Square Park");
-        locationMap.addRoute(40.7128, -74.0060, 40.7308, -73.9973);
-        locationMap.setOnMapClick("L.marker([lat, lng]).addTo(window['map_hq_map']); window.show3DMessage('Map Interaction', 'Marker placed at: ' + lat.toFixed(4) + ', ' + lng.toFixed(4));");
+        OTPValidator otp = new OTPValidator("login_otp");
+        otp.setAmountOfDigits(6);
+        otp.setOnComplete("window.show3DMessage('OTP', 'Token introducido correctamente: ' + otpStr);");
         
-        container.add(locationMap);
+        container.add(otp);
         
         center.add(container);
     }

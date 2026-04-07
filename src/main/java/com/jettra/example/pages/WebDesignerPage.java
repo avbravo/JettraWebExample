@@ -820,6 +820,13 @@ public class WebDesignerPage extends DashboardBasePage {
                                 <option value="true" ${props.enableSearch ? 'selected' : ''}>True</option>
                             </select>
                         </div>
+                        <div class="inspector-row">
+                            <span class="inspector-label">Enable Relief</span>
+                            <select class="inspector-input" onchange="updateProp('enableRelief', this.value === 'true')">
+                                <option value="false" ${props.enableRelief ? '' : 'selected'}>False</option>
+                                <option value="true" ${props.enableRelief ? 'selected' : ''}>True</option>
+                            </select>
+                        </div>
                     `;
                 }
 
@@ -884,6 +891,36 @@ public class WebDesignerPage extends DashboardBasePage {
                                 <option value="month" ${props.view === 'month' ? 'selected' : ''}>Month</option>
                             </select>
                         </div>
+                    `;
+                }
+
+                if (type === 'QR') {
+                    html += `
+                        <div class="inspector-row"><span class="inspector-label">Text</span><input type="text" class="inspector-input" value="${props.text || 'https://jettra.io'}" onchange="updateProp('text', this.value)"></div>
+                        <div class="inspector-row"><span class="inspector-label">Width</span><input type="number" class="inspector-input" value="${props.width || 128}" onchange="updateProp('width', this.value)"></div>
+                        <div class="inspector-row"><span class="inspector-label">Height</span><input type="number" class="inspector-input" value="${props.height || 128}" onchange="updateProp('height', this.value)"></div>
+                        <div class="inspector-row"><span class="inspector-label">Dark Color</span><input type="color" class="inspector-input" value="${props.colorDark || '#000000'}" onchange="updateProp('colorDark', this.value)"></div>
+                        <div class="inspector-row"><span class="inspector-label">Light Color</span><input type="color" class="inspector-input" value="${props.colorLight || '#ffffff'}" onchange="updateProp('colorLight', this.value)"></div>
+                    `;
+                }
+
+                if (type === 'BarCode') {
+                    html += `
+                        <div class="inspector-row"><span class="inspector-label">Text</span><input type="text" class="inspector-input" value="${props.text || '123456789012'}" onchange="updateProp('text', this.value)"></div>
+                        <div class="inspector-row"><span class="inspector-label">Format</span><input type="text" class="inspector-input" value="${props.format || 'CODE128'}" onchange="updateProp('format', this.value)"></div>
+                        <div class="inspector-row"><span class="inspector-label">Line Color</span><input type="color" class="inspector-input" value="${props.lineColor || '#000000'}" onchange="updateProp('lineColor', this.value)"></div>
+                    `;
+                }
+
+                if (type === 'OTPValidator') {
+                    html += `
+                        <div class="inspector-row"><span class="inspector-label">Digits</span><input type="number" class="inspector-input" value="${props.amountOfDigits || 6}" onchange="updateProp('amountOfDigits', this.value)"></div>
+                    `;
+                }
+
+                if (type === 'Catcha') {
+                    html += `
+                        <div class="inspector-row"><span class="inspector-label">Images To Validate</span><input type="number" class="inspector-input" value="${props.amountOfImagesToValidate || 3}" onchange="updateProp('amountOfImagesToValidate', this.value)"></div>
                     `;
                 }
 
@@ -1728,6 +1765,41 @@ public class WebDesignerPage extends DashboardBasePage {
                                 out += `        ${v}.setCenter(${props.lat || 0.0}, ${props.lng || 0.0}, ${props.zoom || 13});\\n`;
                                 if (props.markerTitle) out += `        ${v}.setMarker("${props.markerTitle}");\\n`;
                                 if (props.enableSearch) out += `        ${v}.setEnableSearch(true);\\n`;
+                                if (props.enableRelief) out += `        ${v}.setEnableRelief(true);\\n`;
+                                out += handleCommon(v);
+                                out += handleEvents(v);
+                                out += `        ${container}.add(${v});\\n`;
+                                break;
+                            case 'QR':
+                                out += `        QR ${v} = new QR("${v}");\\n`;
+                                if (props.text) out += `        ${v}.setText("${props.text}");\\n`;
+                                if (props.width) out += `        ${v}.setWidth(${props.width});\\n`;
+                                if (props.height) out += `        ${v}.setHeight(${props.height});\\n`;
+                                if (props.colorDark) out += `        ${v}.setColorDark("${props.colorDark}");\\n`;
+                                if (props.colorLight) out += `        ${v}.setColorLight("${props.colorLight}");\\n`;
+                                out += handleCommon(v);
+                                out += handleEvents(v);
+                                out += `        ${container}.add(${v});\\n`;
+                                break;
+                            case 'BarCode':
+                                out += `        BarCode ${v} = new BarCode("${v}");\\n`;
+                                if (props.text) out += `        ${v}.setText("${props.text}");\\n`;
+                                if (props.format) out += `        ${v}.setFormat("${props.format}");\\n`;
+                                if (props.lineColor) out += `        ${v}.setLineColor("${props.lineColor}");\\n`;
+                                out += handleCommon(v);
+                                out += handleEvents(v);
+                                out += `        ${container}.add(${v});\\n`;
+                                break;
+                            case 'OTPValidator':
+                                out += `        OTPValidator ${v} = new OTPValidator("${v}");\\n`;
+                                if (props.amountOfDigits) out += `        ${v}.setAmountOfDigits(${props.amountOfDigits});\\n`;
+                                out += handleCommon(v);
+                                out += handleEvents(v);
+                                out += `        ${container}.add(${v});\\n`;
+                                break;
+                            case 'Catcha':
+                                out += `        Catcha ${v} = new Catcha("${v}");\\n`;
+                                if (props.amountOfImagesToValidate) out += `        ${v}.setAmountOfImagesToValidate(${props.amountOfImagesToValidate});\\n`;
                                 out += handleCommon(v);
                                 out += handleEvents(v);
                                 out += `        ${container}.add(${v});\\n`;
