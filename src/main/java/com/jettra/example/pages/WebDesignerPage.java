@@ -1257,7 +1257,7 @@ public class WebDesignerPage extends DashboardBasePage {
                         if (name.endsWith('Model.java')) cssClass = "file-model";
                         if (name.endsWith('.properties')) cssClass = "file-props";
 
-                        let action = isFile ? `onclick="window.openClass('${name}')" ondblclick="window.loadFileContent('${node._path}')"` : "";
+                        let action = isFile ? `ondblclick="window.openClass('${name}')"` : "";
                         let html = `<div class="project-file ${cssClass}" style="padding-left:${depth * 12}px" ${action}>${isFile ? '📄' : '📂'} ${name}</div>`;
                         for (const child in node._children) {
                             html += renderTree(node._children[child], child, depth + 1);
