@@ -1,5 +1,6 @@
-package com.jettra.example.pages;
+package com.jettra.example.dashboard;
 
+import com.jettra.example.dashboard.DashboardBasePage;
 import io.jettra.wui.complex.Center;
 import io.jettra.wui.components.*;
 import io.jettra.wui.core.UIComponent;

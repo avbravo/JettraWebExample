@@ -1,5 +1,6 @@
 package com.jettra.example.pages;
 
+import com.jettra.example.dashboard.DashboardBasePage;
 import io.jettra.wui.complex.Center;
 import io.jettra.wui.complex.Modal;
 import io.jettra.wui.components.*;
@@ -1845,19 +1846,17 @@ public class WebDesignerPage extends DashboardBasePage {
                 let varMap = {}; 
                 const lines = code.split('\\n');
                 
-                const instRegex = /([A-Z][a-zA-Z0-9]+)\\s+([a-zA-Z0-9_]+)\\s*=\\s*new\\s+\\1\\s*\\((.*?)\\)/;
-                const setRegex = /([a-zA-Z0-9_]+)\\.set([A-Z][a-zA-Z0-9]+)\\s*\\((.*?)\\)/;
-                const addRegex = /([a-zA-Z0-9_]+)\\.add\\s*\\((.*?)\\)/;
-
                 let currentModalArea = mtArea;
 
                 lines.forEach(line => {
                     let cleanLine = line.trim();
                     if (cleanLine.startsWith("//") || cleanLine.length === 0) return;
 
-                    let mInst = instRegex.exec(cleanLine);
-                    let mSet = setRegex.exec(cleanLine);
-                    let mAdd = addRegex.exec(cleanLine);
+                    let currentVar = null;
+                    
+                    // Match object instantiation (e.g., io.jettra.wui.complex.Modal codeModal = new io.jettra.wui.complex.Modal("clock-code-modal");)
+                    // Group 1: Type name, Group 2: Variable name, Group 3: Constructor args
+                    let mInst = /(?:[a-zA-Z0-9_.]+\\.)?([A-Z][a-zA-Z0-9_]*)\\s+([a-zA-Z0-9_]+)\\s*=\\s*new\\s+(?:[a-zA-Z0-9_.]+\\.)?[A-Z][a-zA-Z0-9_]*\\s*\\((.*?)\\)/.exec(cleanLine);
                     
                     if (mInst) {
                         foundAny = true;
@@ -1865,50 +1864,59 @@ public class WebDesignerPage extends DashboardBasePage {
                         let vname = mInst[2];
                         let args = mInst[3];
                         
+                        currentVar = vname;
+                        
+                        // We skip non-UI things if necessary, but window.addComponentToCanvas handles known types
                         let tempParent = document.createElement('div');
                         window.addComponentToCanvas(type, tempParent);
                         let el = tempParent.lastElementChild;
-                        if (!el) return;
-                        
-                        el.setAttribute('data-var', vname);
-                        varMap[vname] = el;
-                        
-                        let props = JSON.parse(el.getAttribute('data-props') || "{}");
-                        if (args && args.trim().length > 0) {
-                            let cleanParams = args.replace(/"/g, '').split(',');
-                            if (cleanParams.length > 0) {
-                                if (['Header','Paragraph','Button','Clock','Span','Label','Alert','Notification','Link','Downloader','CheckBox','RadioButton','ToggleSwitch','MenuItem','TreeItem','Tab','Card'].includes(type)) {
-                                    props.text = cleanParams.length > 1 ? cleanParams[1].trim() : cleanParams[0].trim();
+                        if (el) {
+                            el.setAttribute('data-var', vname);
+                            varMap[vname] = el;
+                            
+                            let props = JSON.parse(el.getAttribute('data-props') || "{}");
+                            if (args && args.trim().length > 0) {
+                                let cleanParams = args.replace(/"/g, '').split(',');
+                                if (cleanParams.length > 0) {
+                                    if (['Header','Paragraph','Button','Clock','Span','Label','Alert','Notification','Link','Downloader','CheckBox','RadioButton','ToggleSwitch','MenuItem','TreeItem','Tab','Card'].includes(type)) {
+                                        props.text = cleanParams.length > 1 ? cleanParams[1].trim() : cleanParams[0].trim();
+                                    }
+                                    if (type === 'Modal') {
+                                        let mName = cleanParams.length > 1 ? cleanParams[1].trim() : (cleanParams.length > 0 ? cleanParams[0].trim() : 'Modal Component');
+                                        props.text = mName;
+                                        props.idGen = cleanParams[0].trim();
+                                    }
+                                    if (type === 'Board') props.text = cleanParams.length > 1 ? cleanParams[1].trim() : (cleanParams.length > 0 ? cleanParams[0].trim() : 'New Board');
+                                    if (['Panel','Grid','Div','LayoutDisplay','TabView','Tree','MenuBar'].includes(type)){
+                                        props.columns = parseInt(cleanParams[0].trim()) || 2;
+                                    }
+                                    if (type === 'ProgressBar') { props.value = parseInt(cleanParams[0])||0; props.max = parseInt(cleanParams[1])||100; }
                                 }
-                                if (type === 'Modal') {
-                                    let mName = cleanParams.length > 1 ? cleanParams[1].trim() : (cleanParams.length > 0 ? cleanParams[0].trim() : 'Modal Component');
-                                    props.text = mName;
-                                    props.idGen = cleanParams[0].trim();
-                                }
-                                if (type === 'Board') props.text = cleanParams.length > 1 ? cleanParams[1].trim() : (cleanParams.length > 0 ? cleanParams[0].trim() : 'New Board');
-                                if (['Panel','Grid','Div','LayoutDisplay','TabView','Tree','MenuBar'].includes(type)){
-                                    props.columns = parseInt(cleanParams[0].trim()) || 2;
-                                }
-                                if (type === 'ProgressBar') { props.value = parseInt(cleanParams[0])||0; props.max = parseInt(cleanParams[1])||100; }
                             }
+                            el.setAttribute('data-props', JSON.stringify(props));
+                            const inner = el.querySelector('h3, h2, h1, p, button, label, .j-avatar, .j-panel-header, span');
+                            if (props.text && inner) inner.innerText = props.text;
                         }
-                        el.setAttribute('data-props', JSON.stringify(props));
-                        
-                        const inner = el.querySelector('h3, h2, h1, p, button, label, .j-avatar, .j-panel-header, span');
-                        if (props.text && inner) inner.innerText = props.text;
-                        
-                    } else if (mAdd) {
-                        let parentVar = mAdd[1];
-                        let childArg = mAdd[2].trim();
-                        
-                        let parentEl = varMap[parentVar];
-                        if (parentVar === 'center' || parentVar === 'container') parentEl = canvas; 
-                        if (!parentEl && parentVar === 'center') parentEl = canvas;
-                        if (!parentEl && parentVar === 'codeModal') parentEl = canvas; 
-                        
+                    } else {
+                        // Extract starting variable from chains (e.g., container.add(...))
+                        let firstVarMatch = /^([a-zA-Z0-9_]+)\\./.exec(cleanLine);
+                        if (firstVarMatch) currentVar = firstVarMatch[1];
+                    }
+
+                    if (!currentVar && !cleanLine.includes(".add")) return; 
+
+                    let parentEl = varMap[currentVar];
+                    if (currentVar === 'center' || currentVar === 'container') parentEl = canvas; 
+                    if (!parentEl && currentVar === 'center') parentEl = canvas;
+                    if (!parentEl && currentVar === 'codeModal') parentEl = canvas;
+
+                    // Match all .add() calls
+                    let addMatches = [...cleanLine.matchAll(/\\.add\\s*\\((.*?)\\)/g)];
+                    addMatches.forEach(mAdd => {
+                        let childArg = mAdd[1].trim();
                         if (parentEl) {
                            if (childArg.startsWith("new ")) {
-                               let inlineTypeMatch = /new\\s+([A-Z][a-zA-Z0-9]+)\\s*\\((.*?)\\)/.exec(childArg);
+                               let inlineTypeMatch = /new\\s+(?:[a-zA-Z0-9_.]+\\.)?([A-Z][a-zA-Z0-9_]*)\\s*\\((.*?)\\)/.exec(childArg);
                                if (inlineTypeMatch) {
                                    let type = inlineTypeMatch[1];
                                    let args = inlineTypeMatch[2];
@@ -1946,11 +1954,14 @@ public class WebDesignerPage extends DashboardBasePage {
                                }
                            }
                         }
-                    } else if (mSet) {
-                       let vname = mSet[1];
-                       let method = mSet[2];
-                       let args = mSet[3].replace(/"/g, '').trim();
-                       let el = varMap[vname];
+                    });
+
+                    // Match all .setXxx() calls
+                    let setMatches = [...cleanLine.matchAll(/\\.set([A-Z][a-zA-Z0-9_]*)\\s*\\((.*?)\\)/g)];
+                    setMatches.forEach(mSet => {
+                       let method = mSet[1];
+                       let args = mSet[2].replace(/"/g, '').trim();
+                       let el = varMap[currentVar];
                        if (el) {
                            let props = JSON.parse(el.getAttribute('data-props') || "{}");
                            if (method === 'Text') {
@@ -1960,7 +1971,7 @@ public class WebDesignerPage extends DashboardBasePage {
                            }
                            el.setAttribute('data-props', JSON.stringify(props));
                        }
-                    }
+                    });
                 });
                 
                 Object.values(varMap).forEach(el => {

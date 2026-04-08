@@ -1,5 +1,6 @@
 package com.jettra.example.pages;
 
+import com.jettra.example.dashboard.DashboardBasePage;
 import com.jettra.example.model.PaisModel;
 import com.jettra.example.repository.PaisRepository;
 import io.jettra.wui.components.*;

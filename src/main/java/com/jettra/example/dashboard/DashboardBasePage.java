@@ -1,4 +1,4 @@
-package com.jettra.example.pages;
+package com.jettra.example.dashboard;
 
 import com.jettra.server.JettraServer;
 import com.sun.net.httpserver.HttpExchange;
@@ -279,7 +279,7 @@ public abstract class DashboardBasePage extends Page {
         addCategory(menuHtml, txtDate, new String[]{"Calendar", "DatePicker", "Organigram", "Schedule", "Time", "Timeline"}, menuClass, hoverEvents, categoryStyle, compIcon);
         addCategory(menuHtml, txtNav, new String[]{"Link", "Menu", "MenuBar", "Navigation"}, menuClass, hoverEvents, categoryStyle, compIcon);
         addCategory(menuHtml, txtFeed, new String[]{"Alert", "Modal", "Notification", "SessionTimeout", "Feedback"}, menuClass, hoverEvents, categoryStyle, compIcon);
-        addCategory(menuHtml, txtLayout, new String[]{"Avatar", "AvatarGroup", "Board", "Carousel", "Clock", "Div", "Divide", "FileUpload", "FolderSelector", "Grid", "Icon", "Image", "LayoutDisplay", "Loading", "LoginAdvanced", "Map", "Panel", "ProgressBar", "Spinner", "Table", "TabView", "Tree"}, menuClass, hoverEvents, categoryStyle, compIcon);
+        addCategory(menuHtml, txtLayout, new String[]{"Avatar", "AvatarGroup", "Board", "Card", "Carousel", "Clock", "Div", "Divide", "FileUpload", "FolderSelector", "Grid", "Icon", "Image", "LayoutDisplay", "Loading", "LoginAdvanced", "Map", "Panel", "ProgressBar", "Spinner", "Table", "TabView", "Tree"}, menuClass, hoverEvents, categoryStyle, compIcon);
         addCategory(menuHtml, txtMedia, new String[]{"BarCode", "Downloader", "PDFViewer", "QR", "ViewMedia"}, menuClass, hoverEvents, categoryStyle, compIcon);
         addCategory(menuHtml, "Charts", new String[]{"ChartsBar", "ChartsDoughnut", "ChartsLine", "ChartsPie", "ChartsRadar"}, menuClass, hoverEvents, categoryStyle, compIcon);
 

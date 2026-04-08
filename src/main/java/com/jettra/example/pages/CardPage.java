@@ -1,15 +1,20 @@
 package com.jettra.example.pages;
 
-import io.jettra.wui.complex.Center;
+import com.jettra.example.dashboard.DashboardBasePage;
 import io.jettra.wui.components.Card;
+import io.jettra.wui.complex.Center;
+import io.jettra.wui.components.Button;
 import io.jettra.wui.components.Div;
 import io.jettra.wui.components.Header;
 import io.jettra.wui.components.Paragraph;
 
+/**
+ * Showcase page for the new Card component.
+ */
 public class CardPage extends DashboardBasePage {
 
     public CardPage() {
-        super("Card Component");
+        super("Card Showcase");
     }
 
     @Override
@@ -24,7 +29,7 @@ public class CardPage extends DashboardBasePage {
         h1.setStyle("margin", "0");
         headerRow.add(h1);
         
-        io.jettra.wui.components.Button codeBtn = new io.jettra.wui.components.Button("Code");
+        Button codeBtn = new Button("Code");
         codeBtn.addClass("j-btn");
         codeBtn.setStyle("border-color", "var(--jettra-accent)").setStyle("color", "var(--jettra-accent)");
         codeBtn.setProperty("onclick", "document.getElementById('card-code-modal').style.display = 'block'");
@@ -47,17 +52,36 @@ public class CardPage extends DashboardBasePage {
                      .setStyle("border-radius", "4px").setStyle("overflow-x", "auto")
                      .setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
         
-        String javaCode = "// Simple Card\n" +
-                          "Card card = new Card();\n" +
-                          "card.add(new Header(3, \"Title\"));\n" +
-                          "card.add(new Paragraph(\"Body content...\"));\n\n";
+        String javaCode = "// 1. Basic Card\\n" +
+                          "Card basicCard = new Card()\\n" +
+                          "    .setTitle(\"Basic Card\")\\n" +
+                          "    .setSubtitle(\"Simple Information\")\\n" +
+                          "    .setContentText(\"This is a basic card with no image and no actions.\")\\n" +
+                          "    .setWidth(\"100%\");\\n\\n" +
+                          "// 2. Image Card\\n" +
+                          "Card imageCard = new Card()\\n" +
+                          "    .setTitle(\"Scenic View\")\\n" +
+                          "    .setSubtitle(\"Travel & Nature\")\\n" +
+                          "    .setImageUrl(\"https://images.unsplash.com/photo-1506744626753-1fa44df14f28?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80\")\\n" +
+                          "    .setContentText(\"Discover beautiful places around the world.\")\\n" +
+                          "    .setWidth(\"100%\");\\n\\n" +
+                          "// 3. Action Card\\n" +
+                          "Card actionCard = new Card()\\n" +
+                          "    .setTitle(\"User Registration\")\\n" +
+                          "    .setSubtitle(\"Create an account\")\\n" +
+                          "    .setContentText(\"Sign up to get access to premium features.\")\\n" +
+                          "    .setWidth(\"100%\");\\n" +
+                          "Button acceptBtn = new Button(\"Accept\");\\n" +
+                          "acceptBtn.setStyle(Button.Style.PRIMARY);\\n" +
+                          "Button dismissBtn = new Button(\"Dismiss\");\\n" +
+                          "actionCard.add(acceptBtn).add(dismissBtn);";
                           
         io.jettra.wui.core.UIComponent pre = new io.jettra.wui.core.UIComponent("pre") {};
         pre.setStyle("margin", "0");
         io.jettra.wui.core.UIComponent codeTag = new io.jettra.wui.core.UIComponent("code") {};
         codeTag.setProperty("id", "card-java-code");
         codeTag.setStyle("color", "#a5d6ff").setStyle("font-family", "monospace").setStyle("font-size", "0.9rem");
-        codeTag.setContent(javaCode.replace("<", "&lt;").replace(">", "&gt;"));
+        codeTag.setContent(javaCode.replace("<", "&lt;").replace(">", "&gt;").replace("\\n", "\n"));
         
         pre.add(codeTag);
         codeContainer.add(pre);
@@ -66,11 +90,11 @@ public class CardPage extends DashboardBasePage {
         Div modalActions = new Div();
         modalActions.setStyle("display", "flex").setStyle("justify-content", "flex-end").setStyle("gap", "10px");
         
-        io.jettra.wui.components.Button copyBtn = new io.jettra.wui.components.Button("Copy");
+        Button copyBtn = new Button("Copy");
         copyBtn.addClass("j-btn");
         copyBtn.setProperty("onclick", "navigator.clipboard.writeText(document.getElementById('card-java-code').innerText).then(() => { this.innerText='Copied!'; setTimeout(() => this.innerText='Copy', 2000); })");
         
-        io.jettra.wui.components.Button closeBtn = new io.jettra.wui.components.Button("Close");
+        Button closeBtn = new Button("Close");
         closeBtn.addClass("j-btn");
         closeBtn.setStyle("background", "transparent").setStyle("border-color", "var(--jettra-border)");
         closeBtn.setProperty("onclick", "document.getElementById('card-code-modal').style.display = 'none'");
@@ -81,27 +105,45 @@ public class CardPage extends DashboardBasePage {
         container.add(codeModal);
         // --- End Modal Dialog ---
         
-        Paragraph p = new Paragraph("The Card component groups related content beautifully.");
+        Paragraph p = new Paragraph("The Card component is used to represent content visually in a block.");
         container.add(p);
 
-        // --- Demo Cards ---
-        Div row1 = new Div();
-        row1.setStyle("display", "flex").setStyle("gap", "20px").setStyle("margin-bottom", "30px").setStyle("flex-wrap", "wrap");
+        Div grid = new Div();
+        grid.setStyle("display", "grid").setStyle("grid-template-columns", "repeat(auto-fit, minmax(300px, 1fr))").setStyle("gap", "20px").setStyle("margin-top", "30px");
         
-        Card card1 = new Card();
-        card1.setStyle("width", "300px");
-        card1.add(new Header(3, "Basic Card"));
-        card1.add(new Paragraph("This is a simple card wrapper with a subtle background and border."));
-        row1.add(card1);
+        // 1. Basic Card
+        Card basicCard = new Card()
+            .setTitle("Basic Card")
+            .setSubtitle("Simple Information")
+            .setContentText("This is a basic card with no image and no actions.")
+            .setWidth("100%");
+            
+        // 2. Image Card
+        Card imageCard = new Card()
+            .setTitle("Scenic View")
+            .setSubtitle("Travel & Nature")
+            .setImageUrl("https://images.unsplash.com/photo-1549880338-65ddcdfd017b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60")
+            .setContentText("Discover beautiful places around the world.")
+            .setWidth("100%");
+            
+        // 3. Action Card
+        Card actionCard = new Card()
+            .setTitle("User Registration")
+            .setSubtitle("Create an account")
+            .setContentText("Sign up to get access to premium features.")
+            .setWidth("100%");
+            
+        Button acceptBtn = new Button("Accept");
+        acceptBtn.primary();
+        Button dismissBtn = new Button("Dismiss");
         
-        Card card2 = new Card();
-        card2.setStyle("width", "300px");
-        card2.setStyle("background", "var(--jettra-accent-hover)");
-        card2.add(new Header(3, "Highlight Card").setStyle("color", "#000"));
-        card2.add(new Paragraph("You can override background and styling easily.").setStyle("color", "#222"));
-        row1.add(card2);
-
-        container.add(row1);
+        actionCard.add(acceptBtn).add(dismissBtn);
+        
+        grid.add(basicCard);
+        grid.add(imageCard);
+        grid.add(actionCard);
+        
+        container.add(grid);
         center.add(container);
     }
 }

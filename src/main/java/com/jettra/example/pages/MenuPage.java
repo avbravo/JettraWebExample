@@ -1,5 +1,6 @@
 package com.jettra.example.pages;
 
+import com.jettra.example.dashboard.DashboardBasePage;
 import io.jettra.wui.complex.Center;
 import io.jettra.wui.components.Div;
 import io.jettra.wui.components.Header;
@@ -51,6 +52,7 @@ public class MenuPage extends DashboardBasePage {
         
         String javaCode = "Menu sideMenu = new Menu();\n" +
                           "sideMenu.addItem(\"Home\", \"/\");\n" +
+                          "sideMenu.addItem(\"Card\", \"/card\");\n" +
                           "sideMenu.addItem(\"Settings\", \"/settings\");\n" +
                           "page.add(sideMenu);";
                           
@@ -91,6 +93,7 @@ public class MenuPage extends DashboardBasePage {
         
         Menu m = new Menu();
         m.addItem("Dashboard", "#");
+        m.addItem("Card", "/card");
         m.addItem("Profile", "#");
         m.addItem("Preferences", "#");
         

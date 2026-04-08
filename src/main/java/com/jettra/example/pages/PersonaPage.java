@@ -1,5 +1,6 @@
 package com.jettra.example.pages;
 
+import com.jettra.example.dashboard.DashboardBasePage;
 import com.jettra.example.model.PersonaModel;
 import com.jettra.example.repository.PersonaRepository;
 import io.jettra.wui.complex.Center;

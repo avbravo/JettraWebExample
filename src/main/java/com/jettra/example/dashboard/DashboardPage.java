@@ -1,5 +1,6 @@
-package com.jettra.example.pages;
+package com.jettra.example.dashboard;
 
+import com.jettra.example.dashboard.DashboardBasePage;
 import io.jettra.wui.complex.Center;
 
 public class DashboardPage extends DashboardBasePage {

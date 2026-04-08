@@ -1,5 +1,6 @@
 package com.jettra.example.pages;
 
+import com.jettra.example.dashboard.DashboardBasePage;
 import io.jettra.wui.complex.Avatar;
 import io.jettra.wui.complex.AvatarGroup;
 import io.jettra.wui.complex.Center;

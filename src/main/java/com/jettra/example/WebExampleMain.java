@@ -48,11 +48,11 @@ public class WebExampleMain {
         server.addHandler("/checkbox", com.jettra.example.pages.CheckBoxPage.class);
         server.addHandler("/checkboxgroup", com.jettra.example.pages.CheckBoxGroupPage.class);
         server.addHandler("/clock", com.jettra.example.pages.ClockPage.class);
-        server.addHandler("/dashboard", com.jettra.example.pages.DashboardPage.class);
+        server.addHandler("/dashboard", com.jettra.example.dashboard.DashboardPage.class);
         server.addHandler("/header", com.jettra.example.pages.HeaderPage.class);
         server.addHandler("/icon", com.jettra.example.pages.IconPage.class);
         server.addHandler("/image", com.jettra.example.pages.ImagePage.class);
-        server.addHandler("/layoutdisplay", com.jettra.example.pages.LayoutDisplayPage.class);
+        server.addHandler("/layoutdisplay", com.jettra.example.dashboard.LayoutDisplayPage.class);
         server.addHandler("/login", com.jettra.example.pages.LoginPage.class);
         server.addHandler("/logout", com.jettra.example.pages.LoginPage.class);
         server.addHandler("/loading", com.jettra.example.pages.LoadingPage.class);
