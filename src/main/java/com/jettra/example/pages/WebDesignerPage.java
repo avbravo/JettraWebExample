@@ -348,7 +348,7 @@ public class WebDesignerPage extends DashboardBasePage {
         // Charts
         addPaletteCategory(palette, "Charts", new String[]{"ChartsBar", "ChartsDoughnut", "ChartsLine", "ChartsPie", "ChartsRadar"});
         // Layout & Display
-        addPaletteCategory(palette, "Layout", new String[]{"Grid", "Panel", "Board", "Avatar", "Carousel", "Table", "TabView", "Tab", "Modal", "Tree", "TreeItem", "Div", "LayoutDisplay", "Map"});
+        addPaletteCategory(palette, "Layout", new String[]{"Grid", "Panel", "Board", "Card", "Avatar", "Carousel", "Table", "TabView", "Tab", "Modal", "Tree", "TreeItem", "Div", "LayoutDisplay", "Map"});
 
         return palette;
     }
@@ -660,6 +660,9 @@ public class WebDesignerPage extends DashboardBasePage {
                     case 'Board':
                         content = '<div class="canvas-container board-container-mock j-component" style="padding:20px; background:rgba(15,23,42,0.4);"><h2 style="margin-top:0; color:var(--jettra-accent); font-size:18px; margin-bottom:15px;">New Board</h2><div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:15px; min-height:100px;"><div class="canvas-container j-component j-panel" style="padding:10px; min-height:80px; box-shadow:none;"></div><div class="canvas-container j-component j-panel" style="padding:10px; min-height:80px; box-shadow:none;"></div><div class="canvas-container j-component j-panel" style="padding:10px; min-height:80px; box-shadow:none;"></div></div></div>';
                         break;
+                    case 'Card':
+                        content = '<div class="j-component j-card" style="padding:0; border:1px solid var(--jettra-accent); border-radius:8px; background:rgba(0,0,0,0.4); display:flex; flex-direction:column; gap:10px;"><div style="padding:15px; border-bottom:1px solid rgba(255,255,255,0.1);"><h3 style="margin:0;color:var(--jettra-accent);" class="card-title-mock">Card Title</h3><p style="margin:0;font-size:12px;color:#aaa" class="card-subtitle-mock"></p><p style="margin:5px 0 0;font-size:13px;color:rgba(255,255,255,0.8)" class="card-content-mock"></p></div><div class="canvas-container" style="flex:1; border:0; min-height:50px; padding:15px; background:transparent;"></div></div>';
+                        break;
                     case 'Table':
                         content = '<div class="j-table-container j-component" style="padding:0; border-radius:12px; overflow:hidden;"><table style="width:100%; border-collapse:collapse; text-align:left; font-size:0.9rem;"><thead style="background:rgba(0,255,255,0.05); border-bottom:1px solid var(--jettra-accent);"><tr><th style="padding:12px; color:var(--jettra-text);">Col 1</th><th style="padding:12px; color:var(--jettra-text);">Col 2</th></tr></thead><tbody><tr style="border-bottom:1px solid var(--jettra-border);"><td style="padding:10px; color:var(--jettra-text);">Data 1</td><td style="padding:10px; color:var(--jettra-text);">Data 2</td></tr></tbody></table></div>';
                         break;
@@ -898,6 +901,15 @@ public class WebDesignerPage extends DashboardBasePage {
                     `;
                 }
 
+                if (type === 'Card') {
+                    html += `
+                        <div class="inspector-row"><span class="inspector-label">Title</span><input type="text" class="inspector-input" value="${props.title || ''}" onchange="updateProp('title', this.value)"></div>
+                        <div class="inspector-row"><span class="inspector-label">Subtitle</span><input type="text" class="inspector-input" value="${props.subtitle || ''}" onchange="updateProp('subtitle', this.value)"></div>
+                        <div class="inspector-row"><span class="inspector-label">Content</span><textarea class="inspector-input" onchange="updateProp('content', this.value)">${props.content || ''}</textarea></div>
+                        <div class="inspector-row"><span class="inspector-label">Image URL</span><input type="text" class="inspector-input" value="${props.imageUrl || ''}" onchange="updateProp('imageUrl', this.value)"></div>
+                    `;
+                }
+
                 if (type === 'QR') {
                     html += `
                         <div class="inspector-row"><span class="inspector-label">Text</span><input type="text" class="inspector-input" value="${props.text || 'https://jettra.io'}" onchange="updateProp('text', this.value)"></div>
@@ -1099,6 +1111,12 @@ public class WebDesignerPage extends DashboardBasePage {
                         el.className = 'j-btn'; // reset
                         el.classList.add('j-btn-' + value.toLowerCase());
                     }
+                }
+
+                if (type === 'Card') {
+                    if (key === 'title') { const tEl = selectedItem.querySelector('.card-title-mock'); if (tEl) tEl.innerText = value; }
+                    if (key === 'subtitle') { const sEl = selectedItem.querySelector('.card-subtitle-mock'); if (sEl) sEl.innerText = value; }
+                    if (key === 'content') { const cEl = selectedItem.querySelector('.card-content-mock'); if (cEl) cEl.innerText = value; }
                 }
 
                 if ((key === 'options' || key === 'icon') && (type === 'SelectOne' || type === 'SelectOneIcon')) {
@@ -1683,6 +1701,19 @@ public class WebDesignerPage extends DashboardBasePage {
                                 out += `        Modal ${v} = new Modal("${mId}");\\n`;
                                 const kidsM = it.querySelectorAll(':scope > .canvas-container > .canvas-item');
                                 if (kidsM.length > 0) out += walk(kidsM, v);
+                                out += handleCommon(v);
+                                out += handleEvents(v);
+                                out += `        ${container}.add(${v});\\n`;
+                                break;
+                            }
+                            case 'Card': {
+                                out += `        Card ${v} = new Card();\\n`;
+                                if (props.title) out += `        ${v}.setTitle("${props.title}");\\n`;
+                                if (props.subtitle) out += `        ${v}.setSubtitle("${props.subtitle}");\\n`;
+                                if (props.content) out += `        ${v}.setContentText("${props.content}");\\n`;
+                                if (props.imageUrl) out += `        ${v}.setImageUrl("${props.imageUrl}");\\n`;
+                                const kidsCard = it.querySelectorAll(':scope > .canvas-container > .canvas-item, :scope > div > .canvas-container > .canvas-item');
+                                if (kidsCard.length > 0) out += walk(kidsCard, v);
                                 out += handleCommon(v);
                                 out += handleEvents(v);
                                 out += `        ${container}.add(${v});\\n`;
