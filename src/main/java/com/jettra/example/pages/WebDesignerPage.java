@@ -1395,14 +1395,15 @@ public class WebDesignerPage extends DashboardBasePage {
 
                 if (isPage) {
                     const items = canvas.querySelectorAll('.canvas-item');
-                    const content = window.jettraFileCache[name];
+                    const fullPathKey = Object.keys(window.jettraFileCache).find(k => k.endsWith('/' + name) || k === name);
+                    const content = fullPathKey ? window.jettraFileCache[fullPathKey] : undefined;
 
                     const doOpen = () => {
                         const titleEl = document.getElementById('canvas-title-text');
                         if (titleEl) titleEl.innerText = 'View';
                         
                         if (content) {
-                            window.loadFileContent(Object.keys(window.jettraFileCache).find(k => k.endsWith('/' + name) || k === name));
+                            window.loadFileContent(fullPathKey);
                         } else {
                             canvas.innerHTML = '<div class="canvas-placeholder">Start dragging components here to design ' + name + '</div>';
                             window.updateGeneratedCode();
@@ -1836,55 +1837,145 @@ public class WebDesignerPage extends DashboardBasePage {
                 const code = display.value;
                 const canvas = document.getElementById('canvas-drop-area');
                 
-                // Simplistic RegExp to find UI elements
-                const regex = /new\\s+([A-Z][a-zA-Z0-9]+)\\s*\\((.*?)\\)/g;
-                
                 canvas.innerHTML = '';
                 const mtArea = document.getElementById('modal-list-container');
                 if (mtArea) mtArea.innerHTML = '';
                 
-                let match;
                 let foundAny = false;
+                let varMap = {}; 
+                const lines = code.split('\\n');
                 
-                while((match = regex.exec(code)) !== null) {
-                    foundAny = true;
-                    let type = match[1];
-                    let args = match[2];
+                const instRegex = /([A-Z][a-zA-Z0-9]+)\\s+([a-zA-Z0-9_]+)\\s*=\\s*new\\s+\\1\\s*\\((.*?)\\)/;
+                const setRegex = /([a-zA-Z0-9_]+)\\.set([A-Z][a-zA-Z0-9]+)\\s*\\((.*?)\\)/;
+                const addRegex = /([a-zA-Z0-9_]+)\\.add\\s*\\((.*?)\\)/;
+
+                let currentModalArea = mtArea;
+
+                lines.forEach(line => {
+                    let cleanLine = line.trim();
+                    if (cleanLine.startsWith("//") || cleanLine.length === 0) return;
+
+                    let mInst = instRegex.exec(cleanLine);
+                    let mSet = setRegex.exec(cleanLine);
+                    let mAdd = addRegex.exec(cleanLine);
                     
-                    window.addComponentToCanvas(type, canvas);
-                    let el = canvas.lastElementChild;
-                    if(!el) continue;
-                    
-                    let props = JSON.parse(el.getAttribute('data-props') || "{}");
-                    if (args && args.trim().length > 0) {
-                        let cleanParams = args.replace(/"/g, '').split(',');
-                        if (cleanParams.length > 0) {
-                            if (type === 'Header' || type === 'Paragraph' || type === 'Button' || type === 'Clock' || type === 'Span' || type === 'Label' || type === 'Alert' || type === 'Notification' || type === 'Link' || type === 'Downloader' || type === 'CheckBox' || type === 'RadioButton' || type === 'ToggleSwitch' || type === 'MenuItem' || type === 'TreeItem' || type === 'Tab') props.text = cleanParams.length > 1 ? cleanParams[1].trim() : cleanParams[0].trim();
-                            if (type === 'Modal') {
-                                let mName = cleanParams.length > 1 ? cleanParams[1].trim() : (cleanParams.length > 0 ? cleanParams[0].trim() : 'Modal Component');
-                                props.text = mName;
-                                props.idGen = cleanParams[0].trim();
+                    if (mInst) {
+                        foundAny = true;
+                        let type = mInst[1];
+                        let vname = mInst[2];
+                        let args = mInst[3];
+                        
+                        let tempParent = document.createElement('div');
+                        window.addComponentToCanvas(type, tempParent);
+                        let el = tempParent.lastElementChild;
+                        if (!el) return;
+                        
+                        el.setAttribute('data-var', vname);
+                        varMap[vname] = el;
+                        
+                        let props = JSON.parse(el.getAttribute('data-props') || "{}");
+                        if (args && args.trim().length > 0) {
+                            let cleanParams = args.replace(/"/g, '').split(',');
+                            if (cleanParams.length > 0) {
+                                if (['Header','Paragraph','Button','Clock','Span','Label','Alert','Notification','Link','Downloader','CheckBox','RadioButton','ToggleSwitch','MenuItem','TreeItem','Tab','Card'].includes(type)) {
+                                    props.text = cleanParams.length > 1 ? cleanParams[1].trim() : cleanParams[0].trim();
+                                }
+                                if (type === 'Modal') {
+                                    let mName = cleanParams.length > 1 ? cleanParams[1].trim() : (cleanParams.length > 0 ? cleanParams[0].trim() : 'Modal Component');
+                                    props.text = mName;
+                                    props.idGen = cleanParams[0].trim();
+                                }
+                                if (type === 'Board') props.text = cleanParams.length > 1 ? cleanParams[1].trim() : (cleanParams.length > 0 ? cleanParams[0].trim() : 'New Board');
+                                if (['Panel','Grid','Div','LayoutDisplay','TabView','Tree','MenuBar'].includes(type)){
+                                    props.columns = parseInt(cleanParams[0].trim()) || 2;
+                                }
+                                if (type === 'ProgressBar') { props.value = parseInt(cleanParams[0])||0; props.max = parseInt(cleanParams[1])||100; }
                             }
-                            if (type === 'Board') props.text = cleanParams.length > 1 ? cleanParams[1].trim() : (cleanParams.length > 0 ? cleanParams[0].trim() : 'New Board');
-                            if (type === 'Panel' || type === 'Grid' || type === 'Div' || type === 'LayoutDisplay' || type === 'TabView' || type === 'Tree' || type === 'MenuBar') props.columns = parseInt(cleanParams[0].trim()) || 2;
-                            if (type === 'ProgressBar') { props.value = parseInt(cleanParams[0])||0; props.max = parseInt(cleanParams[1])||100; }
                         }
-                    }
-                    el.setAttribute('data-props', JSON.stringify(props));
-                    
-                    // Force visual update on component
-                    if (props.text) {
+                        el.setAttribute('data-props', JSON.stringify(props));
+                        
                         const inner = el.querySelector('h3, h2, h1, p, button, label, .j-avatar, .j-panel-header, span');
-                        if(inner) inner.innerText = props.text;
+                        if (props.text && inner) inner.innerText = props.text;
+                        
+                    } else if (mAdd) {
+                        let parentVar = mAdd[1];
+                        let childArg = mAdd[2].trim();
+                        
+                        let parentEl = varMap[parentVar];
+                        if (parentVar === 'center' || parentVar === 'container') parentEl = canvas; 
+                        if (!parentEl && parentVar === 'center') parentEl = canvas;
+                        if (!parentEl && parentVar === 'codeModal') parentEl = canvas; 
+                        
+                        if (parentEl) {
+                           if (childArg.startsWith("new ")) {
+                               let inlineTypeMatch = /new\\s+([A-Z][a-zA-Z0-9]+)\\s*\\((.*?)\\)/.exec(childArg);
+                               if (inlineTypeMatch) {
+                                   let type = inlineTypeMatch[1];
+                                   let args = inlineTypeMatch[2];
+                                   let targetContainer = parentEl.querySelector('.canvas-container') || parentEl;
+                                   
+                                   window.addComponentToCanvas(type, targetContainer);
+                                   let el = targetContainer.lastElementChild;
+                                   if(el) {
+                                       let props = JSON.parse(el.getAttribute('data-props') || "{}");
+                                       if (args && args.trim().length > 0) {
+                                          let cleanParams = args.replace(/"/g, '').split(',');
+                                          if (['Header','Paragraph','Button','Clock','Span','Label','Card'].includes(type)) {
+                                             props.text = cleanParams.length > 1 ? cleanParams[1].trim() : cleanParams[0].trim();
+                                          }
+                                       }
+                                       el.setAttribute('data-props', JSON.stringify(props));
+                                       const inner = el.querySelector('h3, h2, h1, p, button, label, span');
+                                       if (props.text && inner) inner.innerText = props.text;
+                                   }
+                               }
+                           } else if(!childArg.includes(".")) {
+                               let childEl = varMap[childArg];
+                               if (childEl) {
+                                   let targetContainer = parentEl;
+                                   if (parentEl !== canvas && parentEl.classList.contains('canvas-item')) {
+                                       let innerCont = parentEl.querySelector('.canvas-container');
+                                       if (!innerCont) {
+                                           let possibleContainers = parentEl.querySelectorAll('div');
+                                           if (possibleContainers.length > 0) targetContainer = possibleContainers[possibleContainers.length-1];
+                                       } else {
+                                           targetContainer = innerCont;
+                                       }
+                                   }
+                                   targetContainer.appendChild(childEl);
+                               }
+                           }
+                        }
+                    } else if (mSet) {
+                       let vname = mSet[1];
+                       let method = mSet[2];
+                       let args = mSet[3].replace(/"/g, '').trim();
+                       let el = varMap[vname];
+                       if (el) {
+                           let props = JSON.parse(el.getAttribute('data-props') || "{}");
+                           if (method === 'Text') {
+                               props.text = args;
+                               const inner = el.querySelector('h3, h2, h1, p, button, label, span');
+                               if (inner) inner.innerText = props.text;
+                           }
+                           el.setAttribute('data-props', JSON.stringify(props));
+                       }
                     }
-                }
+                });
                 
-                if (!foundAny) {
+                Object.values(varMap).forEach(el => {
+                    if (!canvas.contains(el) && el.parentElement && !el.parentElement.classList.contains('canvas-container')) {
+                        if (el.getAttribute('data-type') === 'Modal' && mtArea) mtArea.appendChild(el);
+                        else canvas.appendChild(el);
+                    }
+                });
+
+                if (Object.keys(varMap).length === 0 && !foundAny) {
                     canvas.innerHTML = '<div class="canvas-placeholder">Start dragging components here to design</div>';
                 }
                 
                 document.getElementById('generated-code-hidden').value = code;
-                window.show3DMessage("Sync Complete", "Canvas has been rebuilt from the generated source code.");
+                window.show3DMessage("Sync Complete", "Canvas has been rebuilt exactly from the structured Java source code.");
             };
 
             window.previewInterface = function() {
