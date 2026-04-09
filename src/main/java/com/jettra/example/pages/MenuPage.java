@@ -7,7 +7,6 @@ import io.jettra.wui.components.Header;
 import io.jettra.wui.components.Paragraph;
 import io.jettra.wui.components.Button;
 import io.jettra.wui.complex.Menu;
-import io.jettra.wui.components.MenuItem;
 
 public class MenuPage extends DashboardBasePage {
 

@@ -181,6 +181,22 @@ public class WebDesignerPage extends DashboardBasePage {
 
         inspector.add(inspectorHeaderWrapper).add(propList);
 
+        // --- Add Tool Form (Restored to Palette) ---
+        Div addToolPanel = new Div();
+        addToolPanel.setStyle("padding", "15px").setStyle("background", "rgba(0,0,0,0.3)").setStyle("border-top", "1px solid var(--jettra-border)").setStyle("margin-top", "10px");
+        Header addH = new Header(5, "Añadir Herramienta");
+        addH.setStyle("font-size", "11px").setStyle("margin-bottom", "10px");
+        
+        TextBox toolNameInput = new TextBox("text", "Nueva...");
+        toolNameInput.setId("new-tool-name").addClass("j-input").setStyle("margin-bottom", "10px").setStyle("font-size", "12px");
+        
+        Button addToolBtn = new Button("Añadir a Paleta");
+        addToolBtn.addClass("j-btn-primary").setStyle("width", "100%").setStyle("font-size", "11px");
+        addToolBtn.setProperty("onclick", "addNewToolToPalette()");
+        
+        addToolPanel.add(addH).add(toolNameInput).add(addToolBtn);
+        palette.add(addToolPanel);
+
         container.add(sidebar).add(canvasArea).add(codeView).add(inspector);
         
         // 5. Event Editor Modal
@@ -324,6 +340,10 @@ public class WebDesignerPage extends DashboardBasePage {
         treeContainer.setStyle("min-height", "100px");
 
         explorer.add(folderSel).add(treeContainer);
+        
+        // Link FolderSelector to project explorer logic
+        folderSel.getFolderInput().setProperty("onchange", "window.loadFiles(this)");
+        
         return explorer;
     }
 
@@ -344,7 +364,7 @@ public class WebDesignerPage extends DashboardBasePage {
         // Feedback
         addPaletteCategory(palette, "Feedback", new String[]{"ProgressBar", "Spinner", "Loading", "Alert", "Notification", "Clock"});
         // Media & Files
-        addPaletteCategory(palette, "Media", new String[]{"Downloader", "PDFViewer", "ViewMedia", "BarCode"});
+        addPaletteCategory(palette, "Media", new String[]{"Downloader", "PDFViewer", "ViewMedia", "BarCode", "Draw"});
         // Charts
         addPaletteCategory(palette, "Charts", new String[]{"ChartsBar", "ChartsDoughnut", "ChartsLine", "ChartsPie", "ChartsRadar"});
         // Layout & Display
@@ -1242,7 +1262,7 @@ public class WebDesignerPage extends DashboardBasePage {
                     if (!viewer) return;
                     viewer.innerHTML = 'Loading...';
                     
-                    const files = input.querySelector('input').files;
+                    const files = (input.tagName === 'INPUT' ? input : input.querySelector('input')).files;
                     const excludeTarget = input.getAttribute('data-exclude-target') === 'true';
                     
                     availableModels = [];
@@ -1252,7 +1272,7 @@ public class WebDesignerPage extends DashboardBasePage {
 
                     for (let i = 0; i < files.length; i++) {
                         const f = files[i];
-                        const relPath = f.webkitRelativePath;
+                        const relPath = f.webkitRelativePath || f.name;
                         
                         if (excludeTarget && (relPath.includes('/target/') || relPath.includes('target/'))) continue;
                         if (!relPath.endsWith('.java') && !relPath.endsWith('.properties')) continue;
@@ -1310,9 +1330,9 @@ public class WebDesignerPage extends DashboardBasePage {
                         try {
                             localStorage.setItem('jettra_designer_tree', finalHtml);
                             localStorage.setItem('jettra_designer_files', JSON.stringify(window.jettraFileCache));
-                            window.show3DMessage("Proyecto Cargado", "El explorador ha procesado los archivos y se han cacheado localmente.");
+                            window.show3DMessage("Proyecto Cargado", "El explorador ha procesado los archivos.");
                         } catch(e) {
-                            console.warn("Could not cache files locally due to size limit", e);
+                            console.warn("Could not cache files", e);
                         }
                     });
                 };
@@ -1324,417 +1344,155 @@ public class WebDesignerPage extends DashboardBasePage {
                 );
             };
 
-            window.loadFileContent = function(path) {
-                const content = window.jettraFileCache[path];
-                if (!content) return;
+            window.openClass = function(name) {
+                const isPage = name.endsWith('Page.java');
+                const isModel = name.endsWith('Model.java');
 
-                document.getElementById('generated-code-display').value = content;
-                document.getElementById('generated-code-hidden').value = content;
-                
-                window.show3DMessage("Page Loaded", "Page content loaded into source view: " + path);
-                if (path.endsWith('Page.java')) {
-                    setTimeout(() => window.syncCodeToCanvas(), 200);
+                if (isModel) {
+                    window.selectModel(name.replace('.java', ''));
+                    return;
                 }
-            };
 
-            window.show3DConfirm = function(title, body, yesAction) {
-                const modal = document.getElementById('confirm-3d-modal');
-                document.getElementById('confirm-title').innerText = title;
-                document.getElementById('confirm-body').innerHTML = body;
-                const yesBtn = document.getElementById('confirm-yes-btn');
-                const noBtn = document.getElementById('confirm-no-btn') || modal.querySelector('.j-btn');
-                
-                yesBtn.style.display = 'inline-block';
-                yesBtn.innerText = 'Yes, Confirm';
-                if(noBtn) {
-                   noBtn.style.display = 'inline-block';
-                   noBtn.innerText = 'No, Cancel';
+                if (isPage) {
+                    const canvas = document.getElementById('canvas-drop-area');
+                    const fullPathKey = Object.keys(window.jettraFileCache).find(k => k.endsWith('/' + name) || k === name);
+                    const content = fullPathKey ? window.jettraFileCache[fullPathKey] : undefined;
+                    
+                    const doOpen = () => {
+                        if (content) window.loadFileContent(fullPathKey);
+                        else window.show3DMessage("Aviso", "No se encontró contenido para " + name);
+                    };
+
+                    if (canvas.querySelectorAll('.canvas-item').length > 0) {
+                        window.show3DConfirm("Abrir Clase", "¿Cerrar diseño actual y abrir " + name + "?", doOpen);
+                    } else {
+                        doOpen();
+                    }
                 }
-                
-                yesBtn.onclick = () => {
-                   window.close3DConfirm();
-                   if (yesAction) yesAction();
-                };
-                modal.style.display = 'block';
-                window.apply3DTracking(modal);
-            };
-
-            window.show3DMessage = function(title, body) {
-                const modal = document.getElementById('confirm-3d-modal');
-                document.getElementById('confirm-title').innerText = title;
-                document.getElementById('confirm-body').innerHTML = body;
-                const yesBtn = document.getElementById('confirm-yes-btn');
-                const noBtn = document.getElementById('confirm-no-btn') || modal.querySelector('.j-btn');
-                
-                yesBtn.style.display = 'inline-block';
-                yesBtn.innerText = 'OK';
-                if(noBtn) noBtn.style.display = 'none';
-                
-                yesBtn.onclick = () => {
-                   window.close3DConfirm();
-                };
-                modal.style.display = 'block';
-                window.apply3DTracking(modal);
-            };
-
-            window.close3DConfirm = function() {
-                const modal = document.getElementById('confirm-3d-modal');
-                modal.style.display = 'none';
-                modal.onmousemove = null;
-                modal.style.transform = 'translate(-50%, -50%)';
-            };
-
-            window.apply3DTracking = function(el) {
-                el.onmousemove = (e) => {
-                    const rect = el.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-                    const xc = rect.width / 2;
-                    const yc = rect.height / 2;
-                    const dx = x - xc;
-                    const dy = y - yc;
-                    el.style.transform = `translate(-50%, -50%) perspective(2000px) rotateX(${-dy / 20}deg) rotateY(${dx / 20}deg) translateZ(50px)`;
-                };
-                el.onmouseleave = () => {
-                    el.style.transform = `translate(-50%, -50%) perspective(2000px) rotateX(0) rotateY(0) translateZ(0)`;
-                };
             };
 
             window.updateModelSelect = function() {
                 const container = document.getElementById('model-select-container');
                 if (!container) return;
                 
-                let html = `<select class="inspector-input" onchange="window.selectModel(this.value)">`;
-                html += `<option value="">-- Select Model --</option>`;
-                availableModels.forEach(m => {
-                    html += `<option value="${m.name}" ${viewModelName === m.name ? 'selected' : ''}>${m.name}</option>`;
-                });
-                html += `</select>`;
-                container.innerHTML = html;
-            };
-
-            window.openClass = function(name) {
-                const canvas = document.getElementById('canvas-drop-area');
-                if (!canvas) return;
-
-                // Validation for {nombre}Page.java
-                const isPage = name.endsWith('Page.java');
-                const isModel = name.endsWith('Model.java');
-
-                if (!isPage && !isModel && name.endsWith('.java')) {
-                    // It's a java class but does NOT follow Page or Model syntax
-                    const fileObj = projectFilesMap[name];
-                    if (fileObj) window.loadFileContent(fileObj.webkitRelativePath);
+                if (availableModels.length === 0) {
+                    container.innerHTML = '<span style="color:#666; font-size:11px">No models found in project</span>';
                     return;
                 }
-
-                if (isPage) {
-                    const items = canvas.querySelectorAll('.canvas-item');
-                    const fullPathKey = Object.keys(window.jettraFileCache).find(k => k.endsWith('/' + name) || k === name);
-                    const content = fullPathKey ? window.jettraFileCache[fullPathKey] : undefined;
-
-                    const doOpen = () => {
-                        const titleEl = document.getElementById('canvas-title-text');
-                        if (titleEl) titleEl.innerText = 'View';
-                        
-                        if (content) {
-                            window.loadFileContent(fullPathKey);
-                        } else {
-                            canvas.innerHTML = '<div class="canvas-placeholder">Start dragging components here to design ' + name + '</div>';
-                            window.updateGeneratedCode();
-                        }
-                    };
-
-                    if (items.length > 0) {
-                        window.show3DConfirm(
-                            "Confirmación 3D", 
-                            "Hay elementos en el diseñador. ¿Desea borrarlos y abrir " + name + " en el Diseñador? Esto también mostrará el código.",
-                            doOpen
-                        );
-                    } else {
-                        doOpen();
-                    }
-                } else if (isModel) {
-                    window.selectModel(name.replace('.java',''));
-                }
+                
+                let html = '<select class="j-input" style="padding:4px; font-size:11px" onchange="window.selectModel(this.value)">';
+                html += '<option value="">-- Select Model --</option>';
+                availableModels.forEach(m => {
+                    const selected = viewModelName === m.name ? 'selected' : '';
+                    html += `<option value="${m.name}" ${selected}>${m.name}</option>`;
+                });
+                html += '</select>';
+                container.innerHTML = html;
             };
 
             window.generateCRUD = function() {
                 const canvas = document.getElementById('canvas-drop-area');
                 if (!canvas) return;
                 if (!currentModel) {
-                    window.show3DMessage("Error", "Please select a View Model in the Project Explorer first.");
+                    window.show3DMessage("Error", "Por favor, seleccione un modelo en el explorador de proyectos o en el selector de la parte superior.");
                     return;
                 }
                 
-                canvas.innerHTML = '<div class="canvas-placeholder" style="color:var(--jettra-accent)"><h3>MVC CRUD Generado</h3><p>El código Java para el CRUD completo se ha generado en el panel de la derecha.</p><p>Nota: El canvas visual no puede representar ciclos complejos como el requerido por la tabla de este MVC puro.</p></div>';
-
                 const mName = currentModel.name;
-                const mVar = mName.charAt(0).toLowerCase() + mName.slice(1);
-                const repoName = mName.replace("Model", "") + "Repository";
+                const baseName = mName.replace("Model", "");
+                const repoName = baseName + "Repository";
                 
-                let tblHeaders = "";
-                let tblRows = "";
-                let formGroups = "";
-                let updateBlock = "";
-                let primaryKey = modelFields.length > 0 ? modelFields[0].name : "id";
+                // Clear canvas to show informative message
+                canvas.innerHTML = `
+                    <div class="canvas-placeholder" style="color:var(--jettra-accent); display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; text-align:center;">
+                        <span style="font-size:48px; margin-bottom:20px;">⚡</span>
+                        <h3>CRUD MVC GENERADO</h3>
+                        <p>Se ha analizado el modelo <strong>${mName}</strong> y se ha generado el controlador de vista completo.</p>
+                        <p style="font-size:12px; margin-top:10px; opacity:0.7;">Revise el panel de la derecha para ver el código fuente Java.</p>
+                    </div>
+                `;
+
+                let tblHeaders = ""; let tblRows = ""; let modalBody = "";
                 
                 modelFields.forEach(field => {
                     const CapName = field.name.charAt(0).toUpperCase() + field.name.slice(1);
-                    tblHeaders += `            new io.jettra.wui.components.TD("${CapName}"),\\n`;
-                    tblRows += `                new io.jettra.wui.components.TD(String.valueOf(p.get${CapName}())),\\n`;
+                    const vName = field.name;
+                    const isList = field.type.toLowerCase().includes('list');
+                    const isCustom = /^[A-Z]/.test(field.type) && !['String','Integer','Double','Boolean','Long','Float'].includes(field.type);
                     
-                    formGroups += `        Div g_${field.name} = new Div(); g_${field.name}.addClass("form-group"); g_${field.name}.add(new Label("${field.name}", "${CapName}"));\\n`;
+                    tblHeaders += `            new TD("${CapName}"),\\n`;
+                    tblRows += `                new TD(String.valueOf(p.get${CapName}())),\\n`;
                     
-                    let compType = 'TextBox';
-                    let initStr = `new TextBox("text", "${field.name}")`;
-                    if (field.type.startsWith('List<') || field.type.includes('[]')) {
-                        compType = 'SelectMany';
-                        initStr = `new SelectMany("${field.name}")`;
-                        updateBlock += `                 // TODO: Handle List binding for ${field.name}\\n`;
-                    } else if (/^[A-Z]/.test(field.type) && !['String', 'Integer', 'Double', 'Boolean', 'Float', 'Long', 'Date', 'LocalDate'].includes(field.type)) {
-                        compType = 'SelectOne';
-                        initStr = `new SelectOne("sel_${field.name}", "${field.name}")`;
-                        updateBlock += `                 // TODO: Handle Reference binding for ${field.name}\\n`;
+                    modalBody += `        Div group_${vName} = new Div(); group_${vName}.addClass("form-group");\\n`;
+                    modalBody += `        group_${vName}.add(new Label("label_${vName}", "${CapName}"));\\n`;
+                    
+                    if (isList) {
+                        modalBody += `        SelectMany sel_${vName} = new SelectMany("sel_${vName}");\\n`;
+                        modalBody += `        sel_${vName}.setId("input_${vName}").addClass("j-input");\\n`;
+                        modalBody += `        group_${vName}.add(sel_${vName});\\n`;
+                    } else if (isCustom) {
+                        modalBody += `        SelectOne sel_${vName} = new SelectOne("sel_${vName}", "");\\n`;
+                        modalBody += `        sel_${vName}.setId("input_${vName}").addClass("j-input");\\n`;
+                        modalBody += `        group_${vName}.add(sel_${vName});\\n`;
                     } else {
-                         updateBlock += `                 if (params.get("${field.name}") != null) obj.set${CapName}(params.get("${field.name}"));\\n`;
+                        modalBody += `        TextBox tb_${vName} = new TextBox("text", "${vName}");\\n`;
+                        modalBody += `        tb_${vName}.setId("input_${vName}").addClass("j-input");\\n`;
+                        modalBody += `        group_${vName}.add(tb_${vName});\\n`;
                     }
-                    
-                    formGroups += `        ${compType} input_${field.name} = ${initStr};\\n`;
-                    formGroups += `        input_${field.name}.setId("input_${field.name}").addClass("j-input");\\n`;
-                    formGroups += `        JettraValidations.apply(input_${field.name}, ${mName}.class, "${field.name}");\\n`;
-                    formGroups += `        g_${field.name}.add(input_${field.name});\\n`;
-                    formGroups += `        form.add(g_${field.name});\\n\\n`;
+                    modalBody += `        form.add(group_${vName});\\n\\n`;
                 });
-                
-                // Trim trailing commas
-                tblHeaders = tblHeaders.replace(/,\\\\n$/, '\\n');
-                tblRows = tblRows.replace(/,\\\\n$/, '\\n');
 
-                let javaCode = `package com.jettra.example.pages;
-
-import com.jettra.example.dashboard.DashboardBasePage;
-import com.jettra.example.model.${mName};
-// import com.jettra.example.repository.${repoName};
-import io.jettra.wui.components.*;
-import io.jettra.wui.validations.JettraValidations;
-import io.jettra.wui.complex.Center;
-import io.jettra.wui.core.annotations.InjectViewModel;
-import io.jettra.wui.sync.JettraSyncManager;
-import io.jettra.wui.sync.JettraPageSincronized;
-import io.jettra.wui.sync.SyncType;
-import io.jettra.wui.core.annotations.InjectProperties;
-import com.jettra.server.JettraServer;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.ArrayList;
-
-@JettraPageSincronized(SyncType.ALL)
-public class ${mName}Page extends DashboardBasePage {
-
-    @InjectViewModel
-    ${mName} ${mVar};
-
-    @InjectProperties(name = "messages")
-    private Properties msg;
-
-    private String lang = "es";
-    private Div crudModal;
-    private Header modalTitle;
-    private TextBox modalAction;
-    private Button modalSubmitBtn;
-
-    public ${mName}Page() {
-        super("Mantenimiento de ${mName}");
-    }
-
-    @Override
-    protected void onInit(Map<String, String> params) {
-        String lStr = params.get("lang");
-        if (lStr != null) this.lang = lStr;
-        super.onInit(params);
-    }
-
-    @Override
-    protected void initCenter(Center center, String username) {
-        Style customStyles = new Style(
-            ".crud-table { width: 100%; border-collapse: collapse; margin-top: 20px; color: #fff; }\\n" +
-            ".crud-table th, .crud-table td { padding: 12px; border: 1px solid rgba(0,255,255,0.3); text-align: left; }\\n" +
-            ".crud-table th { background: rgba(0,255,255,0.1); color: #0ff; }\\n" +
-            ".modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); justify-content: center; align-items: center;}\\n" +
-            ".modal-content { background-color: #0d1117; padding: 30px; border: 2px solid #0ff; width: 450px; border-radius: 12px; box-shadow: 0 0 50px rgba(0,255,255,0.4); color: #fff; max-height:80vh; overflow-y:auto;}\\n" +
-            ".form-group { margin-bottom: 20px; }\\n" +
-            ".form-group label { display: block; margin-bottom: 8px; color: #0ff; }\\n" +
-            ".modal-actions { display: flex; justify-content: flex-end; gap: 15px; margin-top: 25px; }"
-        );
-
-        center.add(customStyles);
-        
-        Div mainContent = new Div();
-        mainContent.setStyle("padding", "20px");
-
-        Header title = new Header(2, "Gestión de ${mName}");
-        title.setStyle("color", "var(--jettra-accent)").setStyle("margin-bottom", "20px");
-        mainContent.add(title);
-
-        setupModal(); 
-
-        Button addBtn = new Button("➕ Añadir ${mName}");
-        addBtn.setId("addBtn").addClass("j-btn").setStyle("background-color", "#0f5132");
-        addBtn.addClickListener(() -> {
-            showModal("Nuevo ${mName}", "save");
-        });
-        mainContent.add(addBtn);
-
-        io.jettra.wui.complex.Datatable table = new io.jettra.wui.complex.Datatable();
-        table.addHeaderRow(new io.jettra.wui.components.Row(
-${tblHeaders}
-            new io.jettra.wui.components.TD("Acciones")
-        ));
-
-        // List<${mName}> all = ${repoName}.findAll();
-        List<${mName}> all = new ArrayList<>(); // TODO: Implement Repository call
-        
-        for (${mName} p : all) {
-            io.jettra.wui.components.TD actionsTd = new io.jettra.wui.components.TD();
-            actionsTd.setStyle("display", "flex").setStyle("gap", "10px");
-            
-            Button editBtn = new Button("✏️");
-            editBtn.addClass("j-btn").setId("edit-" + p.get${primaryKey.charAt(0).toUpperCase() + primaryKey.slice(1)}());
-            editBtn.addClickListener(() -> {
-                showModal("Editar", "save");
-            });
-            
-            Button deleteBtn = new Button("🗑️");
-            deleteBtn.addClass("j-btn").setId("del-" + p.get${primaryKey.charAt(0).toUpperCase() + primaryKey.slice(1)}());
-            deleteBtn.setStyle("color", "#ff5555").setStyle("border-color", "#ff5555").setStyle("background", "rgba(255,0,0,0.1)");
-            deleteBtn.addClickListener(() -> {
-                showModal("¿Eliminar?", "delete");
-            });
-            
-            actionsTd.add(editBtn).add(deleteBtn);
-            table.addRow(new io.jettra.wui.components.Row(
-${tblRows}
-                actionsTd
-            ));
-        }
-        mainContent.add(table);
-        center.add(mainContent);
-    }
-
-    private void showModal(String title, String action) {
-        this.crudModal.setStyle("display", "flex");
-        this.modalTitle.setContent(title);
-        this.modalAction.setProperty("value", action);
-        
-        if ("delete".equals(action)) {
-            this.modalSubmitBtn.setContent("¡Confirmar!");
-            this.modalSubmitBtn.setStyle("background-color", "rgba(255,0,0,0.6)");
-        } else {
-            this.modalSubmitBtn.setContent("Guardar");
-            this.modalSubmitBtn.setStyle("background-color", "");
-        }
-    }
-
-    private void setupModal() {
-        this.crudModal = new Div();
-        this.crudModal.setId("crudModal").addClass("modal");
-
-        Div modalBody = new Div();
-        modalBody.addClass("modal-content");
-        
-        this.modalTitle = new Header(3, "Operación");
-        this.modalTitle.setId("modalTitle");
-
-        Form form = new Form("crudForm", JettraServer.resolvePath("/" + "${mName}".toLowerCase() + "page"));
-        this.modalAction = new TextBox("hidden", "modalAction");
-        this.modalAction.setId("modalAction");
-        
-${formGroups}
-        Div groupActions = new Div();
-        groupActions.addClass("modal-actions");
-        
-        Button cancelBtn = new Button("CERRAR");
-        cancelBtn.setProperty("type", "button");
-        cancelBtn.addClass("j-btn").setStyle("background", "#555").setStyle("border", "none");
-        cancelBtn.setProperty("onclick", "document.getElementById('crudModal').style.display='none'; return false;");
-
-        this.modalSubmitBtn = new Button("Guardar");
-        this.modalSubmitBtn.setId("modalSubmitBtn").addClass("j-btn").setProperty("type", "submit");
-
-        groupActions.add(cancelBtn).add(this.modalSubmitBtn);
-        form.add(this.modalAction);
-        // Add form group elements manually here: form.add(g_xx)...
-        form.add(groupActions);
-        
-        modalBody.add(this.modalTitle).add(form);
-        this.crudModal.add(modalBody);
-        this.add(this.crudModal);
-    }
-
-    @Override
-    protected void onPost(Map<String, String> params) {
-        String action = params.get("modalAction");
-        String pKey = params.get("${primaryKey}");
-        
-        boolean changed = false;
-        if ("save".equals(action)) {
-             ${mName} obj = new ${mName}();
-${updateBlock}
-             // ${repoName}.save(obj);
-             JettraSyncManager.notifyChange("${mName}", SyncType.UPDATE, getLoggedUser(currentExchange));
-             changed = true;
-        } else if ("delete".equals(action)) {
-             // ${repoName}.delete(pKey);
-             JettraSyncManager.notifyChange("${mName}", SyncType.DELETE, getLoggedUser(currentExchange));
-             changed = true;
-        }
-        
-        if (changed) {
-            try {
-                redirect(currentExchange, JettraServer.resolvePath("/" + "${mName}".toLowerCase() + "page?lang=" + lang));
-            } catch (IOException e) { 
-                e.printStackTrace();
-            }
-        }
-    }
-}
-`;
+                let javaCode = `package com.jettra.example.pages;\\n\\n`;
+                javaCode += `import com.jettra.example.dashboard.DashboardBasePage;\\n`;
+                javaCode += `import com.jettra.example.model.${mName};\\n`;
+                javaCode += `import com.jettra.example.repository.${repoName};\\n`;
+                javaCode += `import io.jettra.wui.complex.*;\\n`;
+                javaCode += `import io.jettra.wui.components.*;\\n`;
+                javaCode += `import java.util.*;\\n\\n`;
+                javaCode += `public class ${baseName}Page extends DashboardBasePage {\\n\\n`;
+                javaCode += `    private ${mName} model = new ${mName}();\\n\\n`;
+                javaCode += `    public ${baseName}Page() {\\n        super("${baseName} Administration");\\n    }\\n\\n`;
+                javaCode += `    @Override\\n    protected void initCenter(Center center, String user) {\\n`;
+                javaCode += `        Div container = new Div(); container.setStyle("padding", "30px");\\n\\n`;
+                javaCode += `        Header title = new Header(2, "Mantenimiento de ${baseName}");\\n`;
+                javaCode += `        title.setStyle("color", "var(--jettra-accent)").setStyle("margin-bottom", "20px");\\n`;
+                javaCode += `        container.add(title);\\n\\n`;
+                javaCode += `        Button addBtn = new Button("➕ Nuevo ${baseName}"); addBtn.addClass("j-btn-primary");\\n`;
+                javaCode += `        addBtn.addClickListener(() -> { showModal("Crear ${baseName}", "save"); });\\n`;
+                javaCode += `        container.add(addBtn).add(new Divide());\\n\\n`;
+                javaCode += `        Datatable table = new Datatable();\\n`;
+                javaCode += `        table.addHeaderRow(new Row(\\n${tblHeaders}            new TD("Acciones")));\\n\\n`;
+                javaCode += `        List<${mName}> list = ${repoName}.findAll();\\n`;
+                javaCode += `        for (${mName} p : list) {\\n`;
+                javaCode += `            TD actions = new TD();\\n`;
+                javaCode += `            Button edit = new Button("✏️"); edit.addClass("j-btn");\\n`;
+                javaCode += `            edit.addClickListener(() -> { this.model = p; showModal("Editar ${baseName}", "update"); });\\n`;
+                javaCode += `            actions.add(edit);\\n`;
+                javaCode += `            table.addRow(new Row(\\n${tblRows}                actions));\\n`;
+                javaCode += `        }\\n        container.add(table);\\n        center.add(container);\\n        setupModal();\\n    }\\n\\n`;
+                javaCode += `    private void showModal(String title, String action) {\\n        document.getElementById("crud-modal").style.display = "flex";\\n    }\\n\\n`;
+                javaCode += `    private void setupModal() {\\n`;
+                javaCode += `        Modal modal = new Modal("crud-modal");\\n`;
+                javaCode += `        modal.addClass("j-modal-content");\\n`;
+                javaCode += `        Form form = new Form("crud-form", "");\\n\\n`;
+                javaCode += modalBody;
+                javaCode += `        Button saveBtn = new Button("GUARDAR"); saveBtn.addClass("j-btn-primary");\\n`;
+                javaCode += `        modal.add(new Header(3, "Datos del Registro")).add(form).add(saveBtn);\\n`;
+                javaCode += `        this.add(modal);\\n    }\\n}\\n`;
 
                 document.getElementById('generated-code-display').value = javaCode;
                 document.getElementById('generated-code-hidden').value = javaCode;
-                
-                window.show3DMessage(
-                    "MVC CRUD Generado", 
-                    "Se ha generado automáticamente el código Java MVC Puro para " + mName + ". Por favor revise el panel de código. Se omitieron visualmente los bucles en el canvas."
-                );
+                window.show3DMessage("CRUD Generado", "Se ha generado el código base siguiendo el patrón MVC.");
             };
 
             window.clearDesigner = function() {
-                window.show3DConfirm(
-                    "Clear Canvas", 
-                    "Are you sure you want to delete all elements and start over?", 
-                    () => {
-                        const canvas = document.getElementById('canvas-drop-area');
-                        if (!canvas) return;
-                        const titleEl = document.getElementById('canvas-title-text');
-                        if (titleEl) titleEl.innerText = 'View';
-                        canvas.innerHTML = '<div class="canvas-placeholder">Start dragging components here to design</div>';
-                        
-                        document.getElementById('generated-code-display').value = "// Designer Cleared";
-                        document.getElementById('generated-code-hidden').value = "";
-                        
-                        const mtArea = document.getElementById('modal-list-container');
-                        if (mtArea) mtArea.innerHTML = '';
-                        
-                        selectedItem = null;
-                        currentModel = null;
-                        window.updateInspector();
-                        window.show3DMessage("Canvas Cleared", "Designer session has been reset.");
-                    }
-                );
+                window.show3DConfirm("Limpiar", "¿Borrar elementos?", () => {
+                    document.getElementById('canvas-drop-area').innerHTML = '<div class="canvas-placeholder">Start dragging...</div>';
+                    selectedItem = null;
+                    window.updateInspector();
+                });
+            };
+
             };
 
             window.updateGeneratedCode = function() {

@@ -145,7 +145,8 @@ public class SelectManyPage extends DashboardBasePage {
         selectMany.addOption("BOG", "Bogotá");
         selectMany.addOption("MIA", "Miami");
         selectMany.addOption("MEX", "Ciudad de México");
-        selectMany.setStyle("width", "300px");
+        selectMany.addOption("BCN", "Barcelona");
+        selectMany.addOption("ROM", "Roma");
         
         demoArea.add(selectMany);
         container.add(demoArea);
