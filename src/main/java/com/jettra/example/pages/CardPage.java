@@ -39,17 +39,45 @@ public class CardPage extends DashboardBasePage {
         
         // --- Modal Dialog for Java Code ---
         io.jettra.wui.complex.Modal codeModal = new io.jettra.wui.complex.Modal("card-code-modal");
-        codeModal.setStyle("display", "none").setStyle("background", "var(--jettra-glass)")
+        
+        // Modal style for centered, draggable, and scrolling
+        codeModal.setStyle("display", "none")
+                 .setStyle("background", "var(--jettra-glass)")
                  .setStyle("backdrop-filter", "blur(10px)")
                  .setStyle("padding", "20px").setStyle("border-radius", "8px")
                  .setStyle("width", "90%").setStyle("max-width", "800px")
-                 .setStyle("border", "1px solid var(--jettra-border)");
+                 .setStyle("border", "1px solid var(--jettra-border)")
+                 .setStyle("position", "fixed").setStyle("top", "50%").setStyle("left", "50%")
+                 .setStyle("transform", "translate(-50%, -50%)").setStyle("z-index", "1000")
+                 .setStyle("box-shadow", "0 10px 40px rgba(0,0,0,0.5)");
         
-        codeModal.add(new Header(3, "Java Code Examples").setStyle("margin-top", "0").setStyle("color", "var(--jettra-accent)"));
+        Header modalH3 = new Header(3, "Java Code Examples");
+        modalH3.setProperty("id", "card-modal-header");
+        modalH3.setStyle("margin-top", "0").setStyle("color", "var(--jettra-accent)").setStyle("cursor", "move");
+        codeModal.add(modalH3);
+
+        // Draggable script
+        io.jettra.wui.core.UIComponent dragScript = new io.jettra.wui.core.UIComponent("script") {};
+        dragScript.setContent(
+            "const cardMod = document.getElementById('card-code-modal');" +
+            "const cardHrd = document.getElementById('card-modal-header');" +
+            "let cardDragging = false; let cardX=0; let cardY=0;" +
+            "cardHrd.onmousedown = (e) => { cardDragging=true; cardX=e.clientX; cardY=e.clientY; };" +
+            "window.addEventListener('mouseup', () => { cardDragging=false; });" +
+            "window.addEventListener('mousemove', (e) => { " +
+            "  if(!cardDragging) return;" +
+            "  const dx = e.clientX - cardX; const dy = e.clientY - cardY; cardX=e.clientX; cardY=e.clientY;" +
+            "  const rect = cardMod.getBoundingClientRect();" +
+            "  cardMod.style.left = (rect.left + dx + rect.width/2) + 'px';" +
+            "  cardMod.style.top = (rect.top + dy + rect.height/2) + 'px';" +
+            "});"
+        );
+        codeModal.add(dragScript);
         
         Div codeContainer = new Div();
         codeContainer.setStyle("background", "rgba(0,0,0,0.4)").setStyle("padding", "15px")
-                     .setStyle("border-radius", "4px").setStyle("overflow-x", "auto")
+                     .setStyle("border-radius", "4px").setStyle("overflow-y", "auto")
+                     .setStyle("max-height", "60vh")
                      .setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
         
         String javaCode = "// 1. Basic Card\\n" +

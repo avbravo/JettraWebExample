@@ -65,6 +65,7 @@ public class WebExampleMain {
         server.addHandler("/paragraph", com.jettra.example.pages.ParagraphPage.class);
         server.addHandler("/radiobutton", com.jettra.example.pages.RadioButtonPage.class);
         server.addHandler("/selectone", com.jettra.example.pages.SelectOnePage.class);
+        server.addHandler("/selectmany", com.jettra.example.pages.SelectManyPage.class);
         server.addHandler("/schedule", com.jettra.example.pages.SchedulePage.class);
         server.addHandler("/table", com.jettra.example.pages.TablePage.class);
         server.addHandler("/textbox", com.jettra.example.pages.TextBoxPage.class);

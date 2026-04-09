@@ -336,7 +336,7 @@ public class WebDesignerPage extends DashboardBasePage {
         // Typography
         addPaletteCategory(palette, "Typography", new String[]{"Header", "Paragraph", "Span", "Label", "Separator", "Divide"});
         // Forms
-        addPaletteCategory(palette, "Forms", new String[]{"Button", "CheckBox", "CheckBoxGroup", "CreditCard", "RadioButton", "RadioGroupButton", "ScheduleControl", "SelectOne", "SelectOneIcon", "TextBox", "TextArea", "ToggleSwitch", "FileUpload", "FolderSelector", "OTPValidator", "Catcha"});
+        addPaletteCategory(palette, "Forms", new String[]{"Button", "CheckBox", "CheckBoxGroup", "CreditCard", "RadioButton", "RadioGroupButton", "ScheduleControl", "SelectOne", "SelectMany", "SelectOneIcon", "TextBox", "TextArea", "ToggleSwitch", "FileUpload", "FolderSelector", "OTPValidator", "Catcha"});
         // Date
         addPaletteCategory(palette, "Date", new String[]{"DatePicker", "Time", "Calendar", "Schedule", "Organigram", "Timeline"});
         // Navigation
@@ -1049,11 +1049,11 @@ public class WebDesignerPage extends DashboardBasePage {
             };
 
             window.parseModelFieldsContent = function(content) {
-                const fieldRegex = /private\\s+\\w+\\s+(\\w+);/g;
+                const fieldRegex = /private\\s+([\\w<>]+)\\s+(\\w+);/g;
                 let match;
                 modelFields = [];
                 while ((match = fieldRegex.exec(content)) !== null) {
-                    modelFields.push(match[1]);
+                    modelFields.push({ type: match[1], name: match[2] });
                 }
                 window.updateInspector();
                 window.updateGeneratedCode();
@@ -1511,12 +1511,19 @@ public class WebDesignerPage extends DashboardBasePage {
                 modelFields.forEach(field => {
                     const fieldRow = document.createElement('div');
                     fieldRow.style.marginBottom = "10px";
-                    fieldRow.innerHTML = `<label style="font-size:10px; color:#aaa; display:block">${field}</label>`;
+                    fieldRow.innerHTML = `<label style="font-size:10px; color:#aaa; display:block">${field.name}</label>`;
                     modalContainer.appendChild(fieldRow);
                     
-                    window.addComponentToCanvas('TextBox', modalContainer);
+                    let compType = 'TextBox';
+                    if (field.type.startsWith('List<')) {
+                        compType = 'SelectMany';
+                    } else if (/^[A-Z]/.test(field.type) && !['String', 'Integer', 'Double', 'Boolean', 'Float', 'Long', 'Date', 'LocalDate'].includes(field.type)) {
+                        compType = 'SelectOne';
+                    }
+                    
+                    window.addComponentToCanvas(compType, modalContainer);
                     const tb = modalContainer.lastElementChild;
-                    tb.setAttribute('data-props', JSON.stringify({text: field, columns: 2, events: {}, binding: field}));
+                    tb.setAttribute('data-props', JSON.stringify({text: field.name, columns: 2, options: "Option 1, Option 2", events: {}, binding: field.name}));
                 });
 
                 // Modal Actions (Save/Cancel)
