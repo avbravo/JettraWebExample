@@ -43,10 +43,7 @@ public class CardPage extends DashboardBasePage {
                  .setStyle("backdrop-filter", "blur(10px)")
                  .setStyle("padding", "20px").setStyle("border-radius", "8px")
                  .setStyle("width", "90%").setStyle("max-width", "800px")
-                 .setStyle("border", "1px solid var(--jettra-border)")
-                 .setStyle("position", "fixed").setStyle("top", "50%").setStyle("left", "50%")
-                 .setStyle("transform", "translate(-50%, -50%)").setStyle("z-index", "1000")
-                 .setStyle("max-height", "80vh").setStyle("overflow-y", "auto");
+                 .setStyle("border", "1px solid var(--jettra-border)");
         
         codeModal.add(new Header(3, "Java Code Examples").setStyle("margin-top", "0").setStyle("color", "var(--jettra-accent)"));
         

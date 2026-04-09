@@ -116,6 +116,7 @@ public class WebExampleMain {
         server.addHandler("/barcode", com.jettra.example.pages.BarCodePage.class);
         server.addHandler("/otpvalidator", com.jettra.example.pages.OTPValidatorPage.class);
         server.addHandler("/catcha", com.jettra.example.pages.CatchaPage.class);
+        server.addHandler("/creditcard", com.jettra.example.pages.CreditCardPage.class);
 
         server.start();
     }

@@ -336,7 +336,7 @@ public class WebDesignerPage extends DashboardBasePage {
         // Typography
         addPaletteCategory(palette, "Typography", new String[]{"Header", "Paragraph", "Span", "Label", "Separator", "Divide"});
         // Forms
-        addPaletteCategory(palette, "Forms", new String[]{"Button", "CheckBox", "CheckBoxGroup", "RadioButton", "RadioGroupButton", "ScheduleControl", "SelectOne", "SelectOneIcon", "TextBox", "TextArea", "ToggleSwitch", "FileUpload", "FolderSelector", "OTPValidator", "Catcha"});
+        addPaletteCategory(palette, "Forms", new String[]{"Button", "CheckBox", "CheckBoxGroup", "CreditCard", "RadioButton", "RadioGroupButton", "ScheduleControl", "SelectOne", "SelectOneIcon", "TextBox", "TextArea", "ToggleSwitch", "FileUpload", "FolderSelector", "OTPValidator", "Catcha"});
         // Date
         addPaletteCategory(palette, "Date", new String[]{"DatePicker", "Time", "Calendar", "Schedule", "Organigram", "Timeline"});
         // Navigation
@@ -470,6 +470,7 @@ public class WebDesignerPage extends DashboardBasePage {
             var viewModelName = "BaseViewModel";
             var activeEventProperty = null;
             var projectFilesMap = {};
+            window.isSyncing = false;
 
             // EXPOSE FUNCTIONS TO WINDOW EXPLICITLY
             window.drag = function(ev) {
@@ -622,6 +623,7 @@ public class WebDesignerPage extends DashboardBasePage {
                     case 'FolderSelector': content = '<div style="border:1px dashed var(--jettra-accent); padding:20px; text-align:center; border-radius:8px; color:var(--jettra-text);"><div style="font-size:24px; margin-bottom:10px;">📁</div><span>Select Directory</span></div>'; break;
                     case 'OTPValidator': content = '<div class="j-component" style="display:flex; justify-content:center; gap:5px; padding:10px;"><input disabled style="width:30px; height:40px; text-align:center;" value="*"/><input disabled style="width:30px; height:40px; text-align:center;" value="*"/><input disabled style="width:30px; height:40px; text-align:center;" value="*"/><input disabled style="width:30px; height:40px; text-align:center;" value="*"/></div>'; break;
                     case 'Catcha': content = '<div class="j-component" style="padding:10px; border:1px solid #aaa; border-radius:4px; display:inline-flex; align-items:center; gap:10px; background:#f9f9f9;"><input type="checkbox" disabled/> <span style="color:#333; font-family:sans-serif">I\\'m not a robot</span></div>'; break;
+                    case 'CreditCard': content = '<div class="j-component" style="padding:15px; border:1px solid rgba(0,255,255,0.2); border-radius:12px; background:linear-gradient(145deg, #1e293b, #0f172a); min-height:100px; display:flex; flex-direction:column; gap:10px; width:280px;"><div style="font-family:monospace; font-size:16px; color:#fff; letter-spacing:2px; margin-top:20px;">•••• •••• •••• ••••</div><div style="display:flex; justify-content:space-between; color:#94a3b8; font-size:10px;"><span class="cc-name-mock">NAME SURNAME</span><span>MM/YY</span></div><button class="j-btn j-btn-primary" style="margin-top:10px; width:100%; border-radius:8px; padding:10px;" disabled>Pay Now</button><div class="canvas-container" style="min-height:30px; border:1px dashed rgba(255,255,255,0.1); margin-top:5px; padding:5px;"></div></div>'; break;
                     case 'Link': content = '<a href="javascript:void(0)" style="color:var(--jettra-accent); text-decoration:underline;"><span>Link Text</span></a>'; break;
                     case 'Menu': content = '<div style="background:rgba(0,0,0,0.4); padding:10px; border-radius:4px; display:inline-block;"><div style="padding:8px 15px; cursor:pointer;"><span>Menu Item</span></div></div>'; break;
                     case 'MenuBar': content = '<div class="canvas-container" style="background:rgba(0,0,0,0.4); padding:10px; border-radius:4px; display:flex; gap:15px; min-height:45px; border:1px dashed rgba(255,255,255,0.2);"></div>'; break;
@@ -940,6 +942,13 @@ public class WebDesignerPage extends DashboardBasePage {
                     `;
                 }
 
+                if (type === 'CreditCard') {
+                    html += `
+                        <div class="inspector-row"><span class="inspector-label">Form Action</span><input type="text" class="inspector-input" value="${props.formAction || ''}" onchange="updateProp('formAction', this.value)"></div>
+                        <div class="inspector-row"><span class="inspector-label">Submit Text</span><input type="text" class="inspector-input" value="${props.submitText || 'Pay Now'}" onchange="updateProp('submitText', this.value)"></div>
+                    `;
+                }
+
                 if (type === 'Clock') {
                     html += `
                         <div class="inspector-row" style="display:flex; justify-content:space-between; align-items:center;">
@@ -1117,6 +1126,13 @@ public class WebDesignerPage extends DashboardBasePage {
                     if (key === 'title') { const tEl = selectedItem.querySelector('.card-title-mock'); if (tEl) tEl.innerText = value; }
                     if (key === 'subtitle') { const sEl = selectedItem.querySelector('.card-subtitle-mock'); if (sEl) sEl.innerText = value; }
                     if (key === 'content') { const cEl = selectedItem.querySelector('.card-content-mock'); if (cEl) cEl.innerText = value; }
+                }
+
+                if (type === 'CreditCard') {
+                    if (key === 'submitText') {
+                        const btnEl = selectedItem.querySelector('button');
+                        if (btnEl) btnEl.innerText = value;
+                    }
                 }
 
                 if ((key === 'options' || key === 'icon') && (type === 'SelectOne' || type === 'SelectOneIcon')) {
@@ -1551,6 +1567,7 @@ public class WebDesignerPage extends DashboardBasePage {
             };
 
             window.updateGeneratedCode = function() {
+                if (window.isSyncing) return;
                 const display = document.getElementById('generated-code-display');
                 const hidden = document.getElementById('generated-code-hidden');
                 if (!display || !hidden) return;
@@ -1840,6 +1857,16 @@ public class WebDesignerPage extends DashboardBasePage {
                                 out += handleEvents(v);
                                 out += `        ${container}.add(${v});\\n`;
                                 break;
+                            case 'CreditCard':
+                                out += `        CreditCard ${v} = new CreditCard("${v}");\\n`;
+                                if (props.formAction) out += `        ${v}.setFormAction("${props.formAction}");\\n`;
+                                if (props.submitText) out += `        ${v}.setSubmitText("${props.submitText}");\\n`;
+                                const kidsCC = it.querySelectorAll(':scope > .canvas-container > .canvas-item, :scope > div > .canvas-container > .canvas-item');
+                                if (kidsCC.length > 0) out += walk(kidsCC, v);
+                                out += handleCommon(v);
+                                out += handleEvents(v);
+                                out += `        ${container}.add(${v});\\n`;
+                                break;
                             default: 
                                 // Catch-all for components without direct text args (e.g., CheckBox, ToggleSwitch, Spinner, etc)
                                 if (props.text && props.text !== type && type !== 'Spinner') {
@@ -1864,8 +1891,12 @@ public class WebDesignerPage extends DashboardBasePage {
             };
 
             window.syncCodeToCanvas = function() {
+                window.isSyncing = true;
                 const display = document.getElementById('generated-code-display');
-                if (!display) return;
+                if (!display) {
+                    window.isSyncing = false;
+                    return;
+                }
                 const code = display.value;
                 const canvas = document.getElementById('canvas-drop-area');
                 
@@ -2017,7 +2048,9 @@ public class WebDesignerPage extends DashboardBasePage {
                 }
                 
                 document.getElementById('generated-code-hidden').value = code;
+                display.value = code;
                 window.show3DMessage("Sync Complete", "Canvas has been rebuilt exactly from the structured Java source code.");
+                setTimeout(() => { window.isSyncing = false; }, 100);
             };
 
             window.previewInterface = function() {
