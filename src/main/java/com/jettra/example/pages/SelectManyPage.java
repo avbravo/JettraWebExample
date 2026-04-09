@@ -63,14 +63,22 @@ public class SelectManyPage extends DashboardBasePage {
             "const smMod = document.getElementById('selectmany-code-modal');" +
             "const smHrd = document.getElementById('selectmany-modal-header');" +
             "let smDragging = false; let smX=0; let smY=0;" +
-            "smHrd.onmousedown = (e) => { smDragging=true; smX=e.clientX; smY=e.clientY; };" +
+            "smHrd.onmousedown = (e) => { " +
+            "  smDragging=true; smX=e.clientX; smY=e.clientY;" +
+            "  if (smMod.style.transform.includes('translate')) {" +
+            "    const rect = smMod.getBoundingClientRect();" +
+            "    smMod.style.transform = 'none';" +
+            "    smMod.style.left = rect.left + 'px';" +
+            "    smMod.style.top = rect.top + 'px';" +
+            "  }" +
+            "};" +
             "window.addEventListener('mouseup', () => { smDragging=false; });" +
             "window.addEventListener('mousemove', (e) => { " +
             "  if(!smDragging) return;" +
             "  const dx = e.clientX - smX; const dy = e.clientY - smY; smX=e.clientX; smY=e.clientY;" +
             "  const rect = smMod.getBoundingClientRect();" +
-            "  smMod.style.left = (rect.left + dx + rect.width/2) + 'px';" +
-            "  smMod.style.top = (rect.top + dy + rect.height/2) + 'px';" +
+            "  smMod.style.left = (rect.left + dx) + 'px';" +
+            "  smMod.style.top = (rect.top + dy) + 'px';" +
             "});"
         );
         codeModal.add(dragScript);
@@ -88,8 +96,7 @@ public class SelectManyPage extends DashboardBasePage {
                           "selectMany.addOption(\"SJO\", \"San José\");\\n" +
                           "selectMany.addOption(\"BOG\", \"Bogotá\");\\n\\n" +
                           "// 2. Styling\\n" +
-                          "selectMany.setStyle(\"width\", \"300px\");\\n" +
-                          "selectMany.setStyle(\"height\", \"150px\");\\n";
+                          "selectMany.setStyle(\"width\", \"300px\");\\n";
                           
         UIComponent pre = new UIComponent("pre") {};
         pre.setStyle("margin", "0");
@@ -138,7 +145,7 @@ public class SelectManyPage extends DashboardBasePage {
         selectMany.addOption("BOG", "Bogotá");
         selectMany.addOption("MIA", "Miami");
         selectMany.addOption("MEX", "Ciudad de México");
-        selectMany.setStyle("width", "300px").setStyle("height", "150px");
+        selectMany.setStyle("width", "300px");
         
         demoArea.add(selectMany);
         container.add(demoArea);

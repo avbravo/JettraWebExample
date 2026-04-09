@@ -1467,85 +1467,249 @@ public class WebDesignerPage extends DashboardBasePage {
                     return;
                 }
                 
-                canvas.innerHTML = "";
-                const placeholder = document.querySelector('.canvas-placeholder');
-                if (placeholder) placeholder.remove();
+                canvas.innerHTML = '<div class="canvas-placeholder" style="color:var(--jettra-accent)"><h3>MVC CRUD Generado</h3><p>El código Java para el CRUD completo se ha generado en el panel de la derecha.</p><p>Nota: El canvas visual no puede representar ciclos complejos como el requerido por la tabla de este MVC puro.</p></div>';
 
-                // 1. Title Header
-                window.addComponentToCanvas('Header', canvas);
-                const lastHeader = canvas.lastElementChild;
-                lastHeader.setAttribute('data-props', JSON.stringify({text: currentModel.name + " Management", columns: 2, events: {}, binding: ""}));
-                const h2 = lastHeader.querySelector('h2');
-                if (h2) h2.innerText = currentModel.name + " Management";
-
-                // 2. Action Bar (Grid with Add Button)
-                window.addComponentToCanvas('Grid', canvas);
-                const grid = canvas.lastElementChild;
-                const gridContainer = grid.querySelector('.canvas-container');
-                grid.setAttribute('data-props', JSON.stringify({text: "Actions", columns: 2, events: {}, binding: ""}));
+                const mName = currentModel.name;
+                const mVar = mName.charAt(0).toLowerCase() + mName.slice(1);
+                const repoName = mName.replace("Model", "") + "Repository";
                 
-                window.addComponentToCanvas('Button', gridContainer);
-                const addBtn = gridContainer.lastElementChild;
-                const modalId = currentModel.name.toLowerCase() + "-modal-" + Math.floor(Math.random()*1000);
-                addBtn.setAttribute('data-props', JSON.stringify({text: "⚡ Add New " + currentModel.name, columns: 2, events: {onClick: "e -> { \\n    document.getElementById('" + modalId + "').style.display = 'block';\\n}"}, binding: ""}));
-                const btn = addBtn.querySelector('button');
-                if (btn) {
-                    btn.innerText = "⚡ Add New " + currentModel.name;
-                    btn.className = "j-btn-primary btn-3d";
-                }
-
-                // 3. Data Table
-                window.addComponentToCanvas('Table', canvas);
-                const table = canvas.lastElementChild;
-                table.setAttribute('data-props', JSON.stringify({text: currentModel.name + " List", columns: 2, events: {}, binding: ""}));
-
-                // 4. Modal with Form Fields
-                window.addComponentToCanvas('Modal', canvas);
-                const modalToolsArea = document.getElementById('modal-list-container');
-                const modal = modalToolsArea ? modalToolsArea.lastElementChild : canvas.lastElementChild;
-                modal.id = modalId;
-                modal.setAttribute('data-props', JSON.stringify({text: "Enter " + currentModel.name + " Details", columns: 2, events: {}, binding: "", idGen: modalId}));
-                const modalContainer = modal.querySelector('.canvas-container') || modal;
+                let tblHeaders = "";
+                let tblRows = "";
+                let formGroups = "";
+                let updateBlock = "";
+                let primaryKey = modelFields.length > 0 ? modelFields[0].name : "id";
                 
-                // Add fields from model
                 modelFields.forEach(field => {
-                    const fieldRow = document.createElement('div');
-                    fieldRow.style.marginBottom = "10px";
-                    fieldRow.innerHTML = `<label style="font-size:10px; color:#aaa; display:block">${field.name}</label>`;
-                    modalContainer.appendChild(fieldRow);
+                    const CapName = field.name.charAt(0).toUpperCase() + field.name.slice(1);
+                    tblHeaders += `            new io.jettra.wui.components.TD("${CapName}"),\\n`;
+                    tblRows += `                new io.jettra.wui.components.TD(String.valueOf(p.get${CapName}())),\\n`;
+                    
+                    formGroups += `        Div g_${field.name} = new Div(); g_${field.name}.addClass("form-group"); g_${field.name}.add(new Label("${field.name}", "${CapName}"));\\n`;
                     
                     let compType = 'TextBox';
-                    if (field.type.startsWith('List<')) {
+                    let initStr = `new TextBox("text", "${field.name}")`;
+                    if (field.type.startsWith('List<') || field.type.includes('[]')) {
                         compType = 'SelectMany';
+                        initStr = `new SelectMany("${field.name}")`;
+                        updateBlock += `                 // TODO: Handle List binding for ${field.name}\\n`;
                     } else if (/^[A-Z]/.test(field.type) && !['String', 'Integer', 'Double', 'Boolean', 'Float', 'Long', 'Date', 'LocalDate'].includes(field.type)) {
                         compType = 'SelectOne';
+                        initStr = `new SelectOne("sel_${field.name}", "${field.name}")`;
+                        updateBlock += `                 // TODO: Handle Reference binding for ${field.name}\\n`;
+                    } else {
+                         updateBlock += `                 if (params.get("${field.name}") != null) obj.set${CapName}(params.get("${field.name}"));\\n`;
                     }
                     
-                    window.addComponentToCanvas(compType, modalContainer);
-                    const tb = modalContainer.lastElementChild;
-                    tb.setAttribute('data-props', JSON.stringify({text: field.name, columns: 2, options: "Option 1, Option 2", events: {}, binding: field.name}));
+                    formGroups += `        ${compType} input_${field.name} = ${initStr};\\n`;
+                    formGroups += `        input_${field.name}.setId("input_${field.name}").addClass("j-input");\\n`;
+                    formGroups += `        JettraValidations.apply(input_${field.name}, ${mName}.class, "${field.name}");\\n`;
+                    formGroups += `        g_${field.name}.add(input_${field.name});\\n`;
+                    formGroups += `        form.add(g_${field.name});\\n\\n`;
                 });
-
-                // Modal Actions (Save/Cancel)
-                const modalActions = document.createElement('div');
-                modalActions.style.display = "flex";
-                modalActions.style.gap = "10px";
-                modalActions.style.marginTop = "20px";
-                modalContainer.appendChild(modalActions);
-
-                window.addComponentToCanvas('Button', modalActions);
-                const saveBtn = modalActions.lastElementChild;
-                saveBtn.setAttribute('data-props', JSON.stringify({text: "Save " + currentModel.name, columns: 2, events: {onClick: "e -> { \\n    window.show3DMessage('Data Saved', 'Saving " + currentModel.name + " to database...'); \\n    document.getElementById('" + modalId + "').style.display = 'none'; \\n}"}, binding: ""}));
                 
-                window.addComponentToCanvas('Button', modalActions);
-                const cancelBtn = modalActions.lastElementChild;
-                cancelBtn.setAttribute('data-props', JSON.stringify({text: "Cancel", columns: 2, events: {onClick: "e -> { \\n    document.getElementById('" + modalId + "').style.display = 'none'; \\n}"}, binding: ""}));
+                // Trim trailing commas
+                tblHeaders = tblHeaders.replace(/,\\\\n$/, '\\n');
+                tblRows = tblRows.replace(/,\\\\n$/, '\\n');
 
+                let javaCode = `package com.jettra.example.pages;
+
+import com.jettra.example.dashboard.DashboardBasePage;
+import com.jettra.example.model.${mName};
+// import com.jettra.example.repository.${repoName};
+import io.jettra.wui.components.*;
+import io.jettra.wui.validations.JettraValidations;
+import io.jettra.wui.complex.Center;
+import io.jettra.wui.core.annotations.InjectViewModel;
+import io.jettra.wui.sync.JettraSyncManager;
+import io.jettra.wui.sync.JettraPageSincronized;
+import io.jettra.wui.sync.SyncType;
+import io.jettra.wui.core.annotations.InjectProperties;
+import com.jettra.server.JettraServer;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.ArrayList;
+
+@JettraPageSincronized(SyncType.ALL)
+public class ${mName}Page extends DashboardBasePage {
+
+    @InjectViewModel
+    ${mName} ${mVar};
+
+    @InjectProperties(name = "messages")
+    private Properties msg;
+
+    private String lang = "es";
+    private Div crudModal;
+    private Header modalTitle;
+    private TextBox modalAction;
+    private Button modalSubmitBtn;
+
+    public ${mName}Page() {
+        super("Mantenimiento de ${mName}");
+    }
+
+    @Override
+    protected void onInit(Map<String, String> params) {
+        String lStr = params.get("lang");
+        if (lStr != null) this.lang = lStr;
+        super.onInit(params);
+    }
+
+    @Override
+    protected void initCenter(Center center, String username) {
+        Style customStyles = new Style(
+            ".crud-table { width: 100%; border-collapse: collapse; margin-top: 20px; color: #fff; }\\n" +
+            ".crud-table th, .crud-table td { padding: 12px; border: 1px solid rgba(0,255,255,0.3); text-align: left; }\\n" +
+            ".crud-table th { background: rgba(0,255,255,0.1); color: #0ff; }\\n" +
+            ".modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); justify-content: center; align-items: center;}\\n" +
+            ".modal-content { background-color: #0d1117; padding: 30px; border: 2px solid #0ff; width: 450px; border-radius: 12px; box-shadow: 0 0 50px rgba(0,255,255,0.4); color: #fff; max-height:80vh; overflow-y:auto;}\\n" +
+            ".form-group { margin-bottom: 20px; }\\n" +
+            ".form-group label { display: block; margin-bottom: 8px; color: #0ff; }\\n" +
+            ".modal-actions { display: flex; justify-content: flex-end; gap: 15px; margin-top: 25px; }"
+        );
+
+        center.add(customStyles);
+        
+        Div mainContent = new Div();
+        mainContent.setStyle("padding", "20px");
+
+        Header title = new Header(2, "Gestión de ${mName}");
+        title.setStyle("color", "var(--jettra-accent)").setStyle("margin-bottom", "20px");
+        mainContent.add(title);
+
+        setupModal(); 
+
+        Button addBtn = new Button("➕ Añadir ${mName}");
+        addBtn.setId("addBtn").addClass("j-btn").setStyle("background-color", "#0f5132");
+        addBtn.addClickListener(() -> {
+            showModal("Nuevo ${mName}", "save");
+        });
+        mainContent.add(addBtn);
+
+        io.jettra.wui.complex.Datatable table = new io.jettra.wui.complex.Datatable();
+        table.addHeaderRow(new io.jettra.wui.components.Row(
+${tblHeaders}
+            new io.jettra.wui.components.TD("Acciones")
+        ));
+
+        // List<${mName}> all = ${repoName}.findAll();
+        List<${mName}> all = new ArrayList<>(); // TODO: Implement Repository call
+        
+        for (${mName} p : all) {
+            io.jettra.wui.components.TD actionsTd = new io.jettra.wui.components.TD();
+            actionsTd.setStyle("display", "flex").setStyle("gap", "10px");
+            
+            Button editBtn = new Button("✏️");
+            editBtn.addClass("j-btn").setId("edit-" + p.get${primaryKey.charAt(0).toUpperCase() + primaryKey.slice(1)}());
+            editBtn.addClickListener(() -> {
+                showModal("Editar", "save");
+            });
+            
+            Button deleteBtn = new Button("🗑️");
+            deleteBtn.addClass("j-btn").setId("del-" + p.get${primaryKey.charAt(0).toUpperCase() + primaryKey.slice(1)}());
+            deleteBtn.setStyle("color", "#ff5555").setStyle("border-color", "#ff5555").setStyle("background", "rgba(255,0,0,0.1)");
+            deleteBtn.addClickListener(() -> {
+                showModal("¿Eliminar?", "delete");
+            });
+            
+            actionsTd.add(editBtn).add(deleteBtn);
+            table.addRow(new io.jettra.wui.components.Row(
+${tblRows}
+                actionsTd
+            ));
+        }
+        mainContent.add(table);
+        center.add(mainContent);
+    }
+
+    private void showModal(String title, String action) {
+        this.crudModal.setStyle("display", "flex");
+        this.modalTitle.setContent(title);
+        this.modalAction.setProperty("value", action);
+        
+        if ("delete".equals(action)) {
+            this.modalSubmitBtn.setContent("¡Confirmar!");
+            this.modalSubmitBtn.setStyle("background-color", "rgba(255,0,0,0.6)");
+        } else {
+            this.modalSubmitBtn.setContent("Guardar");
+            this.modalSubmitBtn.setStyle("background-color", "");
+        }
+    }
+
+    private void setupModal() {
+        this.crudModal = new Div();
+        this.crudModal.setId("crudModal").addClass("modal");
+
+        Div modalBody = new Div();
+        modalBody.addClass("modal-content");
+        
+        this.modalTitle = new Header(3, "Operación");
+        this.modalTitle.setId("modalTitle");
+
+        Form form = new Form("crudForm", JettraServer.resolvePath("/" + "${mName}".toLowerCase() + "page"));
+        this.modalAction = new TextBox("hidden", "modalAction");
+        this.modalAction.setId("modalAction");
+        
+${formGroups}
+        Div groupActions = new Div();
+        groupActions.addClass("modal-actions");
+        
+        Button cancelBtn = new Button("CERRAR");
+        cancelBtn.setProperty("type", "button");
+        cancelBtn.addClass("j-btn").setStyle("background", "#555").setStyle("border", "none");
+        cancelBtn.setProperty("onclick", "document.getElementById('crudModal').style.display='none'; return false;");
+
+        this.modalSubmitBtn = new Button("Guardar");
+        this.modalSubmitBtn.setId("modalSubmitBtn").addClass("j-btn").setProperty("type", "submit");
+
+        groupActions.add(cancelBtn).add(this.modalSubmitBtn);
+        form.add(this.modalAction);
+        // Add form group elements manually here: form.add(g_xx)...
+        form.add(groupActions);
+        
+        modalBody.add(this.modalTitle).add(form);
+        this.crudModal.add(modalBody);
+        this.add(this.crudModal);
+    }
+
+    @Override
+    protected void onPost(Map<String, String> params) {
+        String action = params.get("modalAction");
+        String pKey = params.get("${primaryKey}");
+        
+        boolean changed = false;
+        if ("save".equals(action)) {
+             ${mName} obj = new ${mName}();
+${updateBlock}
+             // ${repoName}.save(obj);
+             JettraSyncManager.notifyChange("${mName}", SyncType.UPDATE, getLoggedUser(currentExchange));
+             changed = true;
+        } else if ("delete".equals(action)) {
+             // ${repoName}.delete(pKey);
+             JettraSyncManager.notifyChange("${mName}", SyncType.DELETE, getLoggedUser(currentExchange));
+             changed = true;
+        }
+        
+        if (changed) {
+            try {
+                redirect(currentExchange, JettraServer.resolvePath("/" + "${mName}".toLowerCase() + "page?lang=" + lang));
+            } catch (IOException e) { 
+                e.printStackTrace();
+            }
+        }
+    }
+}
+`;
+
+                document.getElementById('generated-code-display').value = javaCode;
+                document.getElementById('generated-code-hidden').value = javaCode;
+                
                 window.show3DMessage(
-                    "CRUD Generado", 
-                    "Se ha generado automáticamente el layout CRUD para " + currentModel.name + ". Hemos añadido " + modelFields.length + " campos vinculados al modelo."
+                    "MVC CRUD Generado", 
+                    "Se ha generado automáticamente el código Java MVC Puro para " + mName + ". Por favor revise el panel de código. Se omitieron visualmente los bucles en el canvas."
                 );
-                window.updateGeneratedCode();
             };
 
             window.clearDesigner = function() {

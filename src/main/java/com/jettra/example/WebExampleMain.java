@@ -40,6 +40,7 @@ public class WebExampleMain {
         server.addHandler("/avatargroup", com.jettra.example.pages.AvatarGroupPage.class);
         server.addHandler("/spinner", com.jettra.example.pages.SpinnerPage.class);
         server.addHandler("/icons", com.jettra.example.pages.IconsPage.class);
+        server.addHandler("/draw", com.jettra.example.pages.DrawPage.class);
         server.addHandler("/kanban", com.jettra.example.pages.KanbanPage.class);
 
         server.addHandler("/button", com.jettra.example.pages.ButtonPage.class);

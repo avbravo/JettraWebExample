@@ -62,14 +62,22 @@ public class CardPage extends DashboardBasePage {
             "const cardMod = document.getElementById('card-code-modal');" +
             "const cardHrd = document.getElementById('card-modal-header');" +
             "let cardDragging = false; let cardX=0; let cardY=0;" +
-            "cardHrd.onmousedown = (e) => { cardDragging=true; cardX=e.clientX; cardY=e.clientY; };" +
+            "cardHrd.onmousedown = (e) => { " +
+            "  cardDragging=true; cardX=e.clientX; cardY=e.clientY;" +
+            "  if (cardMod.style.transform.includes('translate')) {" +
+            "    const rect = cardMod.getBoundingClientRect();" +
+            "    cardMod.style.transform = 'none';" +
+            "    cardMod.style.left = rect.left + 'px';" +
+            "    cardMod.style.top = rect.top + 'px';" +
+            "  }" +
+            "};" +
             "window.addEventListener('mouseup', () => { cardDragging=false; });" +
             "window.addEventListener('mousemove', (e) => { " +
             "  if(!cardDragging) return;" +
             "  const dx = e.clientX - cardX; const dy = e.clientY - cardY; cardX=e.clientX; cardY=e.clientY;" +
             "  const rect = cardMod.getBoundingClientRect();" +
-            "  cardMod.style.left = (rect.left + dx + rect.width/2) + 'px';" +
-            "  cardMod.style.top = (rect.top + dy + rect.height/2) + 'px';" +
+            "  cardMod.style.left = (rect.left + dx) + 'px';" +
+            "  cardMod.style.top = (rect.top + dy) + 'px';" +
             "});"
         );
         codeModal.add(dragScript);
