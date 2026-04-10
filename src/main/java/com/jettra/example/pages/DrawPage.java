@@ -2,15 +2,12 @@ package com.jettra.example.pages;
 
 import com.jettra.example.dashboard.DashboardBasePage;
 import io.jettra.wui.complex.Center;
-import io.jettra.wui.components.Button;
 import io.jettra.wui.components.Div;
 import io.jettra.wui.components.Header;
-import io.jettra.wui.components.Draw;
-import io.jettra.wui.components.TextBox;
 import io.jettra.wui.core.UIComponent;
 
 /**
- * Showcase page for the Draw component.
+ * Showcase page for the Draw component - Refactored for hierarchical design.
  */
 public class DrawPage extends DashboardBasePage {
 
@@ -25,10 +22,13 @@ public class DrawPage extends DashboardBasePage {
         mainWrapper.setStyle("display", "flex").setStyle("height", "calc(100vh - 100px)").setStyle("overflow", "hidden").setStyle("gap", "15px");
 
         // --- Left Palette ---
+        Div sidebar = new Div();
+        sidebar.setStyle("width", "300px").setStyle("display", "flex").setStyle("flex-direction", "column").setStyle("gap", "15px");
+
         Div palette = new Div();
         palette.setProperty("id", "tool-palette");
         palette.addClass("j-3d-effect")
-               .setStyle("width", "280px")
+               .setStyle("flex", "1")
                .setStyle("background", "var(--jettra-glass)")
                .setStyle("backdrop-filter", "blur(20px)")
                .setStyle("border", "1px solid var(--jettra-border)")
@@ -39,42 +39,25 @@ public class DrawPage extends DashboardBasePage {
                .setStyle("gap", "15px")
                .setStyle("overflow-y", "auto");
 
-        Div palHeader = new Div();
-        palHeader.setStyle("display", "flex").setStyle("justify-content", "space-between").setStyle("align-items", "center").setStyle("margin-bottom", "10px");
-        
         Header palTitle = new Header(4, "Designer Palette");
-        palTitle.setStyle("color", "var(--jettra-accent)").setStyle("margin", "0").setStyle("font-size", "14px").setStyle("text-transform", "uppercase").setStyle("letter-spacing", "1px");
-        
-        Button configBtn = new Button("⚙️");
-        configBtn.setStyle("padding", "5px").setStyle("background", "rgba(0,255,255,0.1)").setStyle("border", "1px solid var(--jettra-border)").setStyle("border-radius", "8px").setStyle("cursor", "pointer");
-        configBtn.setProperty("onclick", "toggleToolSettings()");
-        
-        palHeader.add(palTitle).add(configBtn);
-        palette.add(palHeader);
+        palTitle.setStyle("color", "var(--jettra-accent)").setStyle("margin", "0").setStyle("font-size", "14px").setStyle("text-transform", "uppercase");
+        palette.add(palTitle);
 
-        // Tool groups and items
         String[][] allTools = {
-            {"Selection", "🖱️", "selection"},
-            {"Rectangle", "⬜", "rectangle"},
-            {"Diamond", "💎", "diamond"},
-            {"Ellipse", "⭕", "ellipse"},
-            {"Arrow", "➡️", "arrow"},
-            {"Line", "➖", "line"},
-            {"Draw", "✏️", "draw"},
-            {"Text", "A", "text"}
+            {"Container", "📦", "container", "rgba(0,255,255,0.05)"},
+            {"Rectangle", "⬜", "rectangle", "rgba(0,255,255,0.2)"},
+            {"Circle", "⭕", "circle", "rgba(0,255,255,0.2)"},
+            {"Text", "A", "text", "transparent"}
         };
 
         Div toolsList = new Div();
-        toolsList.setProperty("id", "active-tools-list");
         toolsList.setStyle("display", "flex").setStyle("flex-direction", "column").setStyle("gap", "12px");
         
         for (String[] tool : allTools) {
             Div toolItem = new Div();
-            toolItem.addClass("j-3d-effect")
-                    .addClass("palette-tool")
-                    .setProperty("id", "tool-" + tool[2])
+            toolItem.addClass("palette-tool")
                     .setProperty("draggable", "true")
-                    .setProperty("ondragstart", "event.dataTransfer.setData('tool', '" + tool[2] + "')")
+                    .setProperty("ondragstart", "event.dataTransfer.setData('toolType', '" + tool[2] + "')")
                     .setStyle("padding", "12px")
                     .setStyle("background", "rgba(255,255,255,0.03)")
                     .setStyle("border-radius", "10px")
@@ -82,200 +65,214 @@ public class DrawPage extends DashboardBasePage {
                     .setStyle("display", "flex")
                     .setStyle("align-items", "center")
                     .setStyle("gap", "15px")
-                    .setStyle("border", "1px solid rgba(255,255,255,0.05)")
-                    .setStyle("transition", "all 0.3s");
+                    .setStyle("border", "1px solid rgba(0,255,255,0.1)");
             
             UIComponent icon = new UIComponent("span") {};
             icon.setContent(tool[1]);
-            icon.setStyle("font-size", "18px").setStyle("filter", "drop-shadow(0 0 5px var(--jettra-glow))");
+            icon.setStyle("font-size", "18px");
             
             UIComponent name = new UIComponent("span") {};
             name.setContent(tool[0]);
-            name.setStyle("font-size", "14px").setStyle("font-weight", "500").setStyle("color", "#fff");
+            name.setStyle("font-size", "14px").setStyle("color", "#fff");
             
             toolItem.add(icon).add(name);
             toolsList.add(toolItem);
         }
         palette.add(toolsList);
 
-        // --- Action Area (Save/Open) ---
-        Div fileActions = new Div();
-        fileActions.setStyle("margin-top", "auto").setStyle("padding-top", "25px").setStyle("display", "flex").setStyle("flex-direction", "column").setStyle("gap", "12px").setStyle("border-top", "1px solid var(--jettra-border)");
-        
-        Button saveBtn = new Button("💾 Guardar Diagrama");
-        saveBtn.addClass("j-btn-primary").setStyle("width", "100%");
-        saveBtn.setProperty("onclick", "saveJDraw()");
-        
-        Button openBtn = new Button("📂 Importar .jdraw");
-        openBtn.addClass("j-btn-secondary").setStyle("width", "100%");
-        openBtn.setProperty("onclick", "document.getElementById('jdraw-loader').click()");
-        
-        UIComponent fileInput = new UIComponent("input") {};
-        fileInput.setProperty("type", "file");
-        fileInput.setProperty("id", "jdraw-loader");
-        fileInput.setProperty("accept", ".jdraw");
-        fileInput.setStyle("display", "none");
-        fileInput.setProperty("onchange", "loadJDraw(this)");
-        
-        fileActions.add(saveBtn).add(openBtn).add(fileInput);
-        palette.add(fileActions);
+        // --- Property Inspector ---
+        Div inspector = new Div();
+        inspector.setProperty("id", "property-inspector");
+        inspector.addClass("j-3d-effect")
+                 .setStyle("height", "300px")
+                 .setStyle("background", "rgba(10,20,30,0.9)")
+                 .setStyle("border", "1px solid var(--jettra-accent)")
+                 .setStyle("border-radius", "15px")
+                 .setStyle("padding", "20px")
+                 .setStyle("display", "flex")
+                 .setStyle("flex-direction", "column")
+                 .setStyle("gap", "10px");
 
-        // --- Add Dynamic Tool Section ---
-        Div addToolSection = new Div();
-        addToolSection.setStyle("margin-top", "20px").setStyle("border-top", "1px dashed rgba(255,255,255,0.1)").setStyle("padding-top", "15px");
-        
-        Header addToolH = new Header(5, "NEW CUSTOM TOOL");
-        addToolH.setStyle("font-size", "11px").setStyle("color", "#aaa").setStyle("margin-bottom", "12px").setStyle("letter-spacing", "0.5px");
-        
-        TextBox newToolInput = new TextBox("text", "");
-        newToolInput.setId("new-tool-name").addClass("j-input").setStyle("font-size", "13px").setStyle("margin-bottom", "12px");
-        newToolInput.setProperty("placeholder", "Tool Name...");
-        
-        Button addToolBtn = new Button("➕ ADD TOOL");
-        addToolBtn.addClass("j-btn").setStyle("width", "100%").setStyle("font-size", "11px").setStyle("background", "rgba(0,255,255,0.05)");
-        addToolBtn.setProperty("onclick", "addNewToolToPalette()");
-        
-        addToolSection.add(addToolH).add(newToolInput).add(addToolBtn);
-        palette.add(addToolSection);
+        Header insTitle = new Header(5, "Properties");
+        insTitle.setStyle("color", "var(--jettra-accent)").setStyle("margin", "0");
+        inspector.add(insTitle);
+
+        Div propForm = new Div();
+        propForm.setProperty("id", "inspector-fields");
+        propForm.setStyle("display", "flex").setStyle("flex-direction", "column").setStyle("gap", "10px");
+        inspector.add(propForm);
+
+        sidebar.add(palette).add(inspector);
 
         // --- Main Canvas Area ---
         Div canvasArea = new Div();
         canvasArea.setStyle("flex", "1").setStyle("display", "flex").setStyle("flex-direction", "column").setStyle("position", "relative");
         
-        // Handle Drop script target
         Div dropTarget = new Div();
-        dropTarget.setStyle("flex", "1").setStyle("position", "relative").setStyle("overflow", "hidden").setStyle("border-radius", "15px").setStyle("border", "1px solid var(--jettra-border)");
+        dropTarget.setProperty("id", "draw-canvas");
+        dropTarget.setStyle("flex", "1").setStyle("position", "relative").setStyle("overflow", "auto").setStyle("border-radius", "15px").setStyle("border", "2px dashed var(--jettra-accent)").setStyle("background", "rgba(0,0,0,0.2)");
         dropTarget.setProperty("ondragover", "event.preventDefault()");
-        dropTarget.setProperty("ondrop", "handleToolDrop(event)");
-        
-        Draw sketchpad = new Draw("main-sketch", 1600, 1000);
-        sketchpad.setStyle("width", "100%").setStyle("height", "100%");
-        
-        dropTarget.add(sketchpad);
+        dropTarget.setProperty("ondrop", "handleCanvasDrop(event)");
+        dropTarget.setProperty("onclick", "deselectAll()");
+
         canvasArea.add(dropTarget);
 
-        mainWrapper.add(palette).add(canvasArea);
+        mainWrapper.add(sidebar).add(canvasArea);
 
-        // --- Tool Settings Modal ---
-        Div settingsModal = createSettingsModal(allTools);
-        
-        // --- Custom Logic Script ---
-        UIComponent mainScript = new UIComponent("script") {};
-        mainScript.setContent(
-            "function handleToolDrop(event) {" +
-            "  event.preventDefault();" +
-            "  const toolType = event.dataTransfer.getData('tool');" +
-            "  const api = window['excalidrawAPI_main-sketch'];" +
-            "  if(api) {" +
-            "    const rect = document.getElementById('main-sketch').getBoundingClientRect();" +
-            "    const x = event.clientX - rect.left;" +
-            "    const y = event.clientY - rect.top;" +
-            "    const newElement = {" +
-            "      type: (['rectangle','ellipse','diamond','arrow','line'].includes(toolType) ? toolType : 'rectangle')," +
-            "      x: x - 50, y: y - 50, width: 100, height: 100," +
-            "      strokeColor: '#00ffff', backgroundColor: 'rgba(0,255,255,0.1)'," +
-            "      fillStyle: 'solid', strokeWidth: 2, roughness: 1, opacity: 100," +
-            "      seed: Math.floor(Math.random() * 100000)," +
-            "      version: 1, versionNonce: Math.floor(Math.random() * 100000)," +
-            "      isDeleted: false, groupIds: [], boundElements: []," +
-            "      id: 'dt_' + Date.now()" +
-            "    };" +
-            "    api.updateScene({ elements: [...api.getSceneElements(), newElement] });" +
-            "    api.updateScene({ appState: { activeTool: { type: toolType } } });" +
-            "  } else {" +
-            "    console.warn('Excalidraw API not ready');" +
-            "  }" +
-            "}" +
-            "function saveJDraw() {" +
-            "  const api = window['excalidrawAPI_main-sketch'];" +
-            "  if(!api) return;" +
-            "  const elements = api.getSceneElements();" +
-            "  const appState = api.getAppState();" +
-            "  const data = JSON.stringify({ elements, appState });" +
-            "  const blob = new Blob([data], { type: 'application/json' });" +
-            "  const url = URL.createObjectURL(blob);" +
-            "  const link = document.createElement('a');" +
-            "  link.href = url;" +
-            "  link.download = 'diagrama-' + new Date().getTime() + '.jdraw';" +
-            "  link.click();" +
-            "}" +
-            "function loadJDraw(input) {" +
-            "  const file = input.files[0]; if(!file) return;" +
-            "  const reader = new FileReader();" +
-            "  reader.onload = (e) => {" +
-            "    const api = window['excalidrawAPI_main-sketch'];" +
-            "    if(api) {" +
-            "      const data = JSON.parse(e.target.result);" +
-            "      api.updateScene({ elements: data.elements, appState: data.appState });" +
-            "      window.show3DMessage('Archivo Cargado', 'Diagrama restaurado correctamente.');" +
-            "    }" +
-            "  };" +
-            "  reader.readAsText(file);" +
-            "}" +
-            "function toggleToolSettings() { document.getElementById('tool-settings-modal').style.display='flex'; }" +
-            "function toggleToolVisibility(toolId, checked) {" +
-            "  const el = document.getElementById('tool-' + toolId);" +
-            "  if(el) el.style.display = checked ? 'flex' : 'none';" +
-            "}" +
-            "function addNewToolToPalette() {" +
-            "  const name = document.getElementById('new-tool-name').value;" +
-            "  if(!name) return;" +
-            "  const id = name.toLowerCase().replace(/\\\\s/g, '-');" +
-            "  const list = document.getElementById('active-tools-list');" +
-            "  const div = document.createElement('div');" +
-            "  div.className = 'j-3d-effect palette-tool';" +
-            "  div.id = 'tool-' + id;" +
-            "  div.draggable = true;" +
-            "  div.style = 'padding:12px; background:rgba(255,255,255,0.03); border-radius:10px; cursor:move; display:flex; align-items:center; gap:15px; border:1px solid rgba(255,255,255,0.05); margin-bottom:12px; position:relative; transition: all 0.3s;';" +
-            "  div.ondragstart = (e) => e.dataTransfer.setData('tool', id);" +
-            "  div.innerHTML = `<span style=\"font-size:18px; filter:drop-shadow(0 0 5px var(--jettra-glow));\">🛠️</span><span style=\"font-size:14px; font-weight:500; color:#fff;\">${name}</span><span onclick=\"this.parentElement.remove()\" style=\"margin-left:auto; cursor:pointer; opacity:0.5; hover:{opacity:1}\">🗑️</span>`;" +
-            "  list.appendChild(div);" +
-            "  document.getElementById('new-tool-name').value = '';" +
-            "  window.show3DMessage('Paleta Actualizada', 'Herramienta añadida: ' + name);" +
-            "}"
-        );
+        // --- JS Support ---
+        UIComponent script = new UIComponent("script") {};
+        script.setContent("""
+            var selectedId = null;
 
-        center.add(mainWrapper).add(settingsModal).add(mainScript);
-    }
+            function handleCanvasDrop(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                
+                const type = event.dataTransfer.getData('toolType');
+                const moveId = event.dataTransfer.getData('moveId');
+                const canvas = document.getElementById('draw-canvas');
+                
+                // Target: the element dropped onto, or the canvas
+                let target = event.target.closest('.draw-item') || canvas;
+                
+                if (moveId) {
+                    // Moving existing element
+                    const el = document.getElementById(moveId);
+                    if (el && target !== el && !el.contains(target)) {
+                        target.appendChild(el);
+                        // Update position relative to new target
+                        const rect = target.getBoundingClientRect();
+                        el.style.left = (event.clientX - rect.left - 50) + 'px';
+                        el.style.top = (event.clientY - rect.top - 25) + 'px';
+                    }
+                } else if (type) {
+                    // Creating new element
+                    const el = document.createElement('div');
+                    el.id = 'draw_' + Date.now();
+                    el.className = 'draw-item ' + type;
+                    el.draggable = true;
+                    el.style.position = 'absolute';
+                    el.style.width = type === 'text' ? 'auto' : '100px';
+                    el.style.height = type === 'text' ? 'auto' : '50px';
+                    el.style.padding = '10px';
+                    el.style.border = '1px solid rgba(0,255,255,0.4)';
+                    el.style.borderRadius = type === 'circle' ? '50%' : '8px';
+                    el.style.background = type === 'text' ? 'transparent' : 'rgba(0,255,255,0.1)';
+                    el.style.color = '#fff';
+                    el.style.cursor = 'move';
+                    el.style.boxSizing = 'border-box';
+                    el.style.display = 'flex';
+                    el.style.alignItems = 'center';
+                    el.style.justifyContent = 'center';
+                    el.style.minWidth = '20px';
+                    el.style.minHeight = '20px';
+                    
+                    if (type === 'text') {
+                        el.innerText = 'New Text';
+                        el.style.border = '1px dashed rgba(255,255,255,0.2)';
+                    } else if (type === 'container') {
+                        el.style.width = '200px';
+                        el.style.height = '150px';
+                        el.style.border = '2px solid var(--jettra-accent)';
+                        el.style.alignItems = 'flex-start';
+                        el.style.justifyContent = 'flex-start';
+                    }
 
-    private Div createSettingsModal(String[][] tools) {
-        Div modal = new Div();
-        modal.setProperty("id", "tool-settings-modal");
-        modal.addClass("j-modal");
-        modal.setStyle("display", "none").setStyle("position", "fixed").setStyle("top", "0").setStyle("left", "0").setStyle("width", "100vw").setStyle("height", "100vh")
-             .setStyle("background", "rgba(0,0,0,0.85)").setStyle("backdrop-filter", "blur(10px)").setStyle("justify-content", "center").setStyle("align-items", "center").setStyle("z-index", "3000");
-        
-        Div content = new Div();
-        content.addClass("j-card").setStyle("width", "400px").setStyle("padding", "35px").setStyle("border-radius", "20px").setStyle("border", "1px solid var(--jettra-accent)");
-        
-        Header h = new Header(3, "Palette Configuration");
-        h.setStyle("margin-top", "0").setStyle("color", "var(--jettra-accent)").setStyle("margin-bottom", "25px").setStyle("text-align", "center");
-        content.add(h);
-        
-        for(String[] tool : tools) {
-            Div row = new Div();
-            row.setStyle("display", "flex").setStyle("justify-content", "space-between").setStyle("align-items", "center").setStyle("margin-bottom", "15px").setStyle("padding", "10px").setStyle("border-radius", "8px").setStyle("background", "rgba(255,255,255,0.02)");
-            
-            UIComponent label = new UIComponent("span") {}; 
-            label.setContent(tool[0]);
-            label.setStyle("color", "#eee").setStyle("font-weight", "500");
-            
-            UIComponent cb = new UIComponent("input") {};
-            cb.setProperty("type", "checkbox");
-            cb.setProperty("checked", "true");
-            cb.setProperty("onchange", "toggleToolVisibility('" + tool[2] + "', this.checked)");
-            cb.setStyle("width", "20px").setStyle("height", "20px").setStyle("accent-color", "var(--jettra-accent)");
-            
-            row.add(label).add(cb);
-            content.add(row);
-        }
-        
-        Button close = new Button("SAVE & CLOSE");
-        close.addClass("j-btn-primary").setStyle("margin-top", "30px").setStyle("width", "100%");
-        close.setProperty("onclick", "document.getElementById('tool-settings-modal').style.display='none'");
-        content.add(close);
-        
-        modal.add(content);
-        return modal;
+                    const rect = target.getBoundingClientRect();
+                    el.style.left = (event.clientX - rect.left - (type==='text'?0:50)) + 'px';
+                    el.style.top = (event.clientY - rect.top - (type==='text'?0:25)) + 'px';
+
+                    el.ondragstart = (e) => {
+                        e.dataTransfer.setData('moveId', el.id);
+                        e.stopPropagation();
+                    };
+                    
+                    el.onclick = (e) => {
+                        e.stopPropagation();
+                        selectItem(el);
+                    };
+
+                    target.appendChild(el);
+                    selectItem(el);
+                }
+            }
+
+            function selectItem(el) {
+                deselectAll();
+                selectedId = el.id;
+                el.style.boxShadow = '0 0 15px var(--jettra-glow)';
+                el.style.borderColor = 'var(--jettra-accent)';
+                updateInspector();
+            }
+
+            function deselectAll() {
+                selectedId = null;
+                document.querySelectorAll('.draw-item').forEach(it => {
+                    it.style.boxShadow = 'none';
+                    it.style.borderColor = it.classList.contains('container') ? 'var(--jettra-accent)' : 'rgba(0,255,255,0.4)';
+                });
+                updateInspector();
+            }
+
+            function updateInspector() {
+                const fields = document.getElementById('inspector-fields');
+                if (!selectedId) {
+                    fields.innerHTML = '<span style="color:#666; font-size:12px;">Select an item to edit</span>';
+                    return;
+                }
+                const el = document.getElementById(selectedId);
+                const isText = el.classList.contains('text');
+                
+                let html = '';
+                
+                // Color de Fondo
+                if (!isText) {
+                    html += `
+                        <label style="color:#aaa; font-size:11px;">Background Color</label>
+                        <input type="color" value="${rgbToHex(el.style.backgroundColor)}" onchange="updateProp('background', this.value)" style="width:100%; height:30px; border:none; background:transparent; cursor:pointer;">
+                    `;
+                }
+
+                // Color de Letra
+                html += `
+                    <label style="color:#aaa; font-size:11px;">Text Color</label>
+                    <input type="color" value="${rgbToHex(el.style.color)}" onchange="updateProp('color', this.value)" style="width:100%; height:30px; border:none; background:transparent; cursor:pointer;">
+                `;
+
+                if (isText) {
+                    html += `
+                        <label style="color:#aaa; font-size:11px;">Text Content</label>
+                        <input type="text" value="${el.innerText}" oninput="updateProp('text', this.value)" class="j-input" style="font-size:12px;">
+                    `;
+                }
+                
+                html += `
+                    <button onclick="document.getElementById('${selectedId}').remove(); deselectAll();" class="j-btn-danger" style="margin-top:20px; width:100%; font-size:11px;">Delete Item</button>
+                `;
+
+                fields.innerHTML = html;
+            }
+
+            function updateProp(prop, value) {
+                if (!selectedId) return;
+                const el = document.getElementById(selectedId);
+                if (prop === 'background') el.style.backgroundColor = value;
+                if (prop === 'color') el.style.color = value;
+                if (prop === 'text') el.innerText = value;
+            }
+
+            function rgbToHex(rgb) {
+                if (!rgb || rgb === 'transparent') return '#000000';
+                if (rgb.startsWith('#')) return rgb;
+                const match = rgb.match(/\\\\d+/g);
+                if (!match) return '#000000';
+                const r = parseInt(match[0]);
+                const g = parseInt(match[1]);
+                const b = parseInt(match[2]);
+                return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+            }
+        """);
+
+        center.add(mainWrapper).add(script);
     }
 }

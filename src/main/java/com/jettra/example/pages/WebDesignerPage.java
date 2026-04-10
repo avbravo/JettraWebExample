@@ -66,13 +66,13 @@ public class WebDesignerPage extends DashboardBasePage {
         Div canvasHeaderActions = new Div();
         canvasHeaderActions.setStyle("display", "flex").setStyle("gap", "10px");
         
-        Button previewBtn = new Button("Preview 👁️");
+        Button previewBtn = new Button("Preview \uD83D\uDC41\uFE0F");
         previewBtn.addClass("j-btn-secondary");
         previewBtn.setStyle("font-size", "11px").setStyle("padding", "5px 12px");
         previewBtn.setProperty("type", "button");
         previewBtn.setProperty("onclick", "window.previewInterface()");
 
-        Button crudBtn = new Button("CRUD ⚡");
+        Button crudBtn = new Button("CRUD \u26A1");
         crudBtn.addClass("j-btn-primary");
         crudBtn.setStyle("font-size", "11px").setStyle("padding", "5px 12px");
         crudBtn.setProperty("type", "button");
@@ -169,7 +169,7 @@ public class WebDesignerPage extends DashboardBasePage {
         Header inspectorHeader = new Header(4, "Properties");
         inspectorHeader.setStyle("color", "var(--jettra-accent)").setStyle("margin", "0");
         
-        Span closeInspector = new Span("×");
+        Span closeInspector = new Span("\u00D7");
         closeInspector.setStyle("color", "#ff4444").setStyle("font-size", "24px").setStyle("cursor", "pointer").setStyle("line-height", "1").setStyle("font-weight", "bold");
         closeInspector.setProperty("onclick", "document.getElementById('property-inspector').style.display='none'");
         
@@ -184,13 +184,13 @@ public class WebDesignerPage extends DashboardBasePage {
         // --- Add Tool Form (Restored to Palette) ---
         Div addToolPanel = new Div();
         addToolPanel.setStyle("padding", "15px").setStyle("background", "rgba(0,0,0,0.3)").setStyle("border-top", "1px solid var(--jettra-border)").setStyle("margin-top", "10px");
-        Header addH = new Header(5, "Añadir Herramienta");
+        Header addH = new Header(5, "A\u00F1adir Herramienta");
         addH.setStyle("font-size", "11px").setStyle("margin-bottom", "10px");
         
         TextBox toolNameInput = new TextBox("text", "Nueva...");
         toolNameInput.setId("new-tool-name").addClass("j-input").setStyle("margin-bottom", "10px").setStyle("font-size", "12px");
         
-        Button addToolBtn = new Button("Añadir a Paleta");
+        Button addToolBtn = new Button("A\u00F1adir a Paleta");
         addToolBtn.addClass("j-btn-primary").setStyle("width", "100%").setStyle("font-size", "11px");
         addToolBtn.setProperty("onclick", "addNewToolToPalette()");
         
@@ -208,7 +208,7 @@ public class WebDesignerPage extends DashboardBasePage {
                  .setStyle("position", "fixed").setStyle("top", "50%").setStyle("left", "50%").setStyle("transform", "translate(-50%, -50%)").setStyle("z-index", "1000")
                  .setStyle("box-shadow", "0 40px 100px -20px rgba(0, 0, 0, 0.8), inset 0 2px 2px 0 rgba(255, 255, 255, 0.2), 0 0 30px rgba(0, 255, 255, 0.3)");
         
-        Header modalHeader = new Header(3, "⚡ Pro Event Handler Editor");
+        Header modalHeader = new Header(3, "\u26A1 Pro Event Handler Editor");
         modalHeader.setStyle("color", "var(--jettra-accent)").setStyle("margin-top", "0").setStyle("text-shadow", "0 0 15px rgba(0,255,255,0.6)").setStyle("font-weight", "800").setStyle("letter-spacing", "1px");
         
         TextArea codeInput = new TextArea("event-code-input", "e -> { \n    // Write your Java code here\n}");
@@ -289,7 +289,7 @@ public class WebDesignerPage extends DashboardBasePage {
         previewHeader.setStyle("display", "flex").setStyle("justify-content", "space-between").setStyle("align-items", "center").setStyle("padding", "15px 30px").setStyle("background", "rgba(0,0,0,0.5)").setStyle("border-bottom", "1px solid rgba(0, 255, 255, 0.2)");
         Header prevTitle = new Header(3, "Interface Preview");
         prevTitle.setStyle("margin", "0").setStyle("color", "var(--jettra-accent)");
-        Button closePreviewBtn = new Button("Close Preview ×");
+        Button closePreviewBtn = new Button("Close Preview \u00D7");
         closePreviewBtn.addClass("j-btn-danger");
         closePreviewBtn.setStyle("font-weight", "bold");
         closePreviewBtn.setProperty("type", "button");
@@ -319,17 +319,17 @@ public class WebDesignerPage extends DashboardBasePage {
         Header h = new Header(5, "Project Explorer");
         h.setStyle("color", "var(--jettra-accent)").setStyle("margin", "0");
         
-        Span clearExplorerBtn = new Span("🗑️");
+        Span clearExplorerBtn = new Span("\uD83D\uDDD1\uFE0F");
         clearExplorerBtn.setStyle("cursor", "pointer").setStyle("font-size", "14px").setStyle("transition", "transform 0.2s").setStyle("opacity", "0.8");
         clearExplorerBtn.setProperty("onclick", "window.clearProjectCache()");
-        clearExplorerBtn.setProperty("title", "Limpiar selección de proyecto");
+        clearExplorerBtn.setProperty("title", "Limpiar selecci\u00F3n de proyecto");
         
         explorerHeaderWrap.add(h).add(clearExplorerBtn);
         explorer.add(explorerHeaderWrap);
 
         FolderSelector folderSel = new FolderSelector("fs-explorer");
         folderSel.setReferenceLocation("/").setReferenceContent("Root");
-        folderSel.excludeTarget(true).style3D().setConfirmUpload(true, "Explorador de Proyecto", "¿Desea cargar los archivos de esta carpeta?");
+        folderSel.excludeTarget(true).style3D().setConfirmUpload(true, "Explorador de Proyecto", "\u00BFDesea cargar los archivos de esta carpeta?");
         folderSel.setStyle("width", "100%").setStyle("margin-top", "10px").setStyle("margin-bottom", "10px");
         
         // Custom ID for JS hook
@@ -413,6 +413,8 @@ public class WebDesignerPage extends DashboardBasePage {
             .inspector-input:focus { border-color: var(--jettra-accent); box-shadow: 0 0 0 1px rgba(0,255,255,0.2); }
             .project-file { padding: 6px 10px; font-size: 12px; color: #94a3b8; cursor: pointer; border-radius: 6px; display: flex; align-items: center; gap: 10px; transition: all 0.2s; }
             .project-file:hover { background: rgba(0,255,255,0.1); color: #fff; transform: translateX(5px); }
+            .tree-node { padding: 4px 8px; transition: all 0.2s; border-radius: 4px; }
+            .tree-node:hover { background: rgba(0,255,255,0.1); color: #fff !important; }
             .file-page { color: #facc15 !important; font-weight: 600; text-shadow: 0 0 5px rgba(250,204,21,0.2); }
             .file-model { color: #4ade80 !important; font-weight: 600; text-shadow: 0 0 5px rgba(74,222,128,0.2); }
             .canvas-container { border: 2px dashed rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; position: relative; min-height: 80px; transition: all 0.3s; }
@@ -483,6 +485,22 @@ public class WebDesignerPage extends DashboardBasePage {
         
         String scriptPart1 = """
             // Designer GLOBALS
+            window.drag = function(ev) {
+                ev.dataTransfer.setData("type", ev.currentTarget.getAttribute("data-type"));
+                ev.dataTransfer.effectAllowed = "move";
+            };
+            window.allowDrop = function(ev) {
+                ev.preventDefault();
+            };
+            window.drop = function(ev) {
+                ev.preventDefault();
+                const type = ev.dataTransfer.getData("type");
+                const canvas = document.getElementById('canvas-drop-area');
+                if (canvas) {
+                    window.addComponentToCanvas(type, canvas);
+                }
+            };
+
             var selectedItem = null;
             var currentModel = null;
             var modelFields = [];
@@ -491,12 +509,6 @@ public class WebDesignerPage extends DashboardBasePage {
             var activeEventProperty = null;
             var projectFilesMap = {};
             window.isSyncing = false;
-
-            // EXPOSE FUNCTIONS TO WINDOW EXPLICITLY
-            window.drag = function(ev) {
-                ev.dataTransfer.setData("type", ev.currentTarget.getAttribute("data-type"));
-                ev.dataTransfer.effectAllowed = "move";
-            };
 
             setInterval(() => {
                 document.querySelectorAll('.live-clock').forEach(el => {
@@ -635,37 +647,37 @@ public class WebDesignerPage extends DashboardBasePage {
                     case 'RadioGroupButton': content = '<div class="canvas-container" style="padding:10px; border:1px dashed var(--jettra-accent); min-height:60px;"><label style="font-weight:bold; color:var(--jettra-accent); display:block; margin-bottom:10px;">Radio Group</label></div>'; break;
                     case 'CheckBoxGroup': content = '<div class="canvas-container" style="padding:10px; border:1px dashed var(--jettra-accent); min-height:60px;"><label style="font-weight:bold; color:var(--jettra-accent); display:block; margin-bottom:10px;">CheckBox Group</label></div>'; break;
                     case 'ScheduleControl': content = '<input type="datetime-local" class="j-input" onfocus="this.blur()"/>'; break;
-                    case 'SelectOne': content = '<select class="j-input" onfocus="this.blur()"><option>Option 1...</option></select><span style="display:none">SelectOne</span>'; break;
-                    case 'SelectOneIcon': content = '<select class="j-input" onfocus="this.blur()"><option>⭐ Option 1...</option></select><span style="display:none">SelectOneIcon</span>'; break;
+                    case 'SelectOne': content = '<div class="select-wrapper"><label style="display:block; font-size:11px; margin-bottom:4px; color:var(--jettra-accent)">Select</label><select class="j-input" onfocus="this.blur()"><option>Option 1...</option></select></div><span style="display:none">SelectOne</span>'; break;
+                    case 'SelectMany': content = '<div class="select-wrapper"><label style="display:block; font-size:11px; margin-bottom:4px; color:var(--jettra-accent)">Select Multiple</label><select class="j-input" multiple="multiple" style="height:80px" onfocus="this.blur()"><option>Option 1...</option></select></div><span style="display:none">SelectMany</span>'; break;
+                    case 'SelectOneIcon': content = '<select class="j-input" onfocus="this.blur()"><option>\u2B50 Option 1...</option></select><span style="display:none">SelectOneIcon</span>'; break;
                     case 'Spinner': content = '<div class="j-spinner-wrapper" style="display:inline-flex; align-items:center; border:1px solid var(--jettra-border); border-radius:8px; background:rgba(0,0,0,0.3); overflow:hidden;"><button type="button" class="j-spinner-btn j-spinner-minus" style="width:40px;height:40px;background:rgba(255,255,255,0.05);border:none;color:var(--jettra-accent);font-size:1.2rem;font-weight:bold;">-</button><div class="j-spinner-display" style="min-width:60px;text-align:center;font-family:monospace;font-size:1.1rem;color:var(--jettra-text);">0</div><button type="button" class="j-spinner-btn j-spinner-plus" style="width:40px;height:40px;background:rgba(255,255,255,0.05);border:none;color:var(--jettra-accent);font-size:1.2rem;font-weight:bold;">+</button></div>'; break;
                     case 'ToggleSwitch': content = '<div style="display:flex; align-items:center; gap:8px;"><div style="width:40px;height:20px;background:var(--jettra-accent);border-radius:10px;position:relative;"><div style="width:16px;height:16px;background:#fff;border-radius:50%;position:absolute;top:2px;right:2px;"></div></div><label>ToggleSwitch</label></div>'; break;
-                    case 'FileUpload': content = '<div style="border:1px dashed var(--jettra-accent); padding:20px; text-align:center; border-radius:8px; color:var(--jettra-text);"><div style="font-size:24px; margin-bottom:10px;">☁️</div><span>Click or drag files here to upload</span></div>'; break;
-                    case 'FolderSelector': content = '<div style="border:1px dashed var(--jettra-accent); padding:20px; text-align:center; border-radius:8px; color:var(--jettra-text);"><div style="font-size:24px; margin-bottom:10px;">📁</div><span>Select Directory</span></div>'; break;
+                    case 'FileUpload': content = '<div style="border:1px dashed var(--jettra-accent); padding:20px; text-align:center; border-radius:8px; color:var(--jettra-text);"><div style="font-size:24px; margin-bottom:10px;">\u2601\uFE0F</div><span>Click or drag files here to upload</span></div>'; break;
+                    case 'FolderSelector': content = '<div style="border:1px dashed var(--jettra-accent); padding:20px; text-align:center; border-radius:8px; color:var(--jettra-text);"><div style="font-size:24px; margin-bottom:10px;">\uD83D\uDCC1</div><span>Select Directory</span></div>'; break;
                     case 'OTPValidator': content = '<div class="j-component" style="display:flex; justify-content:center; gap:5px; padding:10px;"><input disabled style="width:30px; height:40px; text-align:center;" value="*"/><input disabled style="width:30px; height:40px; text-align:center;" value="*"/><input disabled style="width:30px; height:40px; text-align:center;" value="*"/><input disabled style="width:30px; height:40px; text-align:center;" value="*"/></div>'; break;
                     case 'Catcha': content = '<div class="j-component" style="padding:10px; border:1px solid #aaa; border-radius:4px; display:inline-flex; align-items:center; gap:10px; background:#f9f9f9;"><input type="checkbox" disabled/> <span style="color:#333; font-family:sans-serif">I\\'m not a robot</span></div>'; break;
-                    case 'CreditCard': content = '<div class="j-component" style="padding:15px; border:1px solid rgba(0,255,255,0.2); border-radius:12px; background:linear-gradient(145deg, #1e293b, #0f172a); min-height:100px; display:flex; flex-direction:column; gap:10px; width:280px;"><div style="font-family:monospace; font-size:16px; color:#fff; letter-spacing:2px; margin-top:20px;">•••• •••• •••• ••••</div><div style="display:flex; justify-content:space-between; color:#94a3b8; font-size:10px;"><span class="cc-name-mock">NAME SURNAME</span><span>MM/YY</span></div><button class="j-btn j-btn-primary" style="margin-top:10px; width:100%; border-radius:8px; padding:10px;" disabled>Pay Now</button><div class="canvas-container" style="min-height:30px; border:1px dashed rgba(255,255,255,0.1); margin-top:5px; padding:5px;"></div></div>'; break;
+                    case 'CreditCard': content = '<div class="j-component" style="padding:15px; border:1px solid rgba(0,255,255,0.2); border-radius:12px; background:linear-gradient(145deg, #1e293b, #0f172a); min-height:100px; display:flex; flex-direction:column; gap:10px; width:280px;"><div style="font-family:monospace; font-size:16px; color:#fff; letter-spacing:2px; margin-top:20px;">\u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022</div><div style="display:flex; justify-content:space-between; color:#94a3b8; font-size:10px;"><span class="cc-name-mock">NAME SURNAME</span><span>MM/YY</span></div><button class="j-btn j-btn-primary" style="margin-top:10px; width:100%; border-radius:8px; padding:10px;" disabled>Pay Now</button><div class="canvas-container" style="min-height:30px; border:1px dashed rgba(255,255,255,0.1); margin-top:5px; padding:5px;"></div></div>'; break;
                     case 'Link': content = '<a href="javascript:void(0)" style="color:var(--jettra-accent); text-decoration:underline;"><span>Link Text</span></a>'; break;
                     case 'Menu': content = '<div style="background:rgba(0,0,0,0.4); padding:10px; border-radius:4px; display:inline-block;"><div style="padding:8px 15px; cursor:pointer;"><span>Menu Item</span></div></div>'; break;
                     case 'MenuBar': content = '<div class="canvas-container" style="background:rgba(0,0,0,0.4); padding:10px; border-radius:4px; display:flex; gap:15px; min-height:45px; border:1px dashed rgba(255,255,255,0.2);"></div>'; break;
                     case 'MenuItem': content = '<div class="j-component" style="padding:10px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,0.1); background:rgba(0,0,0,0.2);"><span>Menu Item</span></div>'; break;
-                    case 'Spinner': content = '<div class="..." ... ></div>'; break; // removed to fix parsing problem
                     case 'Loading': content = '<div class="j-loading" style="display:inline-flex; align-items:center; justify-content:center; padding:10px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--jettra-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" /></svg></div>'; break;
-                    case 'Alert': content = '<div style="background:rgba(255,0,0,0.1); border-left:4px solid #ff4444; padding:15px; border-radius:4px; color:#ff4444; display:flex; align-items:center; gap:10px;"><b>⚠️</b><span>Alert Message</span></div>'; break;
+                    case 'Alert': content = '<div style="background:rgba(255,0,0,0.1); border-left:4px solid #ff4444; padding:15px; border-radius:4px; color:#ff4444; display:flex; align-items:center; gap:10px;"><b>\\u26A0\\uFE0F</b><span>Alert Message</span></div>'; break;
                     case 'Notification': content = '<div style="background:rgba(0,255,255,0.1); border:1px solid var(--jettra-accent); padding:15px; border-radius:8px; color:var(--jettra-text); max-width:300px; box-shadow:0 4px 12px rgba(0,0,0,0.3);"><span>Notification Message</span></div>'; break;
-                    case 'Downloader': content = '<div style="display:inline-flex; align-items:center; gap:8px; padding:6px 12px; background:rgba(255,255,255,0.1); border-radius:4px; cursor:pointer;"><b>💾</b><span>Download File</span></div>'; break;
+                    case 'Downloader': content = '<div style="display:inline-flex; align-items:center; gap:8px; padding:6px 12px; background:rgba(255,255,255,0.1); border-radius:4px; cursor:pointer;"><b>\uD83D\uDCBE</b><span>Download File</span></div>'; break;
                     case 'PDFViewer': content = '<div style="border:1px solid #aaa; background:#eee; color:#333; height:200px; display:flex; align-items:center; justify-content:center; border-radius:4px;"><span>PDF Document Preview</span></div>'; break;
-                    case 'ViewMedia': content = '<div style="background:#000; color:#fff; height:200px; display:flex; align-items:center; justify-content:center; border-radius:4px;"><span>▶ Media Player</span></div>'; break;
+                    case 'ViewMedia': content = '<div style="background:#000; color:#fff; height:200px; display:flex; align-items:center; justify-content:center; border-radius:4px;"><span>\u25B6 Media Player</span></div>'; break;
                     case 'BarCode': content = '<div class="j-component" style="padding:10px; text-align:center; border:1px dashed #fff;"><span style="font-family:monospace; font-size:24px; letter-spacing:2px">||| | || |||</span><br><span>BarCode</span></div>'; break;
                     case 'Carousel': content = '<div style="display:flex; gap:10px; overflow:hidden; padding:10px; background:rgba(0,0,0,0.2); border-radius:8px;"><div style="width:150px; height:80px; background:rgba(0,255,255,0.1); border:1px solid rgba(0,255,255,0.3); border-radius:8px; display:flex; align-items:center; justify-content:center;"><span>Slide 1</span></div></div>'; break;
                     case 'TabView': content = '<div style="border:1px solid rgba(0,255,255,0.2); border-radius:8px; overflow:hidden;"><div style="display:flex; background:rgba(0,0,0,0.3); border-bottom:1px solid rgba(0,255,255,0.2);" class="tab-headers"><span style="padding:10px; color:#aaa; font-size:11px;">[Tab Headers]</span></div><div class="canvas-container" style="padding:10px; min-height:100px; background:rgba(0,255,255,0.02);"></div></div>'; break;
                     case 'Tab': content = '<div class="canvas-container" style="border:1px dashed var(--jettra-accent); min-height:80px; padding:10px; position:relative; background:rgba(0,0,0,0.4); margin-bottom:10px;"><span style="position:absolute; top:-12px; left:10px; background:var(--jettra-accent); color:#000; padding:2px 8px; border-radius:4px; font-size:10px; font-weight:bold;">Tab Title</span></div>'; break;
                     case 'Tree': content = '<div class="canvas-container" style="padding:10px; border:1px solid rgba(255,255,255,0.1); border-radius:4px; background:rgba(0,0,0,0.2); min-height:50px;"></div>'; break;
-                    case 'TreeItem': content = '<div class="canvas-container" style="padding-left:15px; border-left:1px dashed rgba(0,255,255,0.2); min-height:30px; margin-top:5px; position:relative;"><span style="position:absolute; left:-10px; top:5px; font-size:10px; color:var(--jettra-accent);">▶</span><span style="display:inline-block; margin-bottom:5px; color:#fff;">Tree Node</span></div>'; break;
+                    case 'TreeItem': content = '<div class="canvas-container" style="padding-left:15px; border-left:1px dashed rgba(0,255,255,0.2); min-height:30px; margin-top:5px; position:relative;"><span style="position:absolute; left:-10px; top:5px; font-size:10px; color:var(--jettra-accent);">\u25B6</span><span style="display:inline-block; margin-bottom:5px; color:#fff;">Tree Node</span></div>'; break;
                     case 'Div': content = '<div class="canvas-container" style="border:1px dashed rgba(255,255,255,0.2); min-height:50px; padding:10px; border-radius:4px; position:relative;"><span style="position:absolute;top:2px;left:5px;font-size:9px;color:rgba(255,255,255,0.3)">Div Container</span></div>'; break;
                     case 'LayoutDisplay': content = '<div class="canvas-container" style="border:2px solid rgba(0,255,255,0.2); min-height:100px; padding:15px; border-radius:8px; position:relative;"><span style="position:absolute;top:5px;left:10px;font-size:10px;color:rgba(0,255,255,0.5);font-weight:bold;">LayoutDisplay</span></div>'; break;
                     case 'DatePicker': content = '<div style="display:flex; flex-direction:column; gap:5px;"><label style="font-weight:500; font-size:0.9rem;">Date Selection</label><input type="datetime-local" class="j-input" onfocus="this.blur()"/></div>'; break;
                     case 'Time': content = '<div style="display:flex; flex-direction:column; gap:5px;"><label style="font-weight:500; font-size:0.9rem;">Time Selection</label><input type="time" class="j-input" onfocus="this.blur()"/></div>'; break;
-                    case 'Map': content = '<div style="width:100%; height:200px; background:rgba(0,255,0,0.1); border:1px dashed #0f0; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#0f0;"><span>🗺️ Leaflet Map Area</span></div>'; break;
+                    case 'Map': content = '<div style="width:100%; height:200px; background:rgba(0,255,0,0.1); border:1px dashed #0f0; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#0f0;"><span>\uD83D\uDDFA Leaflet Map Area</span></div>'; break;
                     case 'Calendar': content = '<div style="width:100%; min-height:150px; background:rgba(0,0,0,0.3); border:1px solid var(--jettra-border); border-radius:8px; padding:10px;"><div style="text-align:center; color:var(--jettra-accent); margin-bottom:5px;">[Month Calendar Placeholder]</div><div style="display:grid; grid-template-columns:repeat(7, 1fr); gap:2px; opacity:0.5;"><div style="background:#222;height:20px;"></div><div style="background:#222;height:20px;"></div><div style="background:#222;height:20px;"></div><div style="background:#222;height:20px;"></div><div style="background:#222;height:20px;"></div><div style="background:#222;height:20px;"></div><div style="background:#222;height:20px;"></div></div></div>'; break;
                     case 'Schedule': content = '<div style="width:100%; min-height:100px; background:rgba(0,0,0,0.3); border:1px solid var(--jettra-border); border-radius:8px; padding:10px;"><div style="text-align:center; color:var(--jettra-accent); margin-bottom:5px;">[Weekly Schedule Placeholder]</div><div style="border-left:2px solid var(--jettra-border); padding-left:10px;"><div style="background:var(--jettra-accent); color:#000; font-size:10px; width:80px; padding:2px; margin-bottom:5px;">Event</div></div></div>'; break;
                     case 'Timeline': content = '<div style="border-left:2px solid var(--jettra-border); padding-left:20px; position:relative; min-height:100px;"><div style="position:absolute; left:-6px; top:10px; width:10px; height:10px; border-radius:50%; background:var(--jettra-accent);"></div><div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:4px; margin-top:5px;">Timeline Node</div></div>'; break;
@@ -699,15 +711,15 @@ public class WebDesignerPage extends DashboardBasePage {
                                   '<div class="j-progressbar-fill" style="width:60%; height:100%; background:var(--jettra-accent); box-shadow:0 0 10px var(--jettra-accent)"></div>' +
                                   '</div>';
                         break;
-                    case 'ChartsBar': content = '<div class="j-component" style="display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.2);min-height:100px;border-radius:8px;border:1px solid #36a2eb"><span style="color:#36a2eb;font-size:2rem;">📊 Bar Chart</span></div>'; break;
-                    case 'ChartsDoughnut': content = '<div class="j-component" style="display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.2);min-height:100px;border-radius:50%;border:2px dashed #ff6384;width:100px;margin:auto;"><span style="color:#ff6384;font-size:2rem;">🍩</span></div>'; break;
-                    case 'ChartsLine': content = '<div class="j-component" style="display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.2);min-height:100px;border-radius:8px;border:1px solid #4bc0c0"><span style="color:#4bc0c0;font-size:2rem;">📈 Line Chart</span></div>'; break;
-                    case 'ChartsPie': content = '<div class="j-component" style="display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.2);min-height:100px;border-radius:50%;border:1px solid #ffcd56;width:100px;margin:auto;"><span style="color:#ffcd56;font-size:2rem;">🥧</span></div>'; break;
-                    case 'ChartsRadar': content = '<div class="j-component" style="display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.2);min-height:100px;border-radius:8px;border:1px solid #9966ff"><span style="color:#9966ff;font-size:2rem;">🕸️ Radar Chart</span></div>'; break;
+                    case 'ChartsBar': content = '<div class="j-component" style="display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.2);min-height:100px;border-radius:8px;border:1px solid #36a2eb"><span style="color:#36a2eb;font-size:2rem;">\uD83D\uDCCA Bar Chart</span></div>'; break;
+                    case 'ChartsDoughnut': content = '<div class="j-component" style="display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.2);min-height:100px;border-radius:50%;border:2px dashed #ff6384;width:100px;margin:auto;"><span style="color:#ff6384;font-size:2rem;">\uD83C\uDF69</span></div>'; break;
+                    case 'ChartsLine': content = '<div class="j-component" style="display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.2);min-height:100px;border-radius:8px;border:1px solid #4bc0c0"><span style="color:#4bc0c0;font-size:2rem;">\uD83D\uDCC8 Line Chart</span></div>'; break;
+                    case 'ChartsPie': content = '<div class="j-component" style="display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.2);min-height:100px;border-radius:50%;border:1px solid #ffcd56;width:100px;margin:auto;"><span style="color:#ffcd56;font-size:2rem;">\uD83E\uDDB7</span></div>'; break;
+                    case 'ChartsRadar': content = '<div class="j-component" style="display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.2);min-height:100px;border-radius:8px;border:1px solid #9966ff"><span style="color:#9966ff;font-size:2rem;">\uD83D\uDD78\uFE0F Radar Chart</span></div>'; break;
                     default: content = `<div class="canvas-container j-component" style="padding:10px; text-align:center; color:#888;">${type} Component</div>`;
                 }
 
-                wrapper.innerHTML = content + '<div class="delete-tool" onclick="this.parentElement.remove(); window.updateGeneratedCode();">×</div>';
+                wrapper.innerHTML = content + '<div class="delete-tool" onclick="this.parentElement.remove(); window.updateGeneratedCode();">\u00D7</div>';
                 targetParent.appendChild(wrapper);
                 window.updateGeneratedCode();
             };
@@ -756,18 +768,21 @@ public class WebDesignerPage extends DashboardBasePage {
                     </div>
                 `;
 
-                if (type === 'SelectOne') {
+                if (type === 'SelectOne' || type === 'SelectMany') {
+                    const labelEl = selectedItem.querySelector('label');
+                    const selectEl = selectedItem.querySelector('select');
                     html += `
                         <div class="inspector-row">
-                            <span class="inspector-label">Options (comma separated)</span>
-                            <input type="text" class="inspector-input" value="${props.options || ""}" placeholder="Opt1, Opt2, Opt3..." onchange="updateProp('options', this.value)">
+                            <span class="inspector-label">Label</span>
+                            <input type="text" class="inspector-input" value="${labelEl ? labelEl.innerText : 'Select'}" onchange="updateProp('label', this.value)">
                         </div>
-                    `;
-                } else if (type === 'SelectOneIcon') {
-                    html += `
                         <div class="inspector-row">
-                            <span class="inspector-label">Options (val|label|icon, ...)</span>
-                            <input type="text" class="inspector-input" value="${props.options || ""}" placeholder="en|English|🇺🇸, es|Spanish|🇪🇸..." onchange="updateProp('options', this.value)">
+                            <span class="inspector-label">Options (val:lab,...)</span>
+                            <input type="text" class="inspector-input" value="${Array.from(selectEl.querySelectorAll('option')).map(o => o.value + ':' + o.innerText).join(',')}" onchange="updateProp('options', this.value)">
+                        </div>
+                        <div class="inspector-row">
+                            <span class="inspector-label">Default Value</span>
+                            <input type="text" class="inspector-input" value="${selectEl.dataset.default || ''}" onchange="updateProp('default', this.value)">
                         </div>
                     `;
                 }
@@ -779,7 +794,7 @@ public class WebDesignerPage extends DashboardBasePage {
                         <div class="inspector-row">
                             <span class="inspector-label">Icon</span>
                             <div style="display:grid; grid-template-columns: repeat(5, 1fr); gap:5px; margin-top:5px;">
-                                ${['👤','👥','🏠','⚙️','🔔','📧','📁','📊','🚀','🌙','☀️','➕','✏️','🗑️','✅'].map(icon => 
+                                ${['\uD83D\uDC64','\uD83D\uDC65','\uD83C\uDFE0','\u2619','\uD83D\uDD14','\uD83D\uDCE7','\uD83D\uDCC1','\uD83D\uDCCA','\uD83D\uDE80','\uD83C\uDF19','\u2600\uFE0F','\u2795','\u270F\uFE0F','\uD83D\uDDD1\uFE0F','\u2705'].map(icon => 
                                     `<div class="icon-preset" style="cursor:pointer; padding:5px; text-align:center; border:1px solid ${props.icon === icon ? 'var(--jettra-accent)' : 'rgba(255,255,255,0.1)'}" onclick="updateProp('icon', '${icon}')">${icon}</div>`
                                 ).join('')}
                             </div>
@@ -1029,12 +1044,12 @@ public class WebDesignerPage extends DashboardBasePage {
                 const supportedEvents = ['onClick', 'onChange', 'onAction'];
                 html += `
                     <div style="margin-top:20px; border-top:1px solid rgba(0,255,255,0.1); padding-top:15px">
-                        <span class="inspector-label" style="color:var(--jettra-accent); font-weight:bold">⚡ Event Handlers</span>
+                        <span class="inspector-label" style="color:var(--jettra-accent); font-weight:bold">\u26A1 Event Handlers</span>
                         <div style="display:flex; flex-direction:column; gap:8px; margin-top:10px">
                             ${supportedEvents.map(ev => `
                                 <div class="inspector-row" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center" onclick="window.openEventEditor('${ev}')">
                                     <span style="font-size:11px; color:#ccc">${ev}</span>
-                                    <span style="font-size:10px; color:var(--jettra-accent)">Configure ⇢</span>
+                                    <span style="font-size:10px; color:var(--jettra-accent)">Configure \u21E2</span>
                                 </div>
                             `).join('')}
                         </div>
@@ -1121,6 +1136,30 @@ public class WebDesignerPage extends DashboardBasePage {
                     }
                 }
                 
+                if (key === 'label') {
+                    const label = selectedItem.querySelector('label');
+                    if (label) label.innerText = value;
+                }
+                if (key === 'options') {
+                    const select = selectedItem.querySelector('select');
+                    if (select) {
+                        select.innerHTML = value.split(',').map(pair => {
+                            const [v, l] = pair.split(':');
+                            return `<option value="${v||''}">${l||v||''}</option>`;
+                        }).join('');
+                    }
+                }
+                if (key === 'default') {
+                    const select = selectedItem.querySelector('select');
+                    if (select) {
+                        select.dataset.default = value;
+                        Array.from(select.options).forEach(opt => {
+                            if (opt.value === value) opt.selected = true;
+                            else opt.selected = false;
+                        });
+                    }
+                }
+                
                 if (key === 'icon') {
                     if (type === 'Avatar') {
                         const el = selectedItem.querySelector('.j-avatar');
@@ -1155,34 +1194,6 @@ public class WebDesignerPage extends DashboardBasePage {
                     }
                 }
 
-                if ((key === 'options' || key === 'icon') && (type === 'SelectOne' || type === 'SelectOneIcon')) {
-                    const select = selectedItem.querySelector('select');
-                    if (select) {
-                        select.innerHTML = '';
-                        const opts = (props.options || '').split(',');
-                        opts.forEach(o => {
-                            const opt = document.createElement('option');
-                            const val = o.trim();
-                            if (type === 'SelectOneIcon') {
-                                const parts = val.split('|');
-                                const optVal = parts[0] ? parts[0].trim() : 'val';
-                                const optLabel = parts[1] ? parts[1].trim() : optVal;
-                                const optIcon = parts[2] ? parts[2].trim() : (props.icon || '⭐');
-                                opt.innerText = optIcon + ' ' + optLabel;
-                            } else {
-                                opt.innerText = val;
-                            }
-                            select.appendChild(opt);
-                        });
-                    }
-                }
-                if (key === 'icon' && type === 'Avatar') {
-                    const el = selectedItem.querySelector('.j-avatar');
-                    if (el) el.innerHTML = value;
-                    props.text = "";
-                    selectedItem.setAttribute('data-props', JSON.stringify(props));
-                    setTimeout(window.updateInspector, 10);
-                }
                 if (type === 'ProgressBar') {
                     const fill = selectedItem.querySelector('.j-progressbar-fill');
                     if (key === 'value' || key === 'max') {
@@ -1250,45 +1261,46 @@ public class WebDesignerPage extends DashboardBasePage {
                 availableModels = [];
                 const viewer = document.getElementById('explorer-tree-view');
                 if (viewer) viewer.innerHTML = '';
-                window.updateModelSelect();
+            window.updateGeneratedCode();
             };
         """;
-        
+
         String scriptPart2 = """
 
             window.loadFiles = function(input) {
-                const triggerLoad = () => {
-                    const viewer = document.getElementById('explorer-tree-view');
-                    if (!viewer) return;
-                    viewer.innerHTML = 'Loading...';
-                    
-                    const files = (input.tagName === 'INPUT' ? input : input.querySelector('input')).files;
-                    const excludeTarget = input.getAttribute('data-exclude-target') === 'true';
-                    availableModels = [];
-                    window.jettraFileCache = {};
-                    const tree = { _children: {} };
-                    const readPromises = [];
+                const viewer = document.getElementById('explorer-tree-view');
+                if (!viewer) return;
+                
+                viewer.innerHTML = '<div style="padding:15px; color:var(--jettra-accent);"><i class="jt-icon-loading"></i> Procesando Proyecto...</div>';
+                
+                const files = (input.tagName === 'INPUT' ? input : input.querySelector('input')).files;
+                console.log("Loading files:", files ? files.length : 0);
+                if (!files || files.length === 0) {
+                    viewer.innerHTML = '<div style="color:#666; padding:10px;">Selecci\u00F3n vac\u00EDa.</div>';
+                    return;
+                }
 
-                    for (let i = 0; i < files.length; i++) {
-                        const f = files[i];
-                        const relPath = f.webkitRelativePath || f.name;
-                        
-                        if (excludeTarget && (relPath.includes('/target/') || relPath.includes('target/'))) continue;
-                        if (!relPath.endsWith('.java') && !relPath.endsWith('.properties')) continue;
+                const tree = { _children: {} };
+                const readPromises = [];
+                window.jettraFileCache = {};
+                availableModels = [];
 
-                        const parts = relPath.split('/');
-                        let curr = tree;
-                        for (let j = 0; j < parts.length; j++) {
-                            const part = parts[j];
-                            if (!curr._children[part]) {
-                                curr._children[part] = { _children: {}, _file: null, _path: relPath };
-                            }
-                            if (j === parts.length - 1) {
-                                curr._children[part]._file = f;
-                            }
-                            curr = curr._children[part];
+                for (let i = 0; i < files.length; i++) {
+                    const f = files[i];
+                    const relPath = f.webkitRelativePath || f.name;
+                    if (relPath.includes('/target/') || relPath.includes('/.git/')) continue;
+
+                    const parts = relPath.split(/[\\\\/]/);
+                    let curr = tree;
+                    for (let j = 0; j < parts.length; j++) {
+                        const p = parts[j];
+                        if (!curr._children[p]) {
+                            curr._children[p] = { _children: {}, _path: relPath, _isFile: (j === parts.length - 1) };
                         }
-                        
+                        curr = curr._children[p];
+                    }
+
+                    if (f.name.endsWith('.java') || f.name.endsWith('.md') || f.name.endsWith('.css') || f.name.endsWith('.html')) {
                         readPromises.push(new Promise((resolve) => {
                             const reader = new FileReader();
                             reader.onload = (e) => {
@@ -1302,54 +1314,51 @@ public class WebDesignerPage extends DashboardBasePage {
                                 }
                                 resolve();
                             };
+                            reader.onerror = () => resolve();
                             reader.readAsText(f);
                         }));
                     }
+                }
 
-                    function renderTree(node, name, depth = 0) {
-                        const childrenKeys = Object.keys(node._children);
-                        const isFile = !!node._file;
-                        if (!isFile && childrenKeys.length === 0) return "";
-
-                        const icon = isFile ? (name.endsWith('.java') ? '☕' : '⚙️') : '📂';
-                        const color = isFile ? '#88ccff' : 'var(--jettra-accent)';
-                        const padding = depth * 12;
-                        
-                        let finalHtml = `<div class="tree-node" style="padding-left:${padding}px; cursor:pointer; color:${color}; font-size:11px; margin-bottom:4px;"`;
-                        if (isFile) finalHtml += ` onclick="window.loadFileToCanvas('${node._path.replace(/\\\\/g, '/')}')"`;
-                        finalHtml += `>${icon} ${name}</div>`;
-                        
-                        childrenKeys.sort().forEach(key => {
-                            finalHtml += renderTree(node._children[key], key, depth + 1);
+                function renderTree(node, depth = 0) {
+                    try {
+                        const keys = Object.keys(node._children).sort((a,b) => a.localeCompare(b));
+                        let html = "";
+                        keys.forEach(key => {
+                            const child = node._children[key];
+                            const icon = child._isFile ? (key.endsWith('.java') ? '\\u2615' : '\\uD83D\\uDCC4') : '\\uD83D\\uDCC1';
+                            const color = child._isFile ? '#88ccff' : 'var(--jettra-accent)';
+                            
+                            html += `<div class="tree-node" style="padding-left:${depth * 12}px; cursor:pointer; color:${color}; font-size:11px; margin-bottom:4px; display:flex; align-items:center; gap:5px;"`;
+                            if (child._isFile) {
+                                html += ` onclick="window.loadFileContent('${child._path.replace(/\\\\/g, '/')}')"`;
+                            }
+                            html += `><span style="font-size:14px">${icon}</span> <span>${key}</span></div>`;
+                            
+                            if (!child._isFile) {
+                                html += renderTree(child, depth + 1);
+                            }
                         });
-                        return finalHtml;
+                        return html;
+                    } catch(e) {
+                        console.error("Error rendering tree:", e);
+                        return "Error: " + e.message;
                     }
+                }
 
-                    Promise.all(readPromises).then(() => {
-                        let finalHtml = "";
-                        const rootKeys = Object.keys(tree._children).sort();
-                        rootKeys.forEach(root => {
-                            finalHtml += renderTree(tree._children[root], root);
-                        });
-                        viewer.innerHTML = finalHtml || '<div style="color:#666; padding:10px;">No files found</div>';
-                        window.updateModelSelect();
-                        window.updateInspector();
-                        
-                        try {
-                            localStorage.setItem('jettra_designer_tree', finalHtml);
-                            localStorage.setItem('jettra_designer_files', JSON.stringify(window.jettraFileCache));
-                            window.show3DMessage("Proyecto Cargado", "El explorador ha procesado los archivos.");
-                        } catch(e) {
-                            console.warn("Could not cache files", e);
-                        }
-                    });
-                };
-
-                window.show3DConfirm(
-                    "Explorador de Proyecto", 
-                    "¿Desea cargar los archivos de esta carpeta al explorador?", 
-                    triggerLoad
-                );
+                Promise.all(readPromises).then(() => {
+                    console.log("Files cached. Available models:", availableModels.length);
+                    const finalHtml = renderTree(tree);
+                    viewer.innerHTML = finalHtml || '<div style="color:#666; padding:10px;">No se encontraron archivos visualizables.</div>';
+                    window.updateModelSelect();
+                    try {
+                        localStorage.setItem('jettra_designer_tree', finalHtml);
+                        localStorage.setItem('jettra_designer_files', JSON.stringify(window.jettraFileCache));
+                    } catch(e) {}
+                }).catch(e => {
+                    console.error("Promise error:", e);
+                    viewer.innerHTML = '<div style="color:red; padding:10px;">Error al cargar el proyecto.</div>';
+                });
             };
 
             window.openClass = function(name) {
@@ -1368,11 +1377,11 @@ public class WebDesignerPage extends DashboardBasePage {
                     
                     const doOpen = () => {
                         if (content) window.loadFileContent(fullPathKey);
-                        else window.show3DMessage("Aviso", "No se encontró contenido para " + name);
+                        else window.show3DMessage("Aviso", "No se encontr\u00F3 contenido para " + name);
                     };
 
                     if (canvas.querySelectorAll('.canvas-item').length > 0) {
-                        window.show3DConfirm("Abrir Clase", "¿Cerrar diseño actual y abrir " + name + "?", doOpen);
+                        window.show3DConfirm("Abrir Clase", "\u00BFCerrar dise\u00F1o actual y abrir " + name + "?", doOpen);
                     } else {
                         doOpen();
                     }
@@ -1460,7 +1469,7 @@ public class WebDesignerPage extends DashboardBasePage {
                 code += `        Header title = new Header(2, "Mantenimiento de ${baseName}");\n`;
                 code += `        title.setStyle("color", "var(--jettra-accent)").setStyle("margin-bottom", "20px");\n`;
                 code += `        main.add(title);\n\n`;
-                code += `        Button addBtn = new Button("➕ Añadir ${baseName}");\n`;
+                code += `        Button addBtn = new Button("\\u2795 A\u00F1adir ${baseName}");\n`;
                 code += `        addBtn.addClass("j-btn-primary").addClickListener(() -> {\n`;
                 code += `            this.model = new ${mName}();\n`;
                 code += `            showModal("Nuevo ${baseName}", "save");\n`;
@@ -1471,7 +1480,7 @@ public class WebDesignerPage extends DashboardBasePage {
                 code += `        List<${mName}> all = ${repoName}.findAll();\n`;
                 code += `        for (${mName} p : all) {\n`;
                 code += `            TD actionsTd = new TD(); actionsTd.setStyle("display", "flex").setStyle("gap", "10px");\n`;
-                code += `            Button editBtn = new Button("✏️"); editBtn.addClass("j-btn").addClickListener(() -> {\n`;
+                code += `            Button editBtn = new Button("\\u270F\\uFE0F"); editBtn.addClass("j-btn").addClickListener(() -> {\n`;
                 code += `                this.model = p; showModal("Editar ${baseName}", "save");\n`;
                 code += `            });\n`;
                 code += `            actionsTd.add(editBtn);\n`;
@@ -1497,7 +1506,7 @@ public class WebDesignerPage extends DashboardBasePage {
                 code += `        this.crudModal = new Div(); this.crudModal.setId("crudModal").addClass("j-modal-overlay");\n`;
                 code += `        this.crudModal.setStyle("display","none").setStyle("position","fixed").setStyle("z-index","9999").setStyle("background","rgba(0,0,0,0.8)");\n\n`;
                 code += `        Div content = new Div(); content.addClass("j-modal-content");\n`;
-                code += `        this.modalTitle = new Header(3, "Operación");\n`;
+                code += `        this.modalTitle = new Header(3, "Operaci\u00F3n");\n`;
                 code += `        Form form = new Form("${baseName.toLowerCase()}Form", "");\n`;
                 code += `        this.modalAction = new TextBox("hidden", "action");\n\n`;
                 code += modalFieldsCode;
@@ -1521,13 +1530,11 @@ public class WebDesignerPage extends DashboardBasePage {
             };
 
             window.clearDesigner = function() {
-                window.show3DConfirm("Limpiar", "¿Borrar elementos?", () => {
+                window.show3DConfirm("Limpiar", "\u00BFBorrar elementos?", () => {
                     document.getElementById('canvas-drop-area').innerHTML = '<div class="canvas-placeholder">Start dragging...</div>';
                     selectedItem = null;
                     window.updateInspector();
                 });
-            };
-
             };
 
             window.updateGeneratedCode = function() {
@@ -1711,26 +1718,20 @@ public class WebDesignerPage extends DashboardBasePage {
                                 out += `        ${container}.add(${v});\\n`;
                                 break;
                             case 'SelectOne':
+                            case 'SelectMany':
                             case 'SelectOneIcon':
-                                if (props.text && props.text !== type) {
-                                    out += `        ${type} ${v} = new ${type}("${v}", "${props.text}");\\n`;
-                                } else {
-                                    out += `        ${type} ${v} = new ${type}("${v}", "${type}");\\n`;
-                                }
+                                out += `        ${type} ${v} = new ${type}("${v}");\\n`;
+                                if (props.default) out += `        ${v}.setDefault("${props.default}");\\n`;
                                 if (props.options) {
                                     const opts = props.options.split(',');
                                     opts.forEach(o => {
+                                        const parts = o.split(':');
+                                        const optVal = parts[0] ? parts[0].trim() : 'val';
+                                        const optLabel = parts[1] ? parts[1].trim() : optVal;
                                         if (type === 'SelectOneIcon') {
-                                            const parts = o.trim().split('|');
-                                            const optVal = parts[0] ? parts[0].trim() : 'val';
-                                            const optLabel = parts[1] ? parts[1].trim() : optVal;
-                                            const optIcon = parts[2] ? parts[2].trim() : (props.icon || '⭐');
-                                            out += `        ${v}.addOption("${optVal}", "${optLabel}", "${optIcon}");\\n`;
+                                           out += `        ${v}.addOption("${optVal}", "${optLabel}", "${props.icon || '\u2B50'}");\\n`;
                                         } else {
-                                            const parts = o.trim().split('|');
-                                            const optVal = parts[0] ? parts[0].trim() : 'val';
-                                            const optLabel = parts[1] ? parts[1].trim() : optVal;
-                                            out += `        ${v}.addOption("${optVal}", "${optLabel}");\\n`;
+                                           out += `        ${v}.addOption("${optVal}", "${optLabel}");\\n`;
                                         }
                                     });
                                 }
@@ -1778,70 +1779,68 @@ public class WebDesignerPage extends DashboardBasePage {
                                 out += `        ${container}.add(${v});\\n`;
                                 break;
                             case 'Map':
-                                out += `        Map ${v} = new Map("${v}");\\n`;
-                                out += `        ${v}.setCenter(${props.lat || 0.0}, ${props.lng || 0.0}, ${props.zoom || 13});\\n`;
-                                if (props.markerTitle) out += `        ${v}.setMarker("${props.markerTitle}");\\n`;
-                                if (props.enableSearch) out += `        ${v}.setEnableSearch(true);\\n`;
-                                if (props.enableRelief) out += `        ${v}.setEnableRelief(true);\\n`;
-                                out += handleCommon(v);
-                                out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
-                                break;
-                            case 'QR':
-                                out += `        QR ${v} = new QR("${v}");\\n`;
-                                if (props.text) out += `        ${v}.setText("${props.text}");\\n`;
-                                if (props.width) out += `        ${v}.setWidth(${props.width});\\n`;
-                                if (props.height) out += `        ${v}.setHeight(${props.height});\\n`;
-                                if (props.colorDark) out += `        ${v}.setColorDark("${props.colorDark}");\\n`;
-                                if (props.colorLight) out += `        ${v}.setColorLight("${props.colorLight}");\\n`;
-                                out += handleCommon(v);
-                                out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
-                                break;
-                            case 'BarCode':
-                                out += `        BarCode ${v} = new BarCode("${v}");\\n`;
-                                if (props.text) out += `        ${v}.setText("${props.text}");\\n`;
-                                if (props.format) out += `        ${v}.setFormat("${props.format}");\\n`;
-                                if (props.lineColor) out += `        ${v}.setLineColor("${props.lineColor}");\\n`;
-                                out += handleCommon(v);
-                                out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
-                                break;
-                            case 'OTPValidator':
-                                out += `        OTPValidator ${v} = new OTPValidator("${v}");\\n`;
-                                if (props.amountOfDigits) out += `        ${v}.setAmountOfDigits(${props.amountOfDigits});\\n`;
-                                out += handleCommon(v);
-                                out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
-                                break;
-                            case 'Catcha':
-                                out += `        Catcha ${v} = new Catcha("${v}");\\n`;
-                                if (props.amountOfImagesToValidate) out += `        ${v}.setAmountOfImagesToValidate(${props.amountOfImagesToValidate});\\n`;
-                                out += handleCommon(v);
-                                out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
-                                break;
-                            case 'CreditCard':
-                                out += `        CreditCard ${v} = new CreditCard("${v}");\\n`;
-                                if (props.formAction) out += `        ${v}.setFormAction("${props.formAction}");\\n`;
-                                if (props.submitText) out += `        ${v}.setSubmitText("${props.submitText}");\\n`;
-                                const kidsCC = it.querySelectorAll(':scope > .canvas-container > .canvas-item, :scope > div > .canvas-container > .canvas-item');
-                                if (kidsCC.length > 0) out += walk(kidsCC, v);
-                                out += handleCommon(v);
-                                out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
-                                break;
-                            default: 
-                                // Catch-all for components without direct text args (e.g., CheckBox, ToggleSwitch, Spinner, etc)
-                                if (props.text && props.text !== type && type !== 'Spinner') {
-                                    out += `        ${type} ${v} = new ${type}("${props.text}");\\n`;
-                                } else {
-                                    out += `        ${type} ${v} = new ${type}("${v}");\\n`;
-                                }
-                                if (props.icon) out += `        // Try using icon property if supported\\n        try { ${v}.getClass().getMethod("setIcon", String.class).invoke(${v}, "${props.icon}"); } catch(Exception ignored) {}\\n`;
-                                out += handleCommon(v);
-                                out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
+                                 out += '        Map ' + v + ' = new Map("' + v + '");\\n';
+                                 out += '        ' + v + '.setCenter(' + (props.lat || 0.0) + ', ' + (props.lng || 0.0) + ', ' + (props.zoom || 13) + ');\\n';
+                                 if (props.markerTitle) out += '        ' + v + '.setMarker("' + props.markerTitle + '");\\n';
+                                 if (props.enableSearch) out += '        ' + v + '.setEnableSearch(true);\\n';
+                                 if (props.enableRelief) out += '        ' + v + '.setEnableRelief(true);\\n';
+                                 out += handleCommon(v);
+                                 out += handleEvents(v);
+                                 out += '        ' + container + '.add(' + v + ');\\n';
+                                 break;
+                             case 'QR':
+                                 out += '        QR ' + v + ' = new QR("' + v + '");\\n';
+                                 if (props.text) out += '        ' + v + '.setText("' + props.text + '");\\n';
+                                 if (props.width) out += '        ' + v + '.setWidth(' + props.width + ');\\n';
+                                 if (props.height) out += '        ' + v + '.setHeight(' + props.height + ');\\n';
+                                 if (props.colorDark) out += '        ' + v + '.setColorDark("' + props.colorDark + '");\\n';
+                                 if (props.colorLight) out += '        ' + v + '.setColorLight("' + props.colorLight + '");\\n';
+                                 out += handleCommon(v);
+                                 out += handleEvents(v);
+                                 out += '        ' + container + '.add(' + v + ');\\n';
+                                 break;
+                             case 'BarCode':
+                                 out += '        BarCode ' + v + ' = new BarCode("' + v + '");\\n';
+                                 if (props.text) out += '        ' + v + '.setText("' + props.text + '");\\n';
+                                 if (props.format) out += '        ' + v + '.setFormat("' + props.format + '");\\n';
+                                 if (props.lineColor) out += '        ' + v + '.setLineColor("' + props.lineColor + '");\\n';
+                                 out += handleCommon(v);
+                                 out += handleEvents(v);
+                                 out += '        ' + container + '.add(' + v + ');\\n';
+                                 break;
+                             case 'OTPValidator':
+                                 out += '        OTPValidator ' + v + ' = new OTPValidator("' + v + '");\\n';
+                                 if (props.amountOfDigits) out += '        ' + v + '.setAmountOfDigits(' + props.amountOfDigits + ');\\n';
+                                 out += handleCommon(v);
+                                 out += handleEvents(v);
+                                 out += '        ' + container + '.add(' + v + ');\\n';
+                                 break;
+                             case 'Catcha':
+                                 out += '        Catcha ' + v + ' = new Catcha("' + v + '");\\n';
+                                 if (props.amountOfImagesToValidate) out += '        ' + v + '.setAmountOfImagesToValidate(' + props.amountOfImagesToValidate + ');\\n';
+                                 out += handleCommon(v);
+                                 out += handleEvents(v);
+                                 out += '        ' + container + '.add(' + v + ');\\n';
+                                 break;
+                             case 'CreditCard':
+                                 out += '        CreditCard ' + v + ' = new CreditCard("' + v + '");\\n';
+                                 if (props.formAction) out += '        ' + v + '.setFormAction("' + props.formAction + '");\\n';
+                                 if (props.submitText) out += '        ' + v + '.setSubmitText("' + props.submitText + '");\\n';
+                                 const kidsCC = it.querySelectorAll(':scope > .canvas-container > .canvas-item, :scope > div > .canvas-container > .canvas-item');
+                                 if (kidsCC.length > 0) out += walk(kidsCC, v);
+                                 out += handleCommon(v);
+                                 out += handleEvents(v);
+                                 out += '        ' + container + '.add(' + v + ');\\n';
+                                 break;
+                             default: 
+                                 if (props.text && props.text !== type && type !== 'Spinner') {
+                                     out += '        ' + type + ' ' + v + ' = new ' + type + '("' + props.text + '");\\n';
+                                 } else {
+                                     out += '        ' + type + ' ' + v + ' = new ' + type + '("' + v + '");\\n';
+                                 }
+                                 out += handleCommon(v);
+                                 out += handleEvents(v);
+                                 out += '        ' + container + '.add(' + v + ');\\n';
                         }
                     });
                     return out;
@@ -2056,7 +2055,7 @@ public class WebDesignerPage extends DashboardBasePage {
 
         """;
         
-        Script script = new Script(scriptPart1 + scriptPart2);
+        Script script = new Script(scriptPart1 + "\n\n" + scriptPart2);
         
         center.add(style);
         center.add(script);

@@ -42,7 +42,7 @@ public class WebExampleMain {
         server.addHandler("/icons", com.jettra.example.pages.IconsPage.class);
         server.addHandler("/draw", com.jettra.example.pages.DrawPage.class);
         server.addHandler("/kanban", com.jettra.example.pages.KanbanPage.class);
-
+        server.addHandler("/board", com.jettra.example.pages.BoardPage.class);
         server.addHandler("/button", com.jettra.example.pages.ButtonPage.class);
         server.addHandler("/calendar", com.jettra.example.pages.CalendarPage.class);
         server.addHandler("/card", com.jettra.example.pages.CardPage.class);

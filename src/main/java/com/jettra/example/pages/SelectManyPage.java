@@ -89,21 +89,24 @@ public class SelectManyPage extends DashboardBasePage {
                      .setStyle("max-height", "60vh")
                      .setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
         
-        String javaCode = "// 1. Basic SelectMany Component\\n" +
-                          "SelectMany selectMany = new SelectMany(\"ciudadesVisitar\");\\n" +
-                          "selectMany.addOption(\"PTY\", \"Panamá\");\\n" +
-                          "selectMany.addOption(\"MAD\", \"Madrid\");\\n" +
-                          "selectMany.addOption(\"SJO\", \"San José\");\\n" +
-                          "selectMany.addOption(\"BOG\", \"Bogotá\");\\n\\n" +
-                          "// 2. Styling\\n" +
-                          "selectMany.setStyle(\"width\", \"300px\");\\n";
+        String javaCode = "// 1. Basic SelectMany Component\n" +
+                          "SelectMany selectMany = new SelectMany(\"ciudadesVisitar\");\n" +
+                          "selectMany.addOption(\"PTY\", \"Panamá\");\n" +
+                          "selectMany.addOption(\"MAD\", \"Madrid\");\n" +
+                          "selectMany.addOption(\"SJO\", \"San José\");\n" +
+                          "selectMany.addOption(\"BOG\", \"Bogotá\");\n\n" +
+                          "// 2. Setting Default Selection\n" +
+                          "selectMany.setDefault(\"MAD\");\n\n" +
+                          "// 3. Styling\n" +
+                          "selectMany.setStyle(\"width\", \"300px\");\n" +
+                          "selectMany.setStyle(\"height\", \"150px\");\n";
                           
         UIComponent pre = new UIComponent("pre") {};
         pre.setStyle("margin", "0");
         UIComponent codeTag = new UIComponent("code") {};
         codeTag.setProperty("id", "selectmany-java-code");
         codeTag.setStyle("color", "#a5d6ff").setStyle("font-family", "monospace").setStyle("font-size", "0.9rem");
-        codeTag.setContent(javaCode.replace("<", "&lt;").replace(">", "&gt;").replace("\\n", "\n"));
+        codeTag.setContent(javaCode.replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>"));
         
         pre.add(codeTag);
         codeContainer.add(pre);
@@ -138,8 +141,8 @@ public class SelectManyPage extends DashboardBasePage {
         instruction.setStyle("font-size", "12px").setStyle("color", "#aaa");
         demoArea.add(instruction);
         
-        demoArea.add(new Header(4, "Available Options (Click to select)"));
-        SelectMany selectMany = new SelectMany("ciudades").setInline(true);
+        demoArea.add(new Header(4, "Available Options (Default: Madrid)"));
+        SelectMany selectMany = new SelectMany("ciudades").setInline(false);
         selectMany.addOption("PTY", "Panamá");
         selectMany.addOption("MAD", "Madrid");
         selectMany.addOption("SJO", "San José");
@@ -149,7 +152,10 @@ public class SelectManyPage extends DashboardBasePage {
         selectMany.addOption("BCN", "Barcelona");
         selectMany.addOption("ROM", "Roma");
         
+        selectMany.setDefault("MAD");
+        
         demoArea.add(selectMany);
+        container.add(demoArea);
         container.add(demoArea);
         
         center.add(container);
