@@ -138,7 +138,8 @@ public class SelectManyPage extends DashboardBasePage {
         instruction.setStyle("font-size", "12px").setStyle("color", "#aaa");
         demoArea.add(instruction);
         
-        SelectMany selectMany = new SelectMany("ciudades");
+        demoArea.add(new Header(4, "Available Options (Click to select)"));
+        SelectMany selectMany = new SelectMany("ciudades").setInline(true);
         selectMany.addOption("PTY", "Panamá");
         selectMany.addOption("MAD", "Madrid");
         selectMany.addOption("SJO", "San José");

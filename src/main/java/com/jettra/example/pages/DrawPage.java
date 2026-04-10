@@ -167,8 +167,21 @@ public class DrawPage extends DashboardBasePage {
             "  const toolType = event.dataTransfer.getData('tool');" +
             "  const api = window['excalidrawAPI_main-sketch'];" +
             "  if(api) {" +
+            "    const rect = document.getElementById('main-sketch').getBoundingClientRect();" +
+            "    const x = event.clientX - rect.left;" +
+            "    const y = event.clientY - rect.top;" +
+            "    const newElement = {" +
+            "      type: (['rectangle','ellipse','diamond','arrow','line'].includes(toolType) ? toolType : 'rectangle')," +
+            "      x: x - 50, y: y - 50, width: 100, height: 100," +
+            "      strokeColor: '#00ffff', backgroundColor: 'rgba(0,255,255,0.1)'," +
+            "      fillStyle: 'solid', strokeWidth: 2, roughness: 1, opacity: 100," +
+            "      seed: Math.floor(Math.random() * 100000)," +
+            "      version: 1, versionNonce: Math.floor(Math.random() * 100000)," +
+            "      isDeleted: false, groupIds: [], boundElements: []," +
+            "      id: 'dt_' + Date.now()" +
+            "    };" +
+            "    api.updateScene({ elements: [...api.getSceneElements(), newElement] });" +
             "    api.updateScene({ appState: { activeTool: { type: toolType } } });" +
-            "    window.show3DMessage('Herramienta Seleccionada', 'Se ha activado la herramienta: ' + toolType);" +
             "  } else {" +
             "    console.warn('Excalidraw API not ready');" +
             "  }" +

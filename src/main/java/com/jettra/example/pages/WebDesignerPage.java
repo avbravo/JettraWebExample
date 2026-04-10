@@ -1069,7 +1069,7 @@ public class WebDesignerPage extends DashboardBasePage {
             };
 
             window.parseModelFieldsContent = function(content) {
-                const fieldRegex = /private\\s+([\\w<>]+)\\s+(\\w+);/g;
+                const fieldRegex = /(?:private|protected|public)?\\s+([\\w<>]+)\\s+(\\w+);/g;
                 let match;
                 modelFields = [];
                 while ((match = fieldRegex.exec(content)) !== null) {
@@ -1264,10 +1264,9 @@ public class WebDesignerPage extends DashboardBasePage {
                     
                     const files = (input.tagName === 'INPUT' ? input : input.querySelector('input')).files;
                     const excludeTarget = input.getAttribute('data-exclude-target') === 'true';
-                    
                     availableModels = [];
                     window.jettraFileCache = {};
-                    const tree = {};
+                    const tree = { _children: {} };
                     const readPromises = [];
 
                     for (let i = 0; i < files.length; i++) {
@@ -1281,20 +1280,25 @@ public class WebDesignerPage extends DashboardBasePage {
                         let curr = tree;
                         for (let j = 0; j < parts.length; j++) {
                             const part = parts[j];
-                            if (!curr[part]) curr[part] = { _children: {}, _file: null, _path: relPath };
-                            if (j === parts.length - 1) {
-                                curr[part]._file = f;
+                            if (!curr._children[part]) {
+                                curr._children[part] = { _children: {}, _file: null, _path: relPath };
                             }
-                            curr = curr[part]._children;
+                            if (j === parts.length - 1) {
+                                curr._children[part]._file = f;
+                            }
+                            curr = curr._children[part];
                         }
-
+                        
                         readPromises.push(new Promise((resolve) => {
                             const reader = new FileReader();
                             reader.onload = (e) => {
                                 const content = e.target.result;
                                 window.jettraFileCache[relPath] = content;
                                 if (f.name.endsWith('Model.java')) {
-                                    availableModels.push({ name: f.name.replace('.java',''), content: content });
+                                    const mName = f.name.replace('.java','');
+                                    if (!availableModels.find(m => m.name === mName)) {
+                                        availableModels.push({ name: mName, content: content });
+                                    }
                                 }
                                 resolve();
                             };
@@ -1307,23 +1311,27 @@ public class WebDesignerPage extends DashboardBasePage {
                         const isFile = !!node._file;
                         if (!isFile && childrenKeys.length === 0) return "";
 
-                        let cssClass = "";
-                        if (name.endsWith('Page.java')) cssClass = "file-page";
-                        if (name.endsWith('Model.java')) cssClass = "file-model";
-                        if (name.endsWith('.properties')) cssClass = "file-props";
-
-                        let action = isFile ? `ondblclick="window.openClass('${name}')"` : "";
-                        let html = `<div class="project-file ${cssClass}" style="padding-left:${depth * 12}px" ${action}>${isFile ? '📄' : '📂'} ${name}</div>`;
-                        for (const child in node._children) {
-                            html += renderTree(node._children[child], child, depth + 1);
-                        }
-                        return html;
+                        const icon = isFile ? (name.endsWith('.java') ? '☕' : '⚙️') : '📂';
+                        const color = isFile ? '#88ccff' : 'var(--jettra-accent)';
+                        const padding = depth * 12;
+                        
+                        let finalHtml = `<div class="tree-node" style="padding-left:${padding}px; cursor:pointer; color:${color}; font-size:11px; margin-bottom:4px;"`;
+                        if (isFile) finalHtml += ` onclick="window.loadFileToCanvas('${node._path.replace(/\\\\/g, '/')}')"`;
+                        finalHtml += `>${icon} ${name}</div>`;
+                        
+                        childrenKeys.sort().forEach(key => {
+                            finalHtml += renderTree(node._children[key], key, depth + 1);
+                        });
+                        return finalHtml;
                     }
 
                     Promise.all(readPromises).then(() => {
                         let finalHtml = "";
-                        for (const root in tree) finalHtml += renderTree(tree[root], root);
-                        viewer.innerHTML = finalHtml;
+                        const rootKeys = Object.keys(tree._children).sort();
+                        rootKeys.forEach(root => {
+                            finalHtml += renderTree(tree._children[root], root);
+                        });
+                        viewer.innerHTML = finalHtml || '<div style="color:#666; padding:10px;">No files found</div>';
                         window.updateModelSelect();
                         window.updateInspector();
                         
@@ -1394,7 +1402,7 @@ public class WebDesignerPage extends DashboardBasePage {
                 const canvas = document.getElementById('canvas-drop-area');
                 if (!canvas) return;
                 if (!currentModel) {
-                    window.show3DMessage("Error", "Por favor, seleccione un modelo en el explorador de proyectos o en el selector de la parte superior.");
+                    window.show3DMessage("Error", "Por favor, seleccione un modelo para analizar.");
                     return;
                 }
                 
@@ -1402,87 +1410,114 @@ public class WebDesignerPage extends DashboardBasePage {
                 const baseName = mName.replace("Model", "");
                 const repoName = baseName + "Repository";
                 
-                // Clear canvas to show informative message
-                canvas.innerHTML = `
-                    <div class="canvas-placeholder" style="color:var(--jettra-accent); display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; text-align:center;">
-                        <span style="font-size:48px; margin-bottom:20px;">⚡</span>
-                        <h3>CRUD MVC GENERADO</h3>
-                        <p>Se ha analizado el modelo <strong>${mName}</strong> y se ha generado el controlador de vista completo.</p>
-                        <p style="font-size:12px; margin-top:10px; opacity:0.7;">Revise el panel de la derecha para ver el código fuente Java.</p>
-                    </div>
-                `;
+                // Detailed analysis of model fields
+                let tblHeaders = [];
+                let tblRows = [];
+                let modalFieldsCode = "";
+                let imports = new Set(["com.jettra.example.dashboard.DashboardBasePage", "com.jettra.example.model." + mName, "com.jettra.example.repository." + repoName, "io.jettra.wui.complex.*", "io.jettra.wui.components.*", "io.jettra.wui.core.annotations.*", "io.jettra.wui.sync.*", "java.util.*"]);
 
-                let tblHeaders = ""; let tblRows = ""; let modalBody = "";
-                
                 modelFields.forEach(field => {
-                    const CapName = field.name.charAt(0).toUpperCase() + field.name.slice(1);
+                    const cName = field.name.charAt(0).toUpperCase() + field.name.slice(1);
                     const vName = field.name;
-                    const isList = field.type.toLowerCase().includes('list');
-                    const isCustom = /^[A-Z]/.test(field.type) && !['String','Integer','Double','Boolean','Long','Float'].includes(field.type);
+                    const isList = field.type.includes('List');
+                    const isCustom = /^[A-Z]/.test(field.type) && !['String','Integer','Double','Boolean','Long','Date'].includes(field.type);
                     
-                    tblHeaders += `            new TD("${CapName}"),\\n`;
-                    tblRows += `                new TD(String.valueOf(p.get${CapName}())),\\n`;
+                    tblHeaders.push(`new TD("${cName}")`);
+                    tblRows.push(`new TD(String.valueOf(p.get${cName}()))`);
                     
-                    modalBody += `        Div group_${vName} = new Div(); group_${vName}.addClass("form-group");\\n`;
-                    modalBody += `        group_${vName}.add(new Label("label_${vName}", "${CapName}"));\\n`;
+                    modalFieldsCode += `        Div g_${vName} = new Div(); g_${vName}.addClass("form-group");\n`;
+                    modalFieldsCode += `        g_${vName}.add(new Label("${vName}", "${cName}"));\n`;
                     
                     if (isList) {
-                        modalBody += `        SelectMany sel_${vName} = new SelectMany("sel_${vName}");\\n`;
-                        modalBody += `        sel_${vName}.setId("input_${vName}").addClass("j-input");\\n`;
-                        modalBody += `        group_${vName}.add(sel_${vName});\\n`;
+                        modalFieldsCode += `        SelectMany sel_${vName} = new SelectMany("${vName}").setInline(true);\n`;
+                        modalFieldsCode += `        sel_${vName}.setId("input_${vName}").addClass("j-input");\n`;
+                        modalFieldsCode += `        g_${vName}.add(sel_${vName});\n`;
                     } else if (isCustom) {
-                        modalBody += `        SelectOne sel_${vName} = new SelectOne("sel_${vName}", "");\\n`;
-                        modalBody += `        sel_${vName}.setId("input_${vName}").addClass("j-input");\\n`;
-                        modalBody += `        group_${vName}.add(sel_${vName});\\n`;
+                        modalFieldsCode += `        SelectOne sel_${vName} = new SelectOne("${vName}", "");\n`;
+                        modalFieldsCode += `        sel_${vName}.setId("input_${vName}").addClass("j-input");\n`;
+                        modalFieldsCode += `        g_${vName}.add(sel_${vName});\n`;
+                    } else if (field.type === 'Date') {
+                        modalFieldsCode += `        DatePicker dp_${vName} = new DatePicker("${vName}", "${cName}");\n`;
+                        modalFieldsCode += `        dp_${vName}.setId("input_${vName}").addClass("j-input");\n`;
+                        modalFieldsCode += `        g_${vName}.add(dp_${vName});\n`;
                     } else {
-                        modalBody += `        TextBox tb_${vName} = new TextBox("text", "${vName}");\\n`;
-                        modalBody += `        tb_${vName}.setId("input_${vName}").addClass("j-input");\\n`;
-                        modalBody += `        group_${vName}.add(tb_${vName});\\n`;
+                        modalFieldsCode += `        TextBox tb_${vName} = new TextBox("text", "${vName}");\n`;
+                        modalFieldsCode += `        tb_${vName}.setId("input_${vName}").addClass("j-input");\n`;
+                        modalFieldsCode += `        g_${vName}.add(tb_${vName});\n`;
                     }
-                    modalBody += `        form.add(group_${vName});\\n\\n`;
+                    modalFieldsCode += `        form.add(g_${vName});\n\n`;
                 });
 
-                let javaCode = `package com.jettra.example.pages;\\n\\n`;
-                javaCode += `import com.jettra.example.dashboard.DashboardBasePage;\\n`;
-                javaCode += `import com.jettra.example.model.${mName};\\n`;
-                javaCode += `import com.jettra.example.repository.${repoName};\\n`;
-                javaCode += `import io.jettra.wui.complex.*;\\n`;
-                javaCode += `import io.jettra.wui.components.*;\\n`;
-                javaCode += `import java.util.*;\\n\\n`;
-                javaCode += `public class ${baseName}Page extends DashboardBasePage {\\n\\n`;
-                javaCode += `    private ${mName} model = new ${mName}();\\n\\n`;
-                javaCode += `    public ${baseName}Page() {\\n        super("${baseName} Administration");\\n    }\\n\\n`;
-                javaCode += `    @Override\\n    protected void initCenter(Center center, String user) {\\n`;
-                javaCode += `        Div container = new Div(); container.setStyle("padding", "30px");\\n\\n`;
-                javaCode += `        Header title = new Header(2, "Mantenimiento de ${baseName}");\\n`;
-                javaCode += `        title.setStyle("color", "var(--jettra-accent)").setStyle("margin-bottom", "20px");\\n`;
-                javaCode += `        container.add(title);\\n\\n`;
-                javaCode += `        Button addBtn = new Button("➕ Nuevo ${baseName}"); addBtn.addClass("j-btn-primary");\\n`;
-                javaCode += `        addBtn.addClickListener(() -> { showModal("Crear ${baseName}", "save"); });\\n`;
-                javaCode += `        container.add(addBtn).add(new Divide());\\n\\n`;
-                javaCode += `        Datatable table = new Datatable();\\n`;
-                javaCode += `        table.addHeaderRow(new Row(\\n${tblHeaders}            new TD("Acciones")));\\n\\n`;
-                javaCode += `        List<${mName}> list = ${repoName}.findAll();\\n`;
-                javaCode += `        for (${mName} p : list) {\\n`;
-                javaCode += `            TD actions = new TD();\\n`;
-                javaCode += `            Button edit = new Button("✏️"); edit.addClass("j-btn");\\n`;
-                javaCode += `            edit.addClickListener(() -> { this.model = p; showModal("Editar ${baseName}", "update"); });\\n`;
-                javaCode += `            actions.add(edit);\\n`;
-                javaCode += `            table.addRow(new Row(\\n${tblRows}                actions));\\n`;
-                javaCode += `        }\\n        container.add(table);\\n        center.add(container);\\n        setupModal();\\n    }\\n\\n`;
-                javaCode += `    private void showModal(String title, String action) {\\n        document.getElementById("crud-modal").style.display = "flex";\\n    }\\n\\n`;
-                javaCode += `    private void setupModal() {\\n`;
-                javaCode += `        Modal modal = new Modal("crud-modal");\\n`;
-                javaCode += `        modal.addClass("j-modal-content");\\n`;
-                javaCode += `        Form form = new Form("crud-form", "");\\n\\n`;
-                javaCode += modalBody;
-                javaCode += `        Button saveBtn = new Button("GUARDAR"); saveBtn.addClass("j-btn-primary");\\n`;
-                javaCode += `        modal.add(new Header(3, "Datos del Registro")).add(form).add(saveBtn);\\n`;
-                javaCode += `        this.add(modal);\\n    }\\n}\\n`;
+                let code = `package com.jettra.example.pages;\n\n`;
+                Array.from(imports).sort().forEach(imp => code += `import ${imp};\n`);
+                code += `\n@JettraPageSincronized(SyncType.ALL)\n`;
+                code += `public class ${baseName}Page extends DashboardBasePage {\n\n`;
+                code += `    @InjectViewModel\n    private ${mName} model;\n\n`;
+                code += `    private Div crudModal;\n    private Header modalTitle;\n    private TextBox modalAction;\n    private Button modalSubmitBtn;\n\n`;
+                code += `    public ${baseName}Page() {\n        super("${baseName} Maintenance");\n    }\n\n`;
+                code += `    @Override\n    protected void initCenter(Center center, String username) {\n`;
+                code += `        Div main = new Div(); main.setStyle("padding", "20px");\n\n`;
+                code += `        Header title = new Header(2, "Mantenimiento de ${baseName}");\n`;
+                code += `        title.setStyle("color", "var(--jettra-accent)").setStyle("margin-bottom", "20px");\n`;
+                code += `        main.add(title);\n\n`;
+                code += `        Button addBtn = new Button("➕ Añadir ${baseName}");\n`;
+                code += `        addBtn.addClass("j-btn-primary").addClickListener(() -> {\n`;
+                code += `            this.model = new ${mName}();\n`;
+                code += `            showModal("Nuevo ${baseName}", "save");\n`;
+                code += `        });\n`;
+                code += `        main.add(addBtn);\n\n`;
+                code += `        Datatable table = new Datatable();\n`;
+                code += `        table.addHeaderRow(new Row(\n            ${tblHeaders.join(',\n            ')},\n            new TD("Acciones")\n        ));\n\n`;
+                code += `        List<${mName}> all = ${repoName}.findAll();\n`;
+                code += `        for (${mName} p : all) {\n`;
+                code += `            TD actionsTd = new TD(); actionsTd.setStyle("display", "flex").setStyle("gap", "10px");\n`;
+                code += `            Button editBtn = new Button("✏️"); editBtn.addClass("j-btn").addClickListener(() -> {\n`;
+                code += `                this.model = p; showModal("Editar ${baseName}", "save");\n`;
+                code += `            });\n`;
+                code += `            actionsTd.add(editBtn);\n`;
+                code += `            table.addRow(new Row(\n                ${tblRows.join(',\n                ')},\n                actionsTd\n            ));\n`;
+                code += `        }\n`;
+                code += `        main.add(table);\n        center.add(main);\n        setupModal();\n    }\n\n`;
+                code += `    private void showModal(String title, String action) {\n`;
+                code += `        this.crudModal.setStyle("display", "flex");\n`;
+                code += `        this.modalTitle.setContent(title);\n`;
+                code += `        this.modalAction.setProperty("value", action);\n    }\n\n`;
+                
+                code += `    @Override\n    protected void onPost(Map<String, String> params) {\n`;
+                code += `        String action = params.get("action");\n`;
+                code += `        // logic to handle save/delete based on action\n`;
+                code += `        // boolean result = ${repoName}.handleAction(action, params);\n`;
+                code += `        // if (result) {\n`;
+                code += `        //    JettraSyncManager.notifyChange("${mName}", SyncType.UPDATE, getLoggedUser(currentExchange));\n`;
+                code += `        //    try { redirect(currentExchange, JettraServer.resolvePath("/${baseName.toLowerCase()}")); } catch (Exception e) {}\n`;
+                code += `        // }\n`;
+                code += `    }\n\n`;
 
-                document.getElementById('generated-code-display').value = javaCode;
-                document.getElementById('generated-code-hidden').value = javaCode;
-                window.show3DMessage("CRUD Generado", "Se ha generado el código base siguiendo el patrón MVC.");
+                code += `    private void setupModal() {\n`;
+                code += `        this.crudModal = new Div(); this.crudModal.setId("crudModal").addClass("j-modal-overlay");\n`;
+                code += `        this.crudModal.setStyle("display","none").setStyle("position","fixed").setStyle("z-index","9999").setStyle("background","rgba(0,0,0,0.8)");\n\n`;
+                code += `        Div content = new Div(); content.addClass("j-modal-content");\n`;
+                code += `        this.modalTitle = new Header(3, "Operación");\n`;
+                code += `        Form form = new Form("${baseName.toLowerCase()}Form", "");\n`;
+                code += `        this.modalAction = new TextBox("hidden", "action");\n\n`;
+                code += modalFieldsCode;
+                code += `        Button cancelBtn = new Button("CANCELAR"); cancelBtn.addClass("j-btn");\n`;
+                code += `        cancelBtn.setProperty("onclick", "document.getElementById('crudModal').style.display='none'; return false;");\n`;
+                code += `        this.modalSubmitBtn = new Button("GUARDAR"); this.modalSubmitBtn.addClass("j-btn-primary");\n\n`;
+                code += `        Div footer = new Div(); footer.setStyle("display","flex").setStyle("justify-content","flex-end").setStyle("gap","10px");\n`;
+                code += `        footer.add(cancelBtn).add(this.modalSubmitBtn);\n`;
+                code += `        form.add(this.modalAction).add(footer);\n`;
+                code += `        content.add(this.modalTitle).add(form);\n`;
+                code += `        this.crudModal.add(content);\n        this.add(this.crudModal);\n    }\n}\n`;
+
+                document.getElementById('generated-code-display').value = code;
+                document.getElementById('generated-code-hidden').value = code;
+                
+                // Switch tab to code
+                const tab = document.querySelector('[data-tab="code"]');
+                if (tab) tab.click();
+                
+                window.show3DMessage("CRUD Generado", "Se ha generado la arquitectura MVC completa para " + baseName);
             };
 
             window.clearDesigner = function() {
