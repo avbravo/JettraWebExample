@@ -1598,6 +1598,12 @@ public class WebDesignerPage extends DashboardBasePage {
                                 out += handleEvents(v);
                                 out += `        ${container}.add(${v});\\n`;
                                 break;
+                            case 'Clock':
+                                out += `        Clock ${v} = new Clock("${props.text || 'Clock'}");\\n`;
+                                out += handleCommon(v);
+                                out += handleEvents(v);
+                                out += `        ${container}.add(${v});\\n`;
+                                break;
                             case 'Avatar':
                                 out += `        Avatar ${v} = new Avatar();\\n`;
                                 if (props.text) out += `        ${v}.setText("${props.text}");\\n`;
@@ -1610,32 +1616,6 @@ public class WebDesignerPage extends DashboardBasePage {
                                 if (props.color) out += `        ${v}.setColor("${props.color}");\\n`;
                                 if (props.indeterminate) out += `        ${v}.setIndeterminate(true);\\n`;
                                 if (props.showPercent === false) out += `        ${v}.setShowPercent(false);\\n`;
-                                out += handleCommon(v);
-                                out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
-                                break;
-                            case 'Button': 
-                                out += `        Button ${v} = new Button("${props.text}");\\n`;
-                                out += handleCommon(v);
-                                out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
-                                break;
-                            case 'TextBox':
-                                out += `        TextBox ${v} = new TextBox("${v}", "Enter value");\\n`;
-                                if (props.binding) out += `        ${v}.setValue(model.get${props.binding.charAt(0).toUpperCase() + props.binding.slice(1)}());\\n`;
-                                out += handleCommon(v);
-                                out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
-                                break;
-                            case 'TextArea':
-                                out += `        TextArea ${v} = new TextArea("${v}", "");\\n`;
-                                if (props.binding) out += `        ${v}.setValue(model.get${props.binding.charAt(0).toUpperCase() + props.binding.slice(1)}());\\n`;
-                                out += handleCommon(v);
-                                out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
-                                break;
-                            case 'Clock':
-                                out += `        Clock ${v} = new Clock("${props.text || 'clock'}");\\n`;
                                 out += handleCommon(v);
                                 out += handleEvents(v);
                                 out += `        ${container}.add(${v});\\n`;
@@ -1779,68 +1759,68 @@ public class WebDesignerPage extends DashboardBasePage {
                                 out += `        ${container}.add(${v});\\n`;
                                 break;
                             case 'Map':
-                                 out += '        Map ' + v + ' = new Map("' + v + '");\\n';
-                                 out += '        ' + v + '.setCenter(' + (props.lat || 0.0) + ', ' + (props.lng || 0.0) + ', ' + (props.zoom || 13) + ');\\n';
-                                 if (props.markerTitle) out += '        ' + v + '.setMarker("' + props.markerTitle + '");\\n';
-                                 if (props.enableSearch) out += '        ' + v + '.setEnableSearch(true);\\n';
-                                 if (props.enableRelief) out += '        ' + v + '.setEnableRelief(true);\\n';
+                                 out += `        Map ${v} = new Map("${v}");\\n`;
+                                 out += `        ${v}.setCenter(${props.lat || 0.0}, ${props.lng || 0.0}, ${props.zoom || 13});\\n`;
+                                 if (props.markerTitle) out += `        ${v}.setMarker("${props.markerTitle}");\\n`;
+                                 if (props.enableSearch) out += `        ${v}.setEnableSearch(true);\\n`;
+                                 if (props.enableRelief) out += `        ${v}.setEnableRelief(true);\\n`;
                                  out += handleCommon(v);
                                  out += handleEvents(v);
-                                 out += '        ' + container + '.add(' + v + ');\\n';
+                                 out += `        ${container}.add(${v});\\n`;
                                  break;
                              case 'QR':
-                                 out += '        QR ' + v + ' = new QR("' + v + '");\\n';
-                                 if (props.text) out += '        ' + v + '.setText("' + props.text + '");\\n';
-                                 if (props.width) out += '        ' + v + '.setWidth(' + props.width + ');\\n';
-                                 if (props.height) out += '        ' + v + '.setHeight(' + props.height + ');\\n';
-                                 if (props.colorDark) out += '        ' + v + '.setColorDark("' + props.colorDark + '");\\n';
-                                 if (props.colorLight) out += '        ' + v + '.setColorLight("' + props.colorLight + '");\\n';
+                                 out += `        QR ${v} = new QR("${v}");\\n`;
+                                 if (props.text) out += `        ${v}.setText("${props.text}");\\n`;
+                                 if (props.width) out += `        ${v}.setWidth(${props.width});\\n`;
+                                 if (props.height) out += `        ${v}.setHeight(${props.height});\\n`;
+                                 if (props.colorDark) out += `        ${v}.setColorDark("${props.colorDark}");\\n`;
+                                 if (props.colorLight) out += `        ${v}.setColorLight("${props.colorLight}");\\n`;
                                  out += handleCommon(v);
                                  out += handleEvents(v);
-                                 out += '        ' + container + '.add(' + v + ');\\n';
+                                 out += `        ${container}.add(${v});\\n`;
                                  break;
                              case 'BarCode':
-                                 out += '        BarCode ' + v + ' = new BarCode("' + v + '");\\n';
-                                 if (props.text) out += '        ' + v + '.setText("' + props.text + '");\\n';
-                                 if (props.format) out += '        ' + v + '.setFormat("' + props.format + '");\\n';
-                                 if (props.lineColor) out += '        ' + v + '.setLineColor("' + props.lineColor + '");\\n';
+                                 out += `        BarCode ${v} = new BarCode("${v}");\\n`;
+                                 if (props.text) out += `        ${v}.setText("${props.text}");\\n`;
+                                 if (props.format) out += `        ${v}.setFormat("${props.format}");\\n`;
+                                 if (props.lineColor) out += `        ${v}.setLineColor("${props.lineColor}");\\n`;
                                  out += handleCommon(v);
                                  out += handleEvents(v);
-                                 out += '        ' + container + '.add(' + v + ');\\n';
+                                 out += `        ${container}.add(${v});\\n`;
                                  break;
                              case 'OTPValidator':
-                                 out += '        OTPValidator ' + v + ' = new OTPValidator("' + v + '");\\n';
-                                 if (props.amountOfDigits) out += '        ' + v + '.setAmountOfDigits(' + props.amountOfDigits + ');\\n';
+                                 out += `        OTPValidator ${v} = new OTPValidator("${v}");\\n`;
+                                 if (props.amountOfDigits) out += `        ${v}.setAmountOfDigits(${props.amountOfDigits});\\n`;
                                  out += handleCommon(v);
                                  out += handleEvents(v);
-                                 out += '        ' + container + '.add(' + v + ');\\n';
+                                 out += `        ${container}.add(${v});\\n`;
                                  break;
                              case 'Catcha':
-                                 out += '        Catcha ' + v + ' = new Catcha("' + v + '");\\n';
-                                 if (props.amountOfImagesToValidate) out += '        ' + v + '.setAmountOfImagesToValidate(' + props.amountOfImagesToValidate + ');\\n';
+                                 out += `        Catcha ${v} = new Catcha("${v}");\\n`;
+                                 if (props.amountOfImagesToValidate) out += `        ${v}.setAmountOfImagesToValidate(${props.amountOfImagesToValidate});\\n`;
                                  out += handleCommon(v);
                                  out += handleEvents(v);
-                                 out += '        ' + container + '.add(' + v + ');\\n';
+                                 out += `        ${container}.add(${v});\\n`;
                                  break;
                              case 'CreditCard':
-                                 out += '        CreditCard ' + v + ' = new CreditCard("' + v + '");\\n';
-                                 if (props.formAction) out += '        ' + v + '.setFormAction("' + props.formAction + '");\\n';
-                                 if (props.submitText) out += '        ' + v + '.setSubmitText("' + props.submitText + '");\\n';
+                                 out += `        CreditCard ${v} = new CreditCard("${v}");\\n`;
+                                 if (props.formAction) out += `        ${v}.setFormAction("${props.formAction}");\\n`;
+                                 if (props.submitText) out += `        ${v}.setSubmitText("${props.submitText}");\\n`;
                                  const kidsCC = it.querySelectorAll(':scope > .canvas-container > .canvas-item, :scope > div > .canvas-container > .canvas-item');
                                  if (kidsCC.length > 0) out += walk(kidsCC, v);
                                  out += handleCommon(v);
                                  out += handleEvents(v);
-                                 out += '        ' + container + '.add(' + v + ');\\n';
+                                 out += `        ${container}.add(${v});\\n`;
                                  break;
                              default: 
                                  if (props.text && props.text !== type && type !== 'Spinner') {
-                                     out += '        ' + type + ' ' + v + ' = new ' + type + '("' + props.text + '");\\n';
+                                     out += `        ${type} ${v} = new ${type}("${props.text}");\\n`;
                                  } else {
-                                     out += '        ' + type + ' ' + v + ' = new ' + type + '("' + v + '");\\n';
+                                     out += `        ${type} ${v} = new ${type}("${v}");\\n`;
                                  }
                                  out += handleCommon(v);
                                  out += handleEvents(v);
-                                 out += '        ' + container + '.add(' + v + ');\\n';
+                                 out += `        ${container}.add(${v});\\n`;
                         }
                     });
                     return out;
