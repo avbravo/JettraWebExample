@@ -1,489 +1,4 @@
-package com.jettra.example.pages;
 
-import com.jettra.example.dashboard.DashboardBasePage;
-import io.jettra.wui.complex.Center;
-import io.jettra.wui.complex.Modal;
-import io.jettra.wui.components.*;
-
-/**
- * JettraWebDesigner: A visual designer for JettraWUI interfaces.
- */
-public class WebDesignerPage extends DashboardBasePage {
-
-    // Properties field removed as it was unused
-
-    public WebDesignerPage() {
-        super("Jettra Web Designer");
-    }
-    
-    @Override
-    protected void onPost(java.util.Map<String, String> params) {
-        String code = params.get("generated-code-hidden");
-        if (code != null && !code.isEmpty()) {
-            System.out.println("======= SAVING GENERATED CODE =======");
-            System.out.println(code);
-            System.out.println("=====================================");
-            // In a real production environment, this would write to a .java file
-        }
-        super.onPost(params);
-    }
-
-    @Override
-    protected void initCenter(Center center, String username) {
-        // Layout: 3 Columns
-        // [ Palette (25%) ] | [ Canvas (50%) ] | [ Code View (25%) ]
-        
-        Form saveForm = new Form("save-form", "/webdesigner");
-
-        Div container = new Div();
-        container.setStyle("display", "flex").setStyle("height", "calc(100vh - 120px)").setStyle("gap", "15px");
-
-        // 1. Sidebar (Palette + Project Explorer)
-        Div sidebar = new Div();
-        sidebar.setStyle("flex", "0 0 280px").setStyle("display", "flex").setStyle("flex-direction", "column").setStyle("gap", "15px");
-
-        Div palette = createCategorizedPalette();
-        palette.setStyle("flex", "1").setStyle("background", "rgba(20,30,50,0.8)").setStyle("border", "1px solid var(--jettra-accent)").setStyle("padding", "15px").setStyle("border-radius", "8px").setStyle("overflow-y", "auto");
-
-        Div projectExplorer = createProjectExplorer();
-        projectExplorer.setStyle("flex", "0 0 250px").setStyle("background", "rgba(10,20,30,0.9)").setStyle("border", "1px solid rgba(0,255,255,0.4)").setStyle("padding", "15px").setStyle("border-radius", "8px").setStyle("overflow-y", "auto");
-
-        sidebar.add(palette).add(projectExplorer);
-
-        // 2. Canvas
-        Div canvasArea = new Div();
-        canvasArea.setProperty("id", "canvas-area");
-        canvasArea.setStyle("flex", "1").setStyle("background", "rgba(0,0,0,0.3)").setStyle("border", "2px dashed var(--jettra-accent)").setStyle("border-radius", "8px").setStyle("padding", "20px").setStyle("position", "relative").setStyle("overflow-y", "auto").setStyle("display", "flex").setStyle("flex-direction", "column");
-        
-        Div canvasHeader = new Div();
-        canvasHeader.setProperty("id", "canvas-header");
-        canvasHeader.setStyle("display", "flex").setStyle("justify-content", "space-between").setStyle("align-items", "center").setStyle("margin-bottom", "15px").setStyle("border-bottom", "1px solid rgba(0,255,255,0.1)").setStyle("padding-bottom", "10px");
-        
-        Header canvasTitle = new Header(4, "View");
-        canvasTitle.setProperty("id", "canvas-title-text");
-        canvasTitle.setStyle("color", "var(--jettra-accent)").setStyle("margin", "0");
-        
-        Div canvasHeaderActions = new Div();
-        canvasHeaderActions.setStyle("display", "flex").setStyle("gap", "10px");
-        
-        Button previewBtn = new Button("Preview \uD83D\uDC41\uFE0F");
-        previewBtn.addClass("j-btn-secondary");
-        previewBtn.setStyle("font-size", "11px").setStyle("padding", "5px 12px");
-        previewBtn.setProperty("type", "button");
-        previewBtn.setProperty("onclick", "window.previewInterface()");
-
-        Button crudBtn = new Button("CRUD \u26A1");
-        crudBtn.addClass("j-btn-primary");
-        crudBtn.setStyle("font-size", "11px").setStyle("padding", "5px 12px");
-        crudBtn.setProperty("type", "button");
-        crudBtn.setProperty("onclick", "generateCRUD()");
-        
-        Button toggleCodeBtn = new Button("Code </>");
-        toggleCodeBtn.addClass("j-btn");
-        toggleCodeBtn.setStyle("font-size", "11px").setStyle("padding", "5px 12px");
-        toggleCodeBtn.setProperty("type", "button");
-        toggleCodeBtn.setProperty("onclick", "window.toggleCodeView()");
-        
-        canvasHeaderActions.add(previewBtn).add(crudBtn).add(toggleCodeBtn);
-        canvasHeader.add(canvasTitle).add(canvasHeaderActions);
-        canvasArea.add(canvasHeader);
-
-        Div canvasDropArea = new Div();
-        canvasDropArea.setProperty("id", "canvas-drop-area");
-        canvasDropArea.setStyle("flex", "1").setStyle("display", "flex").setStyle("flex-direction", "column");
-
-        Div canvasPlaceholder = new Div();
-        canvasPlaceholder.addClass("canvas-placeholder");
-        canvasPlaceholder.setContent("Start dragging components here to design your page");
-        canvasPlaceholder.setStyle("color", "rgba(0,255,255,0.2)").setStyle("text-align", "center").setStyle("margin-top", "100px");
-        canvasDropArea.add(canvasPlaceholder);
-
-        canvasArea.add(canvasDropArea);
-
-        // --- NEW: Modal Tools Area ---
-        Div modalToolsArea = new Div();
-        modalToolsArea.setProperty("id", "modal-tools-area");
-        modalToolsArea.setStyle("margin-top", "15px").setStyle("border-top", "1px dashed rgba(0,255,255,0.3)").setStyle("padding-top", "15px").setStyle("display", "flex").setStyle("flex-direction", "column");
-        
-        Header modalToolsTitle = new Header(5, "Modal Tools");
-        modalToolsTitle.setStyle("color", "var(--jettra-accent)").setStyle("margin", "0 0 10px 0").setStyle("font-size", "12px").setStyle("text-transform", "uppercase");
-        
-        Div modalListContainer = new Div();
-        modalListContainer.setProperty("id", "modal-list-container");
-        modalListContainer.setStyle("display", "flex").setStyle("flex-wrap", "wrap").setStyle("gap", "15px").setStyle("min-height", "60px").setStyle("background", "rgba(0,0,0,0.2)").setStyle("border-radius", "8px").setStyle("padding", "10px").setStyle("border", "1px solid rgba(255,255,255,0.05)");
-        
-        modalToolsArea.add(modalToolsTitle).add(modalListContainer);
-        canvasArea.add(modalToolsArea);
-        // -----------------------------
-
-        // 3. Code View
-        Div codeView = new Div();
-        codeView.setProperty("id", "code-view-container");
-        codeView.setStyle("flex", "0 0 350px").setStyle("background", "rgba(10,20,30,0.9)").setStyle("border", "1px solid var(--jettra-accent)").setStyle("padding", "15px").setStyle("border-radius", "8px").setStyle("display", "flex").setStyle("flex-direction", "column");
-        
-        Header codeHeader = new Header(4, "Java Source Code");
-        codeHeader.setStyle("color", "var(--jettra-accent)").setStyle("margin-bottom", "10px");
-        
-        Div codeContainerWrapper = new Div();
-        codeContainerWrapper.setStyle("flex", "1").setStyle("display", "flex").setStyle("flex-direction", "column");
-
-        TextArea codeContainer = new TextArea("generated-code-display", "// Drag components to start generating code...");
-        codeContainer.setProperty("id", "generated-code-display");
-        codeContainer.setStyle("flex", "1").setStyle("background", "#050a10").setStyle("color", "#a9b7c6").setStyle("padding", "10px").setStyle("font-family", "monospace").setStyle("font-size", "11px").setStyle("white-space", "pre").setStyle("border-radius", "4px").setStyle("border", "1px solid #333").setStyle("overflow", "auto").setStyle("resize", "none").setStyle("outline", "none");
-        
-        codeContainerWrapper.add(codeContainer);
-
-        // Hidden input to send code to server
-        TextBox hiddenCode = new TextBox("generated-code-hidden", "");
-        hiddenCode.setProperty("id", "generated-code-hidden");
-        hiddenCode.setStyle("display", "none");
-
-        Div actions = new Div();
-        actions.setStyle("margin-top", "10px").setStyle("display", "flex").setStyle("gap", "10px");
-        
-        Button syncBtn = new Button("SYNC CANVAS");
-        syncBtn.addClass("j-btn-secondary");
-        syncBtn.setProperty("type", "button");
-        syncBtn.setProperty("onclick", "window.syncCodeToCanvas()");
-
-        Button saveBtn = new Button("GENERATE CLASS");
-        saveBtn.addClass("j-btn-primary");
-        saveBtn.setProperty("type", "submit");
-        
-        Button clearBtn = new Button("CLEAR ALL");
-        clearBtn.addClass("j-btn-danger");
-        clearBtn.setProperty("type", "button");
-        clearBtn.setProperty("onclick", "window.clearDesigner()");
-        
-        actions.add(syncBtn).add(saveBtn).add(clearBtn);
-        codeView.add(codeHeader).add(codeContainerWrapper).add(hiddenCode).add(actions);
-
-        // 4. Property Inspector (Floating/Right Sidebar)
-        Div inspector = new Div();
-        inspector.setProperty("id", "property-inspector");
-        inspector.setStyle("flex", "0 0 250px").setStyle("background", "rgba(20,35,55,0.9)").setStyle("border", "1px solid var(--jettra-accent)").setStyle("padding", "15px").setStyle("border-radius", "8px").setStyle("display", "none").setStyle("flex-direction", "column");
-        
-        Div inspectorHeaderWrapper = new Div();
-        inspectorHeaderWrapper.setStyle("display", "flex").setStyle("justify-content", "space-between").setStyle("align-items", "center").setStyle("margin-bottom", "10px");
-        
-        Header inspectorHeader = new Header(4, "Properties");
-        inspectorHeader.setStyle("color", "var(--jettra-accent)").setStyle("margin", "0");
-        
-        Span closeInspector = new Span("\u00D7");
-        closeInspector.setStyle("color", "#ff4444").setStyle("font-size", "24px").setStyle("cursor", "pointer").setStyle("line-height", "1").setStyle("font-weight", "bold");
-        closeInspector.setProperty("onclick", "document.getElementById('property-inspector').style.display='none'");
-        
-        inspectorHeaderWrapper.add(inspectorHeader).add(closeInspector);
-        
-        Div propList = new Div();
-        propList.setProperty("id", "inspector-properties");
-        propList.setStyle("flex", "1");
-
-        inspector.add(inspectorHeaderWrapper).add(propList);
-
-        // --- Add Tool Form (Restored to Palette) ---
-        Div addToolPanel = new Div();
-        addToolPanel.setStyle("padding", "15px").setStyle("background", "rgba(0,0,0,0.3)").setStyle("border-top", "1px solid var(--jettra-border)").setStyle("margin-top", "10px");
-        Header addH = new Header(5, "A\u00F1adir Herramienta");
-        addH.setStyle("font-size", "11px").setStyle("margin-bottom", "10px");
-        
-        TextBox toolNameInput = new TextBox("text", "Nueva...");
-        toolNameInput.setId("new-tool-name").addClass("j-input").setStyle("margin-bottom", "10px").setStyle("font-size", "12px");
-        
-        Button addToolBtn = new Button("A\u00F1adir a Paleta");
-        addToolBtn.addClass("j-btn-primary").setStyle("width", "100%").setStyle("font-size", "11px");
-        addToolBtn.setProperty("onclick", "addNewToolToPalette()");
-        
-        addToolPanel.add(addH).add(toolNameInput).add(addToolBtn);
-        palette.add(addToolPanel);
-
-        container.add(sidebar).add(canvasArea).add(codeView).add(inspector);
-        
-        // 5. Event Editor Modal
-        Modal eventModal = new Modal("event-editor-modal");
-        eventModal.addClass("modal-3d-effect");
-        eventModal.setStyle("display", "none").setStyle("background", "linear-gradient(145deg, rgba(30, 50, 80, 0.98), rgba(15, 25, 45, 1))")
-                 .setStyle("backdrop-filter", "blur(25px)").setStyle("padding", "40px").setStyle("border-radius", "30px")
-                 .setStyle("width", "750px").setStyle("border", "1px solid rgba(0, 255, 255, 0.5)")
-                 .setStyle("position", "fixed").setStyle("top", "50%").setStyle("left", "50%").setStyle("transform", "translate(-50%, -50%)").setStyle("z-index", "1000")
-                 .setStyle("box-shadow", "0 40px 100px -20px rgba(0, 0, 0, 0.8), inset 0 2px 2px 0 rgba(255, 255, 255, 0.2), 0 0 30px rgba(0, 255, 255, 0.3)");
-        
-        Header modalHeader = new Header(3, "\u26A1 Pro Event Handler Editor");
-        modalHeader.setStyle("color", "var(--jettra-accent)").setStyle("margin-top", "0").setStyle("text-shadow", "0 0 15px rgba(0,255,255,0.6)").setStyle("font-weight", "800").setStyle("letter-spacing", "1px");
-        
-        TextArea codeInput = new TextArea("event-code-input", "e -> { \n    // Write your Java code here\n}");
-        codeInput.setStyle("width", "100%").setStyle("height", "350px").setStyle("background", "rgba(0,0,0,0.7)").setStyle("color", "#0ff").setStyle("font-family", "'Fira Code', monospace").setStyle("padding", "20px").setStyle("border", "1px solid rgba(0,255,255,0.3)").setStyle("border-radius", "15px").setStyle("box-shadow", "inset 0 4px 20px rgba(0,0,0,0.7)");
-        
-        Div modalActions = new Div();
-        modalActions.setStyle("display", "flex").setStyle("justify-content", "flex-end").setStyle("gap", "15px").setStyle("margin-top", "25px");
-        
-        Button cancelBtn = new Button("Cancel");
-        cancelBtn.addClass("j-btn");
-        cancelBtn.setStyle("border-radius", "8px").setStyle("background", "rgba(255,255,255,0.05)").setStyle("box-shadow", "0 4px 6px rgba(0,0,0,0.2)");
-        cancelBtn.setProperty("type", "button");
-        cancelBtn.setProperty("onclick", "document.getElementById('event-editor-modal').style.display = 'none'");
-        
-        Button saveEventBtn = new Button("Save Handler");
-        saveEventBtn.addClass("j-btn-primary");
-        saveEventBtn.setStyle("border-radius", "8px").setStyle("box-shadow", "0 4px 15px rgba(0,255,255,0.3)");
-        saveEventBtn.setProperty("onclick", "saveEventHandler()");
-        
-        modalActions.add(cancelBtn).add(saveEventBtn);
-        eventModal.add(modalHeader).add(codeInput).add(modalActions);
-        
-        // 6. 3D Confirmation Modal
-        Modal confirmModal = new Modal("confirm-3d-modal");
-        confirmModal.addClass("modal-3d-effect");
-        confirmModal.setStyle("display", "none").setStyle("background", "linear-gradient(135deg, #1e293b, #0f172a)")
-                   .setStyle("border", "2px solid rgba(0, 255, 255, 0.6)").setStyle("border-radius", "30px")
-                   .setStyle("padding", "50px").setStyle("width", "500px")
-                   .setStyle("position", "fixed").setStyle("top", "50%").setStyle("left", "50%").setStyle("transform", "translate(-50%, -50%)").setStyle("z-index", "1000")
-                   .setStyle("box-shadow", "0 50px 100px -20px rgba(0, 0, 0, 0.8), inset 0 2px 2px rgba(255, 255, 255, 0.1), 0 0 40px rgba(0, 255, 255, 0.2)");
-        
-        Header confirmTitle = new Header(3, "Confirm Action");
-        confirmTitle.setProperty("id", "confirm-title");
-        confirmTitle.setStyle("color", "var(--jettra-accent)").setStyle("margin-top", "0").setStyle("text-align", "center");
-        
-        Paragraph confirmBody = new Paragraph("");
-        confirmBody.setProperty("id", "confirm-body");
-        confirmBody.setStyle("color", "#cbd5e1").setStyle("text-align", "center").setStyle("font-size", "16px").setStyle("margin", "20px 0");
-        
-        Div confirmActions = new Div();
-        confirmActions.setStyle("display", "flex").setStyle("justify-content", "center").setStyle("gap", "20px").setStyle("margin-top", "30px");
-        
-        Button confirmNo = new Button("No, Cancel");
-        confirmNo.addClass("j-btn");
-        confirmNo.setStyle("width", "140px");
-        confirmNo.setProperty("onclick", "window.close3DConfirm()");
-        
-        Button confirmYes = new Button("Yes, Open");
-        confirmYes.addClass("j-btn-primary");
-        confirmYes.setStyle("width", "140px");
-        confirmYes.setProperty("id", "confirm-yes-btn");
-        
-        confirmActions.add(confirmNo).add(confirmYes);
-        confirmModal.add(confirmTitle).add(confirmBody).add(confirmActions);
-
-        // 7. Model Selection Row
-        Div modelSelectionRow = new Div();
-        modelSelectionRow.setStyle("display", "flex").setStyle("align-items", "center").setStyle("gap", "10px").setStyle("margin-bottom", "15px").setStyle("background", "rgba(0,255,255,0.05)").setStyle("padding", "10px").setStyle("border-radius", "10px").setStyle("border", "1px solid rgba(0,255,255,0.1)");
-        
-        Label modelLabel = new Label("Selected Model:");
-        modelLabel.setStyle("font-size", "12px").setStyle("color", "var(--jettra-accent)");
-        
-        Div modelSelectContainer = new Div();
-        modelSelectContainer.setProperty("id", "model-select-container");
-        modelSelectContainer.setStyle("flex", "1");
-        
-        modelSelectionRow.add(modelLabel).add(modelSelectContainer);
-        
-        // Wrap everything into the main center
-        center.add(eventModal);
-        center.add(confirmModal);
-
-        // 8. Preview Modal
-        Modal previewModal = new Modal("preview-modal");
-        previewModal.setStyle("display", "none").setStyle("background", "linear-gradient(135deg, #0f172a, #1e293b)").setStyle("position", "fixed").setStyle("top", "0").setStyle("left", "0").setStyle("width", "100vw").setStyle("height", "100vh").setStyle("z-index", "9999").setStyle("overflow-y", "auto");
-        
-        Div previewHeader = new Div();
-        previewHeader.setStyle("display", "flex").setStyle("justify-content", "space-between").setStyle("align-items", "center").setStyle("padding", "15px 30px").setStyle("background", "rgba(0,0,0,0.5)").setStyle("border-bottom", "1px solid rgba(0, 255, 255, 0.2)");
-        Header prevTitle = new Header(3, "Interface Preview");
-        prevTitle.setStyle("margin", "0").setStyle("color", "var(--jettra-accent)");
-        Button closePreviewBtn = new Button("Close Preview \u00D7");
-        closePreviewBtn.addClass("j-btn-danger");
-        closePreviewBtn.setStyle("font-weight", "bold");
-        closePreviewBtn.setProperty("type", "button");
-        closePreviewBtn.setProperty("onclick", "document.getElementById('preview-modal').style.display = 'none'");
-        previewHeader.add(prevTitle).add(closePreviewBtn);
-
-        Div previewContent = new Div();
-        previewContent.setProperty("id", "preview-content-area");
-        previewContent.setStyle("padding", "40px").setStyle("max-width", "1200px").setStyle("margin", "0 auto");
-
-        previewModal.add(previewHeader).add(previewContent);
-        center.add(previewModal);
-        
-        saveForm.add(modelSelectionRow).add(container);
-        center.add(saveForm);
-
-        // Add Designer Scripts and Styles
-        setupDesignerAssets(center);
-    }
-
-    private Div createProjectExplorer() {
-        Div explorer = new Div();
-        
-        Div explorerHeaderWrap = new Div();
-        explorerHeaderWrap.setStyle("display", "flex").setStyle("justify-content", "space-between").setStyle("align-items", "center").setStyle("margin-bottom", "10px");
-        
-        Header h = new Header(5, "Project Explorer");
-        h.setStyle("color", "var(--jettra-accent)").setStyle("margin", "0");
-        
-        Span clearExplorerBtn = new Span("\uD83D\uDDD1\uFE0F");
-        clearExplorerBtn.setStyle("cursor", "pointer").setStyle("font-size", "14px").setStyle("transition", "transform 0.2s").setStyle("opacity", "0.8");
-        clearExplorerBtn.setProperty("onclick", "window.clearProjectCache()");
-        clearExplorerBtn.setProperty("title", "Limpiar selecci\u00F3n de proyecto");
-        
-        explorerHeaderWrap.add(h).add(clearExplorerBtn);
-        explorer.add(explorerHeaderWrap);
-
-        FolderSelector folderSel = new FolderSelector("fs-explorer");
-        folderSel.setReferenceLocation("/").setReferenceContent("Root");
-        folderSel.excludeTarget(true).style3D().setConfirmUpload(true, "Explorador de Proyecto", "\u00BFDesea cargar los archivos de esta carpeta?");
-        folderSel.setStyle("width", "100%").setStyle("margin-top", "10px").setStyle("margin-bottom", "10px");
-        
-        // Custom ID for JS hook
-        folderSel.setProperty("onchange", "loadFiles(this)");
-
-        Div treeContainer = new Div();
-        treeContainer.setProperty("id", "explorer-tree-view");
-        treeContainer.setStyle("min-height", "100px");
-
-        explorer.add(folderSel).add(treeContainer);
-        
-        // Link FolderSelector to project explorer logic
-        folderSel.getFolderInput().setProperty("onchange", "window.loadFiles(this)");
-        
-        return explorer;
-    }
-
-    private Div createCategorizedPalette() {
-        Div palette = new Div();
-        Header h = new Header(4, "Visual Palette");
-        h.setStyle("color", "var(--jettra-accent)").setStyle("margin-bottom", "20px").setStyle("text-align", "center");
-        palette.add(h);
-
-        // Typography
-        addPaletteCategory(palette, "Typography", new String[]{"Header", "Paragraph", "Span", "Label", "Separator", "Divide"});
-        // Forms
-        addPaletteCategory(palette, "Forms", new String[]{"Button", "CheckBox", "CheckBoxGroup", "CreditCard", "RadioButton", "RadioGroupButton", "ScheduleControl", "SelectOne", "SelectMany", "SelectOneIcon", "TextBox", "TextArea", "ToggleSwitch", "FileUpload", "FolderSelector", "OTPValidator", "Catcha"});
-        // Date
-        addPaletteCategory(palette, "Date", new String[]{"DatePicker", "Time", "Calendar", "Schedule", "Organigram", "Timeline"});
-        // Navigation
-        addPaletteCategory(palette, "Navigation", new String[]{"Link", "Menu", "MenuBar", "MenuItem"});
-        // Feedback
-        addPaletteCategory(palette, "Feedback", new String[]{"ProgressBar", "Spinner", "Loading", "Alert", "Notification", "Clock"});
-        // Media & Files
-        addPaletteCategory(palette, "Media", new String[]{"Downloader", "PDFViewer", "ViewMedia", "BarCode", "Draw"});
-        // Charts
-        addPaletteCategory(palette, "Charts", new String[]{"ChartsBar", "ChartsDoughnut", "ChartsLine", "ChartsPie", "ChartsRadar"});
-        // Layout & Display
-        addPaletteCategory(palette, "Layout", new String[]{"Grid", "Panel", "Board", "Card", "Avatar", "Carousel", "Table", "TabView", "Tab", "Modal", "Tree", "TreeItem", "Div", "LayoutDisplay", "Map"});
-
-        return palette;
-    }
-
-    private void addPaletteCategory(Div palette, String name, String[] components) {
-        Div cat = new Div();
-        cat.addClass("palette-category");
-        cat.setStyle("margin-bottom", "15px");
-        
-        Header head = new Header(5, name);
-        head.setStyle("color", "#0ff").setStyle("font-size", "12px").setStyle("text-transform", "uppercase").setStyle("border-bottom", "1px solid rgba(0,255,255,0.2)").setStyle("padding-bottom", "5px").setStyle("margin-bottom", "10px");
-        cat.add(head);
-
-        Div grid = new Div();
-        grid.setStyle("display", "grid").setStyle("grid-template-columns", "1fr 1fr").setStyle("gap", "8px");
-
-        for (String comp : components) {
-            Div item = new Div();
-            item.addClass("palette-item");
-            item.setProperty("draggable", "true");
-            item.setProperty("ondragstart", "drag(event)");
-            item.setProperty("data-type", comp);
-            item.setContent(comp);
-            item.setStyle("padding", "6px").setStyle("background", "rgba(0,255,255,0.05)").setStyle("border", "1px solid rgba(0,255,255,0.2)").setStyle("border-radius", "4px").setStyle("cursor", "move").setStyle("color", "#eee").setStyle("font-size", "11px").setStyle("text-align", "center").setStyle("transition", "all 0.2s");
-            grid.add(item);
-        }
-        cat.add(grid);
-        palette.add(cat);
-    }
-    private void setupDesignerAssets(Center center) {
-        Style style = new Style("""
-            .palette-item:hover { background: rgba(0,255,255,0.2) !important; border-color: #0ff !important; color: #fff !important; transform: scale(1.05); }
-            .canvas-item { position: relative; margin-bottom: 20px; border: 1px transparent dashed; transition: border 0.2s; min-height: 20px; padding: 10px; border-radius: 4px; cursor: pointer; }
-            .canvas-item:hover { border-color: rgba(0,255,255,0.4); background: rgba(0,255,255,0.02); }
-            .canvas-item.selected { border-color: var(--jettra-accent) !important; background: rgba(0,255,255,0.05) !important; box-shadow: 0 0 10px var(--jettra-glow); }
-            .canvas-item .delete-tool { position: absolute; top: -8px; right: -8px; background: #ff4444; color: white; width: 18px; height: 18px; border-radius: 50%; display: none; justify-content: center; align-items: center; cursor: pointer; font-size: 10px; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
-            .canvas-item:hover .delete-tool { display: flex; }
-            .inspector-row { margin-bottom: 15px; background: rgba(255,255,255,0.02); padding: 8px; border-radius: 6px; border-left: 3px solid transparent; transition: all 0.3s; }
-            .inspector-row:hover { border-left-color: var(--jettra-accent); background: rgba(255,255,255,0.05); }
-            .inspector-label { display: block; font-size: 11px; color: #9aa; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-            .inspector-input { width: 100%; background: #0a0f15; border: 1px solid #334155; color: #fff; padding: 8px; border-radius: 6px; font-size: 13px; outline: none; transition: border-color 0.2s; }
-            .inspector-input:focus { border-color: var(--jettra-accent); box-shadow: 0 0 0 1px rgba(0,255,255,0.2); }
-            .project-file { padding: 6px 10px; font-size: 12px; color: #94a3b8; cursor: pointer; border-radius: 6px; display: flex; align-items: center; gap: 10px; transition: all 0.2s; }
-            .project-file:hover { background: rgba(0,255,255,0.1); color: #fff; transform: translateX(5px); }
-            .tree-node { padding: 4px 8px; transition: all 0.2s; border-radius: 4px; }
-            .tree-node:hover { background: rgba(0,255,255,0.1); color: #fff !important; }
-            .file-page { color: #facc15 !important; font-weight: 600; text-shadow: 0 0 5px rgba(250,204,21,0.2); }
-            .file-model { color: #4ade80 !important; font-weight: 600; text-shadow: 0 0 5px rgba(74,222,128,0.2); }
-            .canvas-container { border: 2px dashed rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; position: relative; min-height: 80px; transition: all 0.3s; }
-            .canvas-container:hover { border-color: var(--jettra-accent); background: rgba(0,255,255,0.02); }
-            .view-model-row { margin-bottom: 20px; padding: 12px; background: rgba(0,255,255,0.05); border-radius: 8px; border: 1px solid rgba(0,255,255,0.1); }
-            .btn-event { background: linear-gradient(135deg, var(--jettra-accent), #0891b2); color: #000; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 5px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3); }
-            .btn-event:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,255,255,0.4); }
-            .btn-event:active { transform: translateY(0); }
-            
-            /* Enhanced 3D Styles for Modals */
-            .modal-3d-effect {
-                transform-style: preserve-3d;
-                perspective: 2000px;
-                transition: transform 0.1s ease-out, opacity 0.3s ease-out;
-                animation: modalDeepAppear 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            }
-            @keyframes modalDeepAppear {
-                from { 
-                    opacity: 0; 
-                    transform: translate(-50%, -30%) scale(0.8) rotateX(-25deg); 
-                }
-                to { 
-                    opacity: 1; 
-                    transform: translate(-50%, -50%) scale(1) rotateX(0); 
-                }
-            }
-            
-            .canvas-container.modal-container-mock {
-                background: rgba(30, 50, 80, 0.3);
-                border: 2px solid var(--jettra-accent);
-                box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-                min-height: 120px;
-            }
-            
-            /* 3D Effects for Modals */
-            #confirm-3d-modal, #event-editor-modal {
-                transform-style: preserve-3d;
-                perspective: 1000px;
-                transition: transform 0.1s ease-out, opacity 0.3s ease-out;
-                animation: modalAppear 0.4s ease-out;
-            }
-            .modal-content-3d {
-                transform: translateZ(50px);
-                transform-style: preserve-3d;
-            }
-            .btn-3d {
-                background: linear-gradient(135deg, var(--jettra-accent), #0891b2);
-                border: none;
-                box-shadow: 0 4px 0 #044e5e, 0 8px 15px rgba(0,0,0,0.4);
-                transition: all 0.1s;
-                transform: translateZ(20px);
-            }
-            .btn-3d:active {
-                box-shadow: 0 2px 0 #044e5e, 0 4px 8px rgba(0,0,0,0.4);
-                transform: translateY(2px) translateZ(10px);
-            }
-            @keyframes modalAppear {
-                from { opacity: 0; transform: translate(-50%, -60%) scale(0.9) rotateX(-15deg); }
-                to { opacity: 1; transform: translate(-50%, -50%) scale(1) rotateX(0); }
-            }
-            .glass-panel {
-                background: linear-gradient(145deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
-                backdrop-filter: blur(16px);
-                border: 1px solid rgba(255, 255, 255, 0.1);
-            }
-            @keyframes spin { 100% { transform: rotate(360deg); } }
-        """);
-        
-        String scriptPart1 = """
             // Designer GLOBALS
             function drag(ev) {
                 ev.dataTransfer.setData("type", ev.currentTarget.getAttribute("data-type"));
@@ -611,7 +126,7 @@ public class WebDesignerPage extends DashboardBasePage {
 
                 if (type === 'Modal' && targetParent.id !== 'modal-list-container' && !targetParent.closest('#modal-list-container')) {
                     const modalIdGen = 'modal_' + Math.floor(Math.random()*10000);
-                    window.addComponentToCanvas('Button', targetParent, { text: "Open Modal", columns: 2, events: {onClick: `e -> { \\n    document.getElementById("${modalIdGen}").style.display = "block"; \\n}`}, binding: "" });
+                    window.addComponentToCanvas('Button', targetParent, { text: "Open Modal", columns: 2, events: {onClick: `e -> { \n    document.getElementById("${modalIdGen}").style.display = "block"; \n}`}, binding: "" });
                     const mt = document.getElementById('modal-list-container');
                     if(mt) window.addComponentToCanvas('Modal', mt, Object.assign({idGen: modalIdGen}, externalProps || {}));
                     return;
@@ -659,15 +174,15 @@ public class WebDesignerPage extends DashboardBasePage {
                     case 'ToggleSwitch': content = '<div style="display:flex; align-items:center; gap:8px;"><div style="width:40px;height:20px;background:var(--jettra-accent);border-radius:10px;position:relative;"><div style="width:16px;height:16px;background:#fff;border-radius:50%;position:absolute;top:2px;right:2px;"></div></div><label>ToggleSwitch</label></div>'; break;
                     case 'FileUpload': content = '<div style="border:1px dashed var(--jettra-accent); padding:20px; text-align:center; border-radius:8px; color:var(--jettra-text);"><div style="font-size:24px; margin-bottom:10px;">\u2601\uFE0F</div><span>Click or drag files here to upload</span></div>'; break;
                     case 'FolderSelector': content = '<div style="border:1px dashed var(--jettra-accent); padding:20px; text-align:center; border-radius:8px; color:var(--jettra-text);"><div style="font-size:24px; margin-bottom:10px;">\uD83D\uDCC1</div><span>Select Directory</span></div>'; break;
-                    case 'OTPValidator': content = '<div class=\"j-component\" style=\"display:flex; justify-content:center; gap:5px; padding:10px;\"><input disabled style=\"width:30px; height:40px; text-align:center;\" value=\"*\"/><input disabled style=\"width:30px; height:40px; text-align:center;\" value=\"*\"/><input disabled style=\"width:30px; height:40px; text-align:center;\" value=\"*\"/><input disabled style=\"width:30px; height:40px; text-align:center;\" value=\"*\"/></div>'; break;
-                    case 'Catcha': content = '<div class=\"j-component\" style=\"padding:10px; border:1px solid #aaa; border-radius:4px; display:inline-flex; align-items:center; gap:10px; background:#f9f9f9;\"><input type=\"checkbox\" disabled/> <span style=\"color:#333; font-family:sans-serif\">I&#39;m not a robot</span></div>'; break;
+                    case 'OTPValidator': content = '<div class="j-component" style="display:flex; justify-content:center; gap:5px; padding:10px;"><input disabled style="width:30px; height:40px; text-align:center;" value="*"/><input disabled style="width:30px; height:40px; text-align:center;" value="*"/><input disabled style="width:30px; height:40px; text-align:center;" value="*"/><input disabled style="width:30px; height:40px; text-align:center;" value="*"/></div>'; break;
+                    case 'Catcha': content = '<div class="j-component" style="padding:10px; border:1px solid #aaa; border-radius:4px; display:inline-flex; align-items:center; gap:10px; background:#f9f9f9;"><input type="checkbox" disabled/> <span style="color:#333; font-family:sans-serif">I\\'m not a robot</span></div>'; break;
                     case 'CreditCard': content = '<div class="j-component" style="padding:15px; border:1px solid rgba(0,255,255,0.2); border-radius:12px; background:linear-gradient(145deg, #1e293b, #0f172a); min-height:100px; display:flex; flex-direction:column; gap:10px; width:280px;"><div style="font-family:monospace; font-size:16px; color:#fff; letter-spacing:2px; margin-top:20px;">\u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022</div><div style="display:flex; justify-content:space-between; color:#94a3b8; font-size:10px;"><span class="cc-name-mock">NAME SURNAME</span><span>MM/YY</span></div><button class="j-btn j-btn-primary" style="margin-top:10px; width:100%; border-radius:8px; padding:10px;" disabled>Pay Now</button><div class="canvas-container" style="min-height:30px; border:1px dashed rgba(255,255,255,0.1); margin-top:5px; padding:5px;"></div></div>'; break;
                     case 'Link': content = '<a href="javascript:void(0)" style="color:var(--jettra-accent); text-decoration:underline;"><span>Link Text</span></a>'; break;
                     case 'Menu': content = '<div style="background:rgba(0,0,0,0.4); padding:10px; border-radius:4px; display:inline-block;"><div style="padding:8px 15px; cursor:pointer;"><span>Menu Item</span></div></div>'; break;
                     case 'MenuBar': content = '<div class="canvas-container" style="background:rgba(0,0,0,0.4); padding:10px; border-radius:4px; display:flex; gap:15px; min-height:45px; border:1px dashed rgba(255,255,255,0.2);"></div>'; break;
                     case 'MenuItem': content = '<div class="j-component" style="padding:10px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,0.1); background:rgba(0,0,0,0.2);"><span>Menu Item</span></div>'; break;
                     case 'Loading': content = '<div class="j-loading" style="display:inline-flex; align-items:center; justify-content:center; padding:10px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--jettra-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" /></svg></div>'; break;
-                    case 'Alert': content = '<div style="background:rgba(255,0,0,0.1); border-left:4px solid #ff4444; padding:15px; border-radius:4px; color:#ff4444; display:flex; align-items:center; gap:10px;"><b>\\u26A0\\uFE0F</b><span>Alert Message</span></div>'; break;
+                    case 'Alert': content = '<div style="background:rgba(255,0,0,0.1); border-left:4px solid #ff4444; padding:15px; border-radius:4px; color:#ff4444; display:flex; align-items:center; gap:10px;"><b>\u26A0\uFE0F</b><span>Alert Message</span></div>'; break;
                     case 'Notification': content = '<div style="background:rgba(0,255,255,0.1); border:1px solid var(--jettra-accent); padding:15px; border-radius:8px; color:var(--jettra-text); max-width:300px; box-shadow:0 4px 12px rgba(0,0,0,0.3);"><span>Notification Message</span></div>'; break;
                     case 'Downloader': content = '<div style="display:inline-flex; align-items:center; gap:8px; padding:6px 12px; background:rgba(255,255,255,0.1); border-radius:4px; cursor:pointer;"><b>\uD83D\uDCBE</b><span>Download File</span></div>'; break;
                     case 'PDFViewer': content = '<div style="border:1px solid #aaa; background:#eee; color:#333; height:200px; display:flex; align-items:center; justify-content:center; border-radius:4px;"><span>PDF Document Preview</span></div>'; break;
@@ -1068,9 +583,9 @@ public class WebDesignerPage extends DashboardBasePage {
                 if (!selectedItem) return;
                 activeEventProperty = evName;
                 const props = JSON.parse(selectedItem.getAttribute('data-props'));
-                const currentCode = props.events[evName] || "e -> { \\n    // Enter code here \\n}";
+                const currentCode = props.events[evName] || "e -> { \n    // Enter code here \n}";
                 
-                document.getElementById('event-code-input').value = currentCode.replace(/\\\\n/g, '\\n');
+                document.getElementById('event-code-input').value = currentCode.replace(/\\\n/g, '\n');
                 const modal = document.getElementById('event-editor-modal');
                 modal.style.display = 'block';
                 window.apply3DTracking(modal);
@@ -1080,7 +595,7 @@ public class WebDesignerPage extends DashboardBasePage {
                 if (!selectedItem || !activeEventProperty) return;
                 const props = JSON.parse(selectedItem.getAttribute('data-props'));
                 const newCode = document.getElementById('event-code-input').value;
-                props.events[activeEventProperty] = newCode.replace(/\\n/g, '\\\\n');
+                props.events[activeEventProperty] = newCode.replace(/\n/g, '\\\n');
                 selectedItem.setAttribute('data-props', JSON.stringify(props));
                 
                 document.getElementById('event-editor-modal').style.display = 'none';
@@ -1268,9 +783,7 @@ public class WebDesignerPage extends DashboardBasePage {
                 if (viewer) viewer.innerHTML = '';
             window.updateGeneratedCode();
             };
-        """;
-
-        String scriptPart2 = """
+        
 
             window.loadFiles = function(input) {
                 const viewer = document.getElementById('explorer-tree-view');
@@ -1281,7 +794,7 @@ public class WebDesignerPage extends DashboardBasePage {
                 const files = (input.tagName === 'INPUT' ? input : input.querySelector('input')).files;
                 console.log("Loading files:", files ? files.length : 0);
                 if (!files || files.length === 0) {
-                    viewer.innerHTML = '<div style="color:#666; padding:10px;">Selecci\\u00F3n vac\\u00EDa.</div>';
+                    viewer.innerHTML = '<div style="color:#666; padding:10px;">Selecci\u00F3n vac\u00EDa.</div>';
                     return;
                 }
 
@@ -1296,7 +809,7 @@ public class WebDesignerPage extends DashboardBasePage {
                     if (relPath.includes('/target/') || relPath.includes('/.git/')) continue;
 
                     // Use a more robust regex for path separator (matches \\ and /)
-                    const parts = relPath.split(/[\\\\/]/);
+                    const parts = relPath.split(/[\\/]/);
                     let curr = tree;
                     for (let j = 0; j < parts.length; j++) {
                         const p = parts[j];
@@ -1332,12 +845,12 @@ public class WebDesignerPage extends DashboardBasePage {
                         let html = "";
                         keys.forEach(key => {
                             const child = node._children[key];
-                            const icon = child._isFile ? (key.endsWith('.java') ? '\\u2615' : '\\uD83D\\uDCC4') : '\\uD83D\\uDCC1';
+                            const icon = child._isFile ? (key.endsWith('.java') ? '\u2615' : '\uD83D\uDCC4') : '\uD83D\uDCC1';
                             const color = child._isFile ? '#88ccff' : 'var(--jettra-accent)';
                             
                             html += `<div class="tree-node" style="padding-left:${depth * 12}px; cursor:pointer; color:${color}; font-size:11px; margin-bottom:4px; display:flex; align-items:center; gap:5px;"`;
                             if (child._isFile) {
-                                html += ` onclick="window.loadFileContent('${child._path.replace(/\\\\/g, '/')}')"`;
+                                html += ` onclick="window.loadFileContent('${child._path.replace(/\\/g, '/')}')"`;
                             }
                             html += `><span style="font-size:14px">${icon}</span> <span>${key}</span></div>`;
                             
@@ -1475,18 +988,18 @@ public class WebDesignerPage extends DashboardBasePage {
                 code += `        Header title = new Header(2, "Mantenimiento de ${baseName}");\n`;
                 code += `        title.setStyle("color", "var(--jettra-accent)").setStyle("margin-bottom", "20px");\n`;
                 code += `        main.add(title);\n\n`;
-                code += `        Button addBtn = new Button("\\\\u2795 A\\u00F1adir ${baseName}");\\n`;
-                code += `        addBtn.addClass("j-btn-primary").addClickListener(() -> {\\n`;
-                code += `            this.model = new ${mName}();\\n`;
-                code += `            showModal("Nuevo ${baseName}", "save");\\n`;
-                code += `        });\\n`;
-                code += `        main.add(addBtn);\\n\\n`;
+                code += `        Button addBtn = new Button("\\\u2795 A\u00F1adir ${baseName}");\n`;
+                code += `        addBtn.addClass("j-btn-primary").addClickListener(() -> {\n`;
+                code += `            this.model = new ${mName}();\n`;
+                code += `            showModal("Nuevo ${baseName}", "save");\n`;
+                code += `        });\n`;
+                code += `        main.add(addBtn);\n\n`;
                 code += `        Datatable table = new Datatable();\n`;
                 code += `        table.addHeaderRow(new Row(\n            ${tblHeaders.join(',\n            ')},\n            new TD("Acciones")\n        ));\n\n`;
                 code += `        List<${mName}> all = ${repoName}.findAll();\n`;
                 code += `        for (${mName} p : all) {\n`;
                 code += `            TD actionsTd = new TD(); actionsTd.setStyle("display", "flex").setStyle("gap", "10px");\n`;
-                code += `            Button editBtn = new Button("\\u270F\\uFE0F"); editBtn.addClass("j-btn").addClickListener(() -> {\n`;
+                code += `            Button editBtn = new Button("\u270F\uFE0F"); editBtn.addClass("j-btn").addClickListener(() -> {\n`;
                 code += `                this.model = p; showModal("Editar ${baseName}", "save");\n`;
                 code += `            });\n`;
                 code += `            actionsTd.add(editBtn);\n`;
@@ -1511,19 +1024,19 @@ public class WebDesignerPage extends DashboardBasePage {
                 code += `    private void setupModal() {\n`;
                 code += `        this.crudModal = new Div(); this.crudModal.setId("crudModal").addClass("j-modal-overlay");\n`;
                 code += `        this.crudModal.setStyle("display","none").setStyle("position","fixed").setStyle("z-index","9999").setStyle("background","rgba(0,0,0,0.8)");\n\n`;
-                code += `        Div content = new Div(); content.addClass("j-modal-content");\\n`;
-                code += `        this.modalTitle = new Header(3, "Operaci\\u00F3n");\\n`;
+                code += `        Div content = new Div(); content.addClass("j-modal-content");\n`;
+                code += `        this.modalTitle = new Header(3, "Operaci\u00F3n");\n`;
                 code += `        Form form = new Form("${baseName.toLowerCase()}Form", "");\n`;
                 code += `        this.modalAction = new TextBox("hidden", "action");\n\n`;
                 code += modalFieldsCode;
                 code += `        Button cancelBtn = new Button("CANCELAR"); cancelBtn.addClass("j-btn");\n`;
                 code += `        cancelBtn.setProperty("onclick", "document.getElementById('crudModal').style.display='none'; return false;");\n`;
                 code += `        this.modalSubmitBtn = new Button("GUARDAR"); this.modalSubmitBtn.addClass("j-btn-primary");\n\n`;
-                code += `        Div footer = new Div(); footer.setStyle("display","flex").setStyle("justify-content","flex-end").setStyle("gap","10px");\\n`;
-                code += `        footer.add(cancelBtn).add(this.modalSubmitBtn);\\n`;
-                code += `        form.add(this.modalAction).add(footer);\\n`;
-                code += `        content.add(this.modalTitle).add(form);\\n`;
-                code += `        this.crudModal.add(content);\\n        this.add(this.crudModal);\\n    }\\n}\\n`;
+                code += `        Div footer = new Div(); footer.setStyle("display","flex").setStyle("justify-content","flex-end").setStyle("gap","10px");\n`;
+                code += `        footer.add(cancelBtn).add(this.modalSubmitBtn);\n`;
+                code += `        form.add(this.modalAction).add(footer);\n`;
+                code += `        content.add(this.modalTitle).add(form);\n`;
+                code += `        this.crudModal.add(content);\n        this.add(this.crudModal);\n    }\n}\n`;
 
                 document.getElementById('generated-code-display').value = code;
                 document.getElementById('generated-code-hidden').value = code;
@@ -1555,10 +1068,10 @@ public class WebDesignerPage extends DashboardBasePage {
                     return;
                 }
 
-                let code = `package com.jettra.example.pages;\\n\\nimport io.jettra.wui.complex.*;\\nimport io.jettra.wui.components.*;\\n\\n`;
-                code += `public class GeneratedPage extends DashboardBasePage {\\n`;
-                code += `    private ${viewModelName} model = ${viewModelName}.getInstance();\\n\\n`;
-                code += `    protected void initCenter(Center center, String username) {\\n`;
+                let code = `package com.jettra.example.pages;\n\nimport io.jettra.wui.complex.*;\nimport io.jettra.wui.components.*;\n\n`;
+                code += `public class GeneratedPage extends DashboardBasePage {\n`;
+                code += `    private ${viewModelName} model = ${viewModelName}.getInstance();\n\n`;
+                code += `    protected void initCenter(Center center, String username) {\n`;
                 
                 function walk(items, container) {
                     let out = "";
@@ -1569,80 +1082,80 @@ public class WebDesignerPage extends DashboardBasePage {
                         
                         const handleCommon = (compVar) => {
                             let out = "";
-                            if (props.update) out += `        ${compVar}.setUpdate("${props.update}");\\n`;
+                            if (props.update) out += `        ${compVar}.setUpdate("${props.update}");\n`;
                             return out;
                         };
 
                         const handleEvents = (compVar) => {
                             let evOut = "";
                             Object.keys(props.events).forEach(ev => {
-                                const eventCode = props.events[ev].replace(/\\\\n/g, '\\n');
-                                evOut += `        ${compVar}.${ev}(${eventCode});\\n`;
+                                const eventCode = props.events[ev].replace(/\\\n/g, '\n');
+                                evOut += `        ${compVar}.${ev}(${eventCode});\n`;
                             });
                             return evOut;
                         };
 
                         switch(type) {
-                            case 'Divide': out += `        ${container}.add(new Divide());\\n`; break;
-                            case 'Separator': out += `        ${container}.add(new Separator());\\n`; break;
-                            case 'Header': out += `        ${container}.add(new Header(1, "${props.text}"));\\n`; break;
-                            case 'Paragraph': out += `        ${container}.add(new Paragraph("${props.text}"));\\n`; break;
-                            case 'Span': out += `        ${container}.add(new Span("${props.text}"));\\n`; break;
-                            case 'Label': out += `        ${container}.add(new Label("${props.text}"));\\n`; break;
+                            case 'Divide': out += `        ${container}.add(new Divide());\n`; break;
+                            case 'Separator': out += `        ${container}.add(new Separator());\n`; break;
+                            case 'Header': out += `        ${container}.add(new Header(1, "${props.text}"));\n`; break;
+                            case 'Paragraph': out += `        ${container}.add(new Paragraph("${props.text}"));\n`; break;
+                            case 'Span': out += `        ${container}.add(new Span("${props.text}"));\n`; break;
+                            case 'Label': out += `        ${container}.add(new Label("${props.text}"));\n`; break;
                             case 'Button': 
-                                out += `        ${type} ${v} = new ${type}("${props.text}");\\n`;
-                                if (props.btnStyle) out += `        ${v}.setStyle(${type}.Style.${props.btnStyle});\\n`;
-                                if (props.icon) out += `        ${v}.setIcon("${props.icon}");\\n`;
+                                out += `        ${type} ${v} = new ${type}("${props.text}");\n`;
+                                if (props.btnStyle) out += `        ${v}.setStyle(${type}.Style.${props.btnStyle});\n`;
+                                if (props.icon) out += `        ${v}.setIcon("${props.icon}");\n`;
                                 out += handleCommon(v);
                                 out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
+                                out += `        ${container}.add(${v});\n`;
                                 break;
                             case 'TextBox':
                             case 'TextArea':
-                                out += `        ${type} ${v} = new ${type}("${props.text || type}", "${props.text || type}");\\n`;
+                                out += `        ${type} ${v} = new ${type}("${props.text || type}", "${props.text || type}");\n`;
                                 out += handleCommon(v);
                                 out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
+                                out += `        ${container}.add(${v});\n`;
                                 break;
                             case 'Clock':
-                                out += `        Clock ${v} = new Clock("${props.text || 'Clock'}");\\n`;
+                                out += `        Clock ${v} = new Clock("${props.text || 'Clock'}");\n`;
                                 out += handleCommon(v);
                                 out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
+                                out += `        ${container}.add(${v});\n`;
                                 break;
                             case 'Avatar':
-                                out += `        Avatar ${v} = new Avatar();\\n`;
-                                if (props.text) out += `        ${v}.setText("${props.text}");\\n`;
-                                if (props.icon) out += `        ${v}.setIcon("${props.icon}");\\n`;
+                                out += `        Avatar ${v} = new Avatar();\n`;
+                                if (props.text) out += `        ${v}.setText("${props.text}");\n`;
+                                if (props.icon) out += `        ${v}.setIcon("${props.icon}");\n`;
                                 out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
+                                out += `        ${container}.add(${v});\n`;
                                 break;
                             case 'ProgressBar':
-                                out += `        ProgressBar ${v} = new ProgressBar(${props.value || 0}, ${props.max || 100});\\n`;
-                                if (props.color) out += `        ${v}.setColor("${props.color}");\\n`;
-                                if (props.indeterminate) out += `        ${v}.setIndeterminate(true);\\n`;
-                                if (props.showPercent === false) out += `        ${v}.setShowPercent(false);\\n`;
+                                out += `        ProgressBar ${v} = new ProgressBar(${props.value || 0}, ${props.max || 100});\n`;
+                                if (props.color) out += `        ${v}.setColor("${props.color}");\n`;
+                                if (props.indeterminate) out += `        ${v}.setIndeterminate(true);\n`;
+                                if (props.showPercent === false) out += `        ${v}.setShowPercent(false);\n`;
                                 out += handleCommon(v);
                                 out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
+                                out += `        ${container}.add(${v});\n`;
                                 break;
                             case 'Spinner':
-                                out += `        Spinner ${v} = new Spinner("${v}", ${props.value || 0});\\n`;
-                                if (props.min !== undefined && props.min !== "") out += `        ${v}.setMin(${props.min});\\n`;
-                                if (props.max !== undefined && props.max !== "") out += `        ${v}.setMax(${props.max});\\n`;
-                                if (props.step !== undefined && props.step !== "") out += `        ${v}.setStep(${props.step});\\n`;
+                                out += `        Spinner ${v} = new Spinner("${v}", ${props.value || 0});\n`;
+                                if (props.min !== undefined && props.min !== "") out += `        ${v}.setMin(${props.min});\n`;
+                                if (props.max !== undefined && props.max !== "") out += `        ${v}.setMax(${props.max});\n`;
+                                if (props.step !== undefined && props.step !== "") out += `        ${v}.setStep(${props.step});\n`;
                                 out += handleCommon(v);
                                 out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
+                                out += `        ${container}.add(${v});\n`;
                                 break;
                             case 'ScheduleControl': {
-                                out += `        ScheduleControl ${v} = new ScheduleControl("${v}");\\n`;
-                                if (props.binding) out += `        ${v}.setValue(model.get${props.binding.charAt(0).toUpperCase() + props.binding.slice(1)}());\\n`;
-                                if (props.showTimeRemaining) out += `        ${v}.setShowTimeRemaining(true);\\n`;
-                                if (props.onTimeReached) out += `        ${v}.setOnTimeReached("${props.onTimeReached}");\\n`;
+                                out += `        ScheduleControl ${v} = new ScheduleControl("${v}");\n`;
+                                if (props.binding) out += `        ${v}.setValue(model.get${props.binding.charAt(0).toUpperCase() + props.binding.slice(1)}());\n`;
+                                if (props.showTimeRemaining) out += `        ${v}.setShowTimeRemaining(true);\n`;
+                                if (props.onTimeReached) out += `        ${v}.setOnTimeReached("${props.onTimeReached}");\n`;
                                 out += handleCommon(v);
                                 out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
+                                out += `        ${container}.add(${v});\n`;
                                 break;
                             }
                             case 'ChartsBar':
@@ -1650,64 +1163,64 @@ public class WebDesignerPage extends DashboardBasePage {
                             case 'ChartsLine':
                             case 'ChartsPie':
                             case 'ChartsRadar': {
-                                out += `        ${type} ${v} = new ${type}("${v}");\\n`;
+                                out += `        ${type} ${v} = new ${type}("${v}");\n`;
                                 const lArg = props.labels ? `"${props.labels.split(',').map(s => s.trim()).join('", "')}"` : '"Label 1", "Label 2"';
                                 const dLabel = props.datasetLabel ? props.datasetLabel : "Data";
                                 const dData = props.data ? props.data : "10, 20";
                                 const dBg = props.bgColor ? props.bgColor : "#00ffff";
-                                out += `        ${v}.setLabels(${lArg});\\n`;
-                                out += `        ${v}.addDataset("${dLabel}", new Number[]{${dData}}, new String[]{"${dBg}"}, new String[]{"${dBg}"});\\n`;
+                                out += `        ${v}.setLabels(${lArg});\n`;
+                                out += `        ${v}.addDataset("${dLabel}", new Number[]{${dData}}, new String[]{"${dBg}"}, new String[]{"${dBg}"});\n`;
                                 out += handleCommon(v);
                                 out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
+                                out += `        ${container}.add(${v});\n`;
                                 break;
                             }
                             case 'Loading':
-                                out += `        Loading ${v} = new Loading();\\n`;
-                                if (props.size) out += `        ${v}.setSize(Loading.Size.${props.size});\\n`;
-                                if (props.color) out += `        ${v}.setColor("${props.color}");\\n`;
+                                out += `        Loading ${v} = new Loading();\n`;
+                                if (props.size) out += `        ${v}.setSize(Loading.Size.${props.size});\n`;
+                                if (props.color) out += `        ${v}.setColor("${props.color}");\n`;
                                 out += handleCommon(v);
                                 out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
+                                out += `        ${container}.add(${v});\n`;
                                 break;
                             case 'Modal': {
                                 const mId = props.idGen || "modal_" + Math.floor(Math.random()*1000);
-                                out += `        Modal ${v} = new Modal("${mId}");\\n`;
+                                out += `        Modal ${v} = new Modal("${mId}");\n`;
                                 const kidsM = it.querySelectorAll(':scope > .canvas-container > .canvas-item');
                                 if (kidsM.length > 0) out += walk(kidsM, v);
                                 out += handleCommon(v);
                                 out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
+                                out += `        ${container}.add(${v});\n`;
                                 break;
                             }
                             case 'Card': {
-                                out += `        Card ${v} = new Card();\\n`;
-                                if (props.title) out += `        ${v}.setTitle("${props.title}");\\n`;
-                                if (props.subtitle) out += `        ${v}.setSubtitle("${props.subtitle}");\\n`;
-                                if (props.content) out += `        ${v}.setContentText("${props.content}");\\n`;
-                                if (props.imageUrl) out += `        ${v}.setImageUrl("${props.imageUrl}");\\n`;
+                                out += `        Card ${v} = new Card();\n`;
+                                if (props.title) out += `        ${v}.setTitle("${props.title}");\n`;
+                                if (props.subtitle) out += `        ${v}.setSubtitle("${props.subtitle}");\n`;
+                                if (props.content) out += `        ${v}.setContentText("${props.content}");\n`;
+                                if (props.imageUrl) out += `        ${v}.setImageUrl("${props.imageUrl}");\n`;
                                 const kidsCard = it.querySelectorAll(':scope > .canvas-container > .canvas-item, :scope > div > .canvas-container > .canvas-item');
                                 if (kidsCard.length > 0) out += walk(kidsCard, v);
                                 out += handleCommon(v);
                                 out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
+                                out += `        ${container}.add(${v});\n`;
                                 break;
                             }
                             case 'MenuItem':
                             case 'TreeItem':
                             case 'Tab':
-                                out += `        ${type} ${v} = new ${type}("${props.text || type}");\\n`;
+                                out += `        ${type} ${v} = new ${type}("${props.text || type}");\n`;
                                 const kidsNested = it.querySelectorAll(':scope > .canvas-container > .canvas-item, :scope > div > .canvas-container > .canvas-item, :scope > span > .canvas-container > .canvas-item');
                                 if (kidsNested.length > 0) out += walk(kidsNested, v);
                                 out += handleCommon(v);
                                 out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
+                                out += `        ${container}.add(${v});\n`;
                                 break;
                             case 'SelectOne':
                             case 'SelectMany':
                             case 'SelectOneIcon':
-                                out += `        ${type} ${v} = new ${type}("${v}");\\n`;
-                                if (props.default) out += `        ${v}.setDefault("${props.default}");\\n`;
+                                out += `        ${type} ${v} = new ${type}("${v}");\n`;
+                                if (props.default) out += `        ${v}.setDefault("${props.default}");\n`;
                                 if (props.options) {
                                     const opts = props.options.split(',');
                                     opts.forEach(o => {
@@ -1715,15 +1228,15 @@ public class WebDesignerPage extends DashboardBasePage {
                                         const optVal = parts[0] ? parts[0].trim() : 'val';
                                         const optLabel = parts[1] ? parts[1].trim() : optVal;
                                         if (type === 'SelectOneIcon') {
-                                           out += `        ${v}.addOption("${optVal}", "${optLabel}", "${props.icon || '\u2B50'}");\\n`;
+                                           out += `        ${v}.addOption("${optVal}", "${optLabel}", "${props.icon || '\u2B50'}");\n`;
                                         } else {
-                                           out += `        ${v}.addOption("${optVal}", "${optLabel}");\\n`;
+                                           out += `        ${v}.addOption("${optVal}", "${optLabel}");\n`;
                                         }
                                     });
                                 }
                                 out += handleCommon(v);
                                 out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
+                                out += `        ${container}.add(${v});\n`;
                                 break;
                             case 'Panel':
                             case 'Grid':
@@ -1736,100 +1249,100 @@ public class WebDesignerPage extends DashboardBasePage {
                             case 'Div':
                             case 'LayoutDisplay':
                                 if (type === 'RadioGroupButton' || type === 'CheckBoxGroup') {
-                                    out += `        ${type} ${v} = new ${type}("${props.name || v}");\\n`;
+                                    out += `        ${type} ${v} = new ${type}("${props.name || v}");\n`;
                                 } else {
-                                    out += `        ${type} ${v} = new ${type}("${v}");\\n`;
+                                    out += `        ${type} ${v} = new ${type}("${v}");\n`;
                                 }
-                                if (props.columns && (type === 'Grid' || type === 'Panel')) out += `        ${v}.setColumns(${props.columns});\\n`;
+                                if (props.columns && (type === 'Grid' || type === 'Panel')) out += `        ${v}.setColumns(${props.columns});\n`;
                                 const kids = it.querySelectorAll(':scope > .canvas-container > .canvas-item, :scope > div > .canvas-container > .canvas-item');
                                 if (kids.length > 0) out += walk(kids, v);
-                                if (props.icon) out += `        // Try using icon property if supported for ${type}\\n        try { ${v}.getClass().getMethod("setIcon", String.class).invoke(${v}, "${props.icon}"); } catch(Exception ignored) {}\\n`;
+                                if (props.icon) out += `        // Try using icon property if supported for ${type}\n        try { ${v}.getClass().getMethod("setIcon", String.class).invoke(${v}, "${props.icon}"); } catch(Exception ignored) {}\n`;
                                 out += handleCommon(v);
                                 out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
+                                out += `        ${container}.add(${v});\n`;
                                 break;
                             case 'DatePicker':
                             case 'Time':
-                                out += `        ${type} ${v} = new ${type}("${v}", "${props.text || type}");\\n`;
+                                out += `        ${type} ${v} = new ${type}("${v}", "${props.text || type}");\n`;
                                 out += handleCommon(v);
                                 out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
+                                out += `        ${container}.add(${v});\n`;
                                 break;
                             case 'Calendar':
                             case 'Schedule':
                             case 'Timeline':
                             case 'Organigram':
-                                out += `        ${type} ${v} = new ${type}();\\n`;
+                                out += `        ${type} ${v} = new ${type}();\n`;
                                 out += handleCommon(v);
                                 out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
+                                out += `        ${container}.add(${v});\n`;
                                 break;
                             case 'Map':
-                                 out += `        Map ${v} = new Map("${v}");\\n`;
-                                 out += `        ${v}.setCenter(${props.lat || 0.0}, ${props.lng || 0.0}, ${props.zoom || 13});\\n`;
-                                 if (props.markerTitle) out += `        ${v}.setMarker("${props.markerTitle}");\\n`;
-                                 if (props.enableSearch) out += `        ${v}.setEnableSearch(true);\\n`;
-                                 if (props.enableRelief) out += `        ${v}.setEnableRelief(true);\\n`;
+                                 out += `        Map ${v} = new Map("${v}");\n`;
+                                 out += `        ${v}.setCenter(${props.lat || 0.0}, ${props.lng || 0.0}, ${props.zoom || 13});\n`;
+                                 if (props.markerTitle) out += `        ${v}.setMarker("${props.markerTitle}");\n`;
+                                 if (props.enableSearch) out += `        ${v}.setEnableSearch(true);\n`;
+                                 if (props.enableRelief) out += `        ${v}.setEnableRelief(true);\n`;
                                  out += handleCommon(v);
                                  out += handleEvents(v);
-                                 out += `        ${container}.add(${v});\\n`;
+                                 out += `        ${container}.add(${v});\n`;
                                  break;
                              case 'QR':
-                                 out += `        QR ${v} = new QR("${v}");\\n`;
-                                 if (props.text) out += `        ${v}.setText("${props.text}");\\n`;
-                                 if (props.width) out += `        ${v}.setWidth(${props.width});\\n`;
-                                 if (props.height) out += `        ${v}.setHeight(${props.height});\\n`;
-                                 if (props.colorDark) out += `        ${v}.setColorDark("${props.colorDark}");\\n`;
-                                 if (props.colorLight) out += `        ${v}.setColorLight("${props.colorLight}");\\n`;
+                                 out += `        QR ${v} = new QR("${v}");\n`;
+                                 if (props.text) out += `        ${v}.setText("${props.text}");\n`;
+                                 if (props.width) out += `        ${v}.setWidth(${props.width});\n`;
+                                 if (props.height) out += `        ${v}.setHeight(${props.height});\n`;
+                                 if (props.colorDark) out += `        ${v}.setColorDark("${props.colorDark}");\n`;
+                                 if (props.colorLight) out += `        ${v}.setColorLight("${props.colorLight}");\n`;
                                  out += handleCommon(v);
                                  out += handleEvents(v);
-                                 out += `        ${container}.add(${v});\\n`;
+                                 out += `        ${container}.add(${v});\n`;
                                  break;
                              case 'BarCode':
-                                 out += `        BarCode ${v} = new BarCode("${v}");\\n`;
-                                 if (props.text) out += `        ${v}.setText("${props.text}");\\n`;
-                                 if (props.format) out += `        ${v}.setFormat("${props.format}");\\n`;
-                                 if (props.lineColor) out += `        ${v}.setLineColor("${props.lineColor}");\\n`;
+                                 out += `        BarCode ${v} = new BarCode("${v}");\n`;
+                                 if (props.text) out += `        ${v}.setText("${props.text}");\n`;
+                                 if (props.format) out += `        ${v}.setFormat("${props.format}");\n`;
+                                 if (props.lineColor) out += `        ${v}.setLineColor("${props.lineColor}");\n`;
                                  out += handleCommon(v);
                                  out += handleEvents(v);
-                                 out += `        ${container}.add(${v});\\n`;
+                                 out += `        ${container}.add(${v});\n`;
                                  break;
                             case 'OTPValidator': {
-                                 out += `        OTPValidator ${v} = new OTPValidator("${v}");\\n`;
-                                 if (props.amountOfDigits) out += `        ${v}.setAmountOfDigits(${props.amountOfDigits});\\n`;
+                                 out += `        OTPValidator ${v} = new OTPValidator("${v}");\n`;
+                                 if (props.amountOfDigits) out += `        ${v}.setAmountOfDigits(${props.amountOfDigits});\n`;
                                  out += handleCommon(v);
                                  out += handleEvents(v);
-                                 out += `        ${container}.add(${v});\\n`;
+                                 out += `        ${container}.add(${v});\n`;
                                  break;
                              }
                              case 'Catcha': {
-                                 out += `        Catcha ${v} = new Catcha("${v}");\\n`;
-                                 if (props.amountOfImagesToValidate) out += `        ${v}.setAmountOfImagesToValidate(${props.amountOfImagesToValidate});\\n`;
+                                 out += `        Catcha ${v} = new Catcha("${v}");\n`;
+                                 if (props.amountOfImagesToValidate) out += `        ${v}.setAmountOfImagesToValidate(${props.amountOfImagesToValidate});\n`;
                                  out += handleCommon(v);
                                  out += handleEvents(v);
-                                 out += `        ${container}.add(${v});\\n`;
+                                 out += `        ${container}.add(${v});\n`;
                                  break;
                              }
                              case 'CreditCard': {
-                                 out += `        CreditCard ${v} = new CreditCard("${v}");\\n`;
-                                 if (props.formAction) out += `        ${v}.setFormAction("${props.formAction}");\\n`;
-                                 if (props.submitText) out += `        ${v}.setSubmitText("${props.submitText}");\\n`;
+                                 out += `        CreditCard ${v} = new CreditCard("${v}");\n`;
+                                 if (props.formAction) out += `        ${v}.setFormAction("${props.formAction}");\n`;
+                                 if (props.submitText) out += `        ${v}.setSubmitText("${props.submitText}");\n`;
                                  const kidsCC = it.querySelectorAll(':scope > .canvas-container > .canvas-item, :scope > div > .canvas-container > .canvas-item');
                                  if (kidsCC.length > 0) out += walk(kidsCC, v);
                                  out += handleCommon(v);
                                  out += handleEvents(v);
-                                 out += `        ${container}.add(${v});\\n`;
+                                 out += `        ${container}.add(${v});\n`;
                                  break;
                              }
                              default: {
                                  if (props.text && props.text !== type && type !== 'Spinner') {
-                                     out += `        ${type} ${v} = new ${type}("${props.text}");\\n`;
+                                     out += `        ${type} ${v} = new ${type}("${props.text}");\n`;
                                  } else {
-                                     out += `        ${type} ${v} = new ${type}("${v}");\\n`;
+                                     out += `        ${type} ${v} = new ${type}("${v}");\n`;
                                  }
                                  out += handleCommon(v);
                                  out += handleEvents(v);
-                                 out += `        ${container}.add(${v});\\n`;
+                                 out += `        ${container}.add(${v});\n`;
                              }
                         }
                     });
@@ -1837,7 +1350,7 @@ public class WebDesignerPage extends DashboardBasePage {
                 }
                 code += walk(document.querySelectorAll('#canvas-drop-area > .canvas-item'), "center");
                 code += walk(document.querySelectorAll('#modal-list-container > .canvas-item'), "center");
-                code += `    }\\n}`;
+                code += `    }\n}`;
                 
                 display.value = code;
                 hidden.value = code;
@@ -1859,7 +1372,7 @@ public class WebDesignerPage extends DashboardBasePage {
                 
                 let foundAny = false;
                 let varMap = {}; 
-                const lines = code.split(/\\r?\\n/);
+                const lines = code.split(/\\r?\n/);
                 
                 let currentModalArea = mtArea;
 
@@ -2043,13 +1556,4 @@ public class WebDesignerPage extends DashboardBasePage {
                 document.getElementById('preview-modal').style.display = 'block';
             };
 
-        """;
         
-        Script script1 = new Script(scriptPart1);
-        Script script2 = new Script(scriptPart2);
-        
-        center.add(style);
-        center.add(script1);
-        center.add(script2);
-    }
-}
