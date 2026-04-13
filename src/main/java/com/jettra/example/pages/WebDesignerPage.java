@@ -1443,6 +1443,25 @@ public class WebDesignerPage extends DashboardBasePage {
                 container.innerHTML = html;
             };
 
+            window.show3DConfirm = function(title, body, onConfirm) {
+                const modal = document.getElementById('global-3d-message-modal');
+                if (modal) {
+                    document.getElementById('global-3d-title').innerText = title;
+                    document.getElementById('global-3d-body').innerText = body;
+                    const footer = modal.querySelector('div:last-child');
+                    if (footer) {
+                        footer.innerHTML = `
+                            <button class="dash-btn-3d" onclick="document.getElementById('global-3d-message-modal').style.display='none'; window._lastConfirm();">Aceptar</button>
+                            <button class="dash-btn-3d" style="background:#444; margin-left:10px" onclick="document.getElementById('global-3d-message-modal').style.display='none'">Cancelar</button>
+                        `;
+                        window._lastConfirm = onConfirm;
+                    }
+                    modal.style.display = 'block';
+                } else {
+                    if (confirm(body)) onConfirm();
+                }
+            };
+
             window.generateCRUD = function() {
                 const canvas = document.getElementById('canvas-drop-area');
                 if (!canvas) return;
@@ -1459,7 +1478,32 @@ public class WebDesignerPage extends DashboardBasePage {
                 let tblHeaders = [];
                 let tblRows = [];
                 let modalFieldsCode = "";
-                let imports = new Set(["com.jettra.example.dashboard.DashboardBasePage", "com.jettra.example.model." + mName, "com.jettra.example.repository." + repoName, "io.jettra.wui.complex.*", "io.jettra.wui.components.*", "io.jettra.wui.core.annotations.*", "io.jettra.wui.sync.*", "java.util.*"]);
+                
+                // Requirement: Add specific imports
+                let imports = new Set([
+                    "io.jettra.wui.components.*",
+                    "io.jettra.wui.validations.JettraValidations",
+                    "io.jettra.wui.complex.Center",
+                    "io.jettra.wui.core.annotations.InjectViewModel",
+                    "io.jettra.wui.sync.JettraSyncManager",
+                    "io.jettra.wui.sync.JettraPageSincronized",
+                    "io.jettra.wui.sync.SyncType",
+                    "io.jettra.wui.core.annotations.InjectProperties",
+                    "com.jettra.server.JettraServer",
+                    "java.io.IOException",
+                    "java.util.List",
+                    "java.util.Map",
+                    "java.util.Properties",
+                    "com.jettra.example.dashboard.DashboardBasePage",
+                    "com.jettra.example.model." + mName,
+                    "com.jettra.example.repository." + repoName
+                ]);
+
+                // Requirement: Repository check
+                const repoFile = Object.keys(window.jettraFileCache).find(k => k.endsWith(repoName + ".java"));
+                if (!repoFile) {
+                    window.show3DMessage("Aviso", "No se entr\u00F3 la clase " + repoName + ".java en el proyecto actual.");
+                }
 
                 modelFields.forEach(field => {
                     const cName = field.name.charAt(0).toUpperCase() + field.name.slice(1);
@@ -1495,11 +1539,18 @@ public class WebDesignerPage extends DashboardBasePage {
 
                 let code = `package com.jettra.example.pages;\n\n`;
                 Array.from(imports).sort().forEach(imp => code += `import ${imp};\n`);
-                code += `\n@JettraPageSincronized(SyncType.ALL)\n`;
+                code += `@JettraPageSincronized(SyncType.ALL)\n`;
                 code += `public class ${baseName}Page extends DashboardBasePage {\n\n`;
                 code += `    @InjectViewModel\n    private ${mName} model;\n\n`;
+                code += `    @InjectProperties(name = "messages")\n    private Properties msg;\n\n`;
+                code += `    private String lang = "es";\n\n`;
                 code += `    private Div crudModal;\n    private Header modalTitle;\n    private TextBox modalAction;\n    private Button modalSubmitBtn;\n\n`;
                 code += `    public ${baseName}Page() {\n        super("${baseName} Maintenance");\n    }\n\n`;
+                code += `    @Override\n    protected void onInit(Map<String, String> params) {\n`;
+                code += `        String lStr = params.get("lang");\n`;
+                code += `        if (lStr != null) this.lang = lStr;\n`;
+                code += `        super.onInit(params);\n`;
+                code += `    }\n\n`;
                 code += `    @Override\n    protected void initCenter(Center center, String username) {\n`;
                 code += `        Div main = new Div(); main.setStyle("padding", "20px");\n\n`;
                 code += `        Header title = new Header(2, "Mantenimiento de ${baseName}");\n`;
