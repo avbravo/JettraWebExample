@@ -551,8 +551,19 @@ public class WebDesignerPage extends DashboardBasePage {
                     
                     const type = ev.dataTransfer.getData("type");
                     const moveId = ev.dataTransfer.getData("move-id");
+                    const projectFile = ev.dataTransfer.getData("project-file");
                     const target = ev.target.closest('.canvas-container') || canvasSection;
                     
+                    if (projectFile) {
+                        ev.preventDefault();
+                        if (projectFile.endsWith('Page.java')) {
+                            window.loadFileContent(projectFile);
+                        } else if (projectFile.endsWith('Model.java')) {
+                            window.selectModel(projectFile.split('/').pop().replace('.java', ''));
+                        }
+                        return;
+                    }
+
                     if (target) {
                         const targetWrapper = target.closest('.canvas-item');
                         if (targetWrapper && targetWrapper.getAttribute('data-type') === 'RadioGroupButton') {
@@ -1332,10 +1343,12 @@ public class WebDesignerPage extends DashboardBasePage {
                         let html = "";
                         keys.forEach(key => {
                             const child = node._children[key];
-                            const icon = child._isFile ? (key.endsWith('.java') ? '\\u2615' : '\\uD83D\\uDCC4') : '\\uD83D\\uDCC1';
-                            const color = child._isFile ? '#88ccff' : 'var(--jettra-accent)';
-                            
-                            html += `<div class="tree-node" style="padding-left:${depth * 12}px; cursor:pointer; color:${color}; font-size:11px; margin-bottom:4px; display:flex; align-items:center; gap:5px;"`;
+                            const isPage = key.endsWith('Page.java');
+                            const isModel = key.endsWith('Model.java');
+                            const draggable = isPage ? 'draggable="true" ondragstart="window.dragProjectFile(event)" data-path="'+child._path.replace(/\\\\/g, '/')+'"' : '';
+                            const pageClass = isPage ? 'file-page' : (isModel ? 'file-model' : '');
+                             
+                            html += `<div class="tree-node ${pageClass}" ${draggable} style="padding-left:${depth * 12}px; cursor:pointer; color:${color}; font-size:11px; margin-bottom:4px; display:flex; align-items:center; gap:5px;"`;
                             if (child._isFile) {
                                 html += ` onclick="window.loadFileContent('${child._path.replace(/\\\\/g, '/')}')"`;
                             }
@@ -1361,10 +1374,27 @@ public class WebDesignerPage extends DashboardBasePage {
                         localStorage.setItem('jettra_designer_tree', finalHtml);
                         localStorage.setItem('jettra_designer_files', JSON.stringify(window.jettraFileCache));
                     } catch(e) {}
-                }).catch(e => {
-                    console.error("Promise error:", e);
-                    viewer.innerHTML = '<div style="color:red; padding:10px;">Error al cargar el proyecto.</div>';
                 });
+            };
+
+            window.dragProjectFile = function(ev) {
+                ev.dataTransfer.setData("project-file", ev.currentTarget.getAttribute("data-path"));
+                ev.dataTransfer.effectAllowed = "copy";
+            };
+
+            window.loadFileContent = function(path) {
+                console.log("Loading file content for:", path);
+                const content = window.jettraFileCache[path];
+                if (!content) {
+                    console.error("No content found for path:", path);
+                    return;
+                }
+                
+                const display = document.getElementById('generated-code-display');
+                if (display) {
+                    display.value = content;
+                    window.syncCodeToCanvas();
+                }
             };
 
             window.openClass = function(name) {
