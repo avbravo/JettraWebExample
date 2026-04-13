@@ -1542,6 +1542,7 @@ public class WebDesignerPage extends DashboardBasePage {
                 code += `@JettraPageSincronized(SyncType.ALL)\n`;
                 code += `public class ${baseName}Page extends DashboardBasePage {\n\n`;
                 code += `    @InjectViewModel\n    private ${mName} model;\n\n`;
+                code += `    @io.jettra.wui.core.annotations.Inject\n    private ${repoName} repository;\n\n`;
                 code += `    @InjectProperties(name = "messages")\n    private Properties msg;\n\n`;
                 code += `    private String lang = "es";\n\n`;
                 code += `    private Div crudModal;\n    private Header modalTitle;\n    private TextBox modalAction;\n    private Button modalSubmitBtn;\n\n`;
@@ -1564,7 +1565,7 @@ public class WebDesignerPage extends DashboardBasePage {
                 code += `        main.add(addBtn);\\n\\n`;
                 code += `        Datatable table = new Datatable();\\n`;
                 code += `        table.addHeaderRow(new Row(\\n            ${tblHeaders.join(', ')},\\n            new TD("Acciones")\\n        ));\\n\\n`;
-                code += `        List<${mName}> all = ${repoName}.findAll();\n`;
+                code += `        List<${mName}> all = repository.findAll();\n`;
                 code += `        for (${mName} p : all) {\n`;
                 code += `            TD actionsTd = new TD(); actionsTd.setStyle("display", "flex").setStyle("gap", "10px");\n`;
                 code += `            Button editBtn = new Button("\\u270F\\uFE0F"); editBtn.addClass("j-btn").addClickListener(() -> {\n`;
@@ -1621,6 +1622,7 @@ public class WebDesignerPage extends DashboardBasePage {
                     document.getElementById('canvas-drop-area').innerHTML = '<div class="canvas-placeholder">Start dragging...</div>';
                     selectedItem = null;
                     window.updateInspector();
+                    window.updateGeneratedCode();
                 });
             };
 
@@ -1632,7 +1634,7 @@ public class WebDesignerPage extends DashboardBasePage {
 
                 const canvasItems = document.querySelectorAll('#canvas-drop-area > .canvas-item, .canvas-container > .canvas-item');
                 if (canvasItems.length === 0) {
-                    display.innerText = "// No components added yet";
+                    display.value = "// No components added yet";
                     return;
                 }
 

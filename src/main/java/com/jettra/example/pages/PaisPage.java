@@ -23,6 +23,9 @@ public class PaisPage extends DashboardBasePage {
     @InjectViewModel
     PaisModel pais;
 
+    @io.jettra.wui.core.annotations.Inject  
+    private PaisRepository paisRepository;
+
     @InjectProperties(name = "messages")
     private Properties msg;
 
@@ -86,7 +89,7 @@ public class PaisPage extends DashboardBasePage {
             new io.jettra.wui.components.TD(msg.getProperty("th.actions", "Acciones"))
         ));
 
-        List<PaisModel> all = PaisRepository.findAll();
+        List<PaisModel> all = paisRepository.findAll();
         for (PaisModel p : all) {
             io.jettra.wui.components.TD actionsTd = new io.jettra.wui.components.TD();
             actionsTd.setStyle("display", "flex").setStyle("gap", "10px");
@@ -188,18 +191,15 @@ public class PaisPage extends DashboardBasePage {
         System.out.println("[PaisPage] POST Action: " + action + " | Code: " + code + " | Name: " + name);
         
         boolean changed = false;
-        if ("save".equals(action)) {
-            if (code != null && !code.trim().isEmpty()) {
-                PaisRepository.save(new PaisModel(code, name));
-                JettraSyncManager.notifyChange("PaisModel", SyncType.UPDATE, getLoggedUser(currentExchange));
+        if (action != null) {
+            if (action.equals("save")) {
+                paisRepository.save(pais);
+                changed = true;
+            } else if (action.equals("delete")) {
+                paisRepository.delete(pais.getCode());
                 changed = true;
             }
-        } else if ("delete".equals(action)) {
-            if (code != null && !code.trim().isEmpty()) {
-                PaisRepository.delete(code);
-                JettraSyncManager.notifyChange("PaisModel", SyncType.DELETE, getLoggedUser(currentExchange));
-                changed = true;
-            }
+            JettraSyncManager.notifyChange("PaisModel", SyncType.UPDATE, getLoggedUser(currentExchange));
         }
         
         if (changed) {
