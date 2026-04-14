@@ -40,6 +40,7 @@ public class WebDesignerPage extends DashboardBasePage {
 
         // 1. Sidebar (Palette + Project Explorer)
         Div sidebar = new Div();
+        sidebar.setProperty("id", "designer-sidebar");
         sidebar.setStyle("flex", "0 0 280px").setStyle("display", "flex").setStyle("flex-direction", "column").setStyle("gap", "15px");
 
         Div palette = createCategorizedPalette();
@@ -78,13 +79,19 @@ public class WebDesignerPage extends DashboardBasePage {
         crudBtn.setProperty("type", "button");
         crudBtn.setProperty("onclick", "generateCRUD()");
         
+        Button toggleSidebarBtn = new Button("\u2630"); // Sidebar toggle
+        toggleSidebarBtn.addClass("j-btn");
+        toggleSidebarBtn.setStyle("font-size", "14px").setStyle("padding", "5px 12px");
+        toggleSidebarBtn.setProperty("type", "button");
+        toggleSidebarBtn.setProperty("onclick", "window.toggleSidebar()");
+
         Button toggleCodeBtn = new Button("Code </>");
         toggleCodeBtn.addClass("j-btn");
         toggleCodeBtn.setStyle("font-size", "11px").setStyle("padding", "5px 12px");
         toggleCodeBtn.setProperty("type", "button");
         toggleCodeBtn.setProperty("onclick", "window.toggleCodeView()");
         
-        canvasHeaderActions.add(previewBtn).add(crudBtn).add(toggleCodeBtn);
+        canvasHeaderActions.add(toggleSidebarBtn).add(previewBtn).add(crudBtn).add(toggleCodeBtn);
         canvasHeader.add(canvasTitle).add(canvasHeaderActions);
         canvasArea.add(canvasHeader);
 
@@ -527,6 +534,15 @@ public class WebDesignerPage extends DashboardBasePage {
                     cv.style.display = 'flex';
                 } else {
                     cv.style.display = 'none';
+                }
+            };
+
+            window.toggleSidebar = function() {
+                const sidebar = document.getElementById('designer-sidebar');
+                if (sidebar.style.display === 'none') {
+                    sidebar.style.display = 'flex';
+                } else {
+                    sidebar.style.display = 'none';
                 }
             };
 
@@ -1979,6 +1995,19 @@ public class WebDesignerPage extends DashboardBasePage {
                                  if (props.submitText) out += `        ${v}.setSubmitText("${props.submitText}");\\n`;
                                  const kidsCC = it.querySelectorAll(':scope > .canvas-container > .canvas-item, :scope > div > .canvas-container > .canvas-item');
                                  if (kidsCC.length > 0) out += walk(kidsCC, v);
+                                 out += handleCommon(v);
+                                 out += handleEvents(v);
+                                 out += `        ${container}.add(${v});\\n`;
+                                 break;
+                             }
+                             case 'Table': {
+                                 out += `        Table ${v} = new Table();\\n`;
+                                 if (props.columnsList && props.columnsList.length > 0) {
+                                     const colsStr = props.columnsList.map(c => `"${c}"`).join(", ");
+                                     out += `        ${v}.addHeaderRow(${colsStr});\\n`;
+                                 } else {
+                                     out += `        ${v}.addHeaderRow("Col 1", "Col 2");\\n`;
+                                 }
                                  out += handleCommon(v);
                                  out += handleEvents(v);
                                  out += `        ${container}.add(${v});\\n`;
