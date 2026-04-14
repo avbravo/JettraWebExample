@@ -7,10 +7,10 @@ import io.jettra.wui.components.Header;
 import io.jettra.wui.components.Paragraph;
 import io.jettra.wui.components.Button;
 
-public class TablePage extends DashboardBasePage {
+public class DataTablePage extends DashboardBasePage {
 
-    public TablePage() {
-        super("Table Showcase");
+    public DataTablePage() {
+        super("Datatable Showcase");
     }
 
     @Override
@@ -21,7 +21,7 @@ public class TablePage extends DashboardBasePage {
         Div headerRow = new Div();
         headerRow.setStyle("display", "flex").setStyle("justify-content", "space-between").setStyle("align-items", "center").setStyle("margin-bottom", "15px");
         
-        Header h1 = new Header(1, "Table Component Showcase");
+        Header h1 = new Header(1, "Datatable Component Showcase");
         h1.setStyle("margin", "0");
         headerRow.add(h1);
         
@@ -49,9 +49,9 @@ public class TablePage extends DashboardBasePage {
                      .setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
         
         String javaCode = "Datatable table = new Datatable();\n" +
-                          "table.addHeaderRow(new Row(new TD(\"ID\"), new TD(\"Name\"), new TD(\"Role\")));\n" +
-                          "table.addRow(new Row(new TD(\"1\"), new TD(\"Alice\"), new TD(\"Admin\")));\n" +
-                          "table.addRow(new Row(new TD(\"2\"), new TD(\"Bob\"), new TD(\"User\")));";
+                          "table.addHeaderRow(\"ID\", \"Name\", \"Role\")\n" +
+                          "     .addRow(new Row(new TD(\"1\"), new TD(\"Alice\"), new TD(\"Admin\")))\n" +
+                          "     .addRow(new Row(new TD(\"2\"), new TD(\"Bob\"), new TD(\"User\")));";
                           
         io.jettra.wui.core.UIComponent pre = new io.jettra.wui.core.UIComponent("pre") {};
         pre.setStyle("margin", "0");
@@ -82,7 +82,7 @@ public class TablePage extends DashboardBasePage {
         container.add(codeModal);
         // --- End Modal Dialog ---
         
-        Paragraph p = new Paragraph("The Table component for tabular data display.");
+        Paragraph p = new Paragraph("The Datatable component for tabular data display with pagination and filter.");
         container.add(p);
 
         // --- Demo ---
@@ -91,13 +91,13 @@ public class TablePage extends DashboardBasePage {
         row1.setStyle("display", "flex").setStyle("gap", "20px").setStyle("margin-bottom", "30px").setStyle("width", "100%");
         
         io.jettra.wui.complex.Datatable table = new io.jettra.wui.complex.Datatable();
-        table.addHeaderRow(new io.jettra.wui.components.Row(new io.jettra.wui.components.TD("ID"), new io.jettra.wui.components.TD("Name"), new io.jettra.wui.components.TD("Role")));
-        table.addRow(new io.jettra.wui.components.Row(new io.jettra.wui.components.TD("1"), new io.jettra.wui.components.TD("Alice"), new io.jettra.wui.components.TD("Admin")));
-        table.addRow(new io.jettra.wui.components.Row(new io.jettra.wui.components.TD("2"), new io.jettra.wui.components.TD("Bob"), new io.jettra.wui.components.TD("User")));
-        table.addRow(new io.jettra.wui.components.Row(new io.jettra.wui.components.TD("3"), new io.jettra.wui.components.TD("Charlie"), new io.jettra.wui.components.TD("Manager")));
-        table.addRow(new io.jettra.wui.components.Row(new io.jettra.wui.components.TD("4"), new io.jettra.wui.components.TD("Dave"), new io.jettra.wui.components.TD("User")));
-        table.addRow(new io.jettra.wui.components.Row(new io.jettra.wui.components.TD("5"), new io.jettra.wui.components.TD("Eve"), new io.jettra.wui.components.TD("User")));
-        table.addRow(new io.jettra.wui.components.Row(new io.jettra.wui.components.TD("6"), new io.jettra.wui.components.TD("Frank"), new io.jettra.wui.components.TD("Admin")));
+        table.addHeaderRow("ID", "Name", "Role")
+             .addRow(new io.jettra.wui.components.Row(new io.jettra.wui.components.TD("1"), new io.jettra.wui.components.TD("Alice"), new io.jettra.wui.components.TD("Admin")))
+             .addRow(new io.jettra.wui.components.Row(new io.jettra.wui.components.TD("2"), new io.jettra.wui.components.TD("Bob"), new io.jettra.wui.components.TD("User")))
+             .addRow(new io.jettra.wui.components.Row(new io.jettra.wui.components.TD("3"), new io.jettra.wui.components.TD("Charlie"), new io.jettra.wui.components.TD("Manager")))
+             .addRow(new io.jettra.wui.components.Row(new io.jettra.wui.components.TD("4"), new io.jettra.wui.components.TD("Dave"), new io.jettra.wui.components.TD("User")))
+             .addRow(new io.jettra.wui.components.Row(new io.jettra.wui.components.TD("5"), new io.jettra.wui.components.TD("Eve"), new io.jettra.wui.components.TD("User")))
+             .addRow(new io.jettra.wui.components.Row(new io.jettra.wui.components.TD("6"), new io.jettra.wui.components.TD("Frank"), new io.jettra.wui.components.TD("Admin")));
         
         row1.add(table);
         

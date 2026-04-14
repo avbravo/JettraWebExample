@@ -57,9 +57,10 @@ public class WebExampleMain {
         server.addHandler("/login", com.jettra.example.pages.LoginPage.class);
         server.addHandler("/logout", com.jettra.example.pages.LoginPage.class);
         server.addHandler("/loading", com.jettra.example.pages.LoadingPage.class);
-        server.addHandler("/persona", com.jettra.example.pages.PersonaPage.class);
+    
 
         server.addHandler("/datepicker", com.jettra.example.pages.DatePickerPage.class);
+        server.addHandler("/datatable", com.jettra.example.pages.DataTablePage.class);
         server.addHandler("/label", com.jettra.example.pages.LabelPage.class);
         server.addHandler("/link", com.jettra.example.pages.LinkPage.class);
         server.addHandler("/organigram", com.jettra.example.pages.OrganigramPage.class);
@@ -68,7 +69,6 @@ public class WebExampleMain {
         server.addHandler("/selectone", com.jettra.example.pages.SelectOnePage.class);
         server.addHandler("/selectmany", com.jettra.example.pages.SelectManyPage.class);
         server.addHandler("/schedule", com.jettra.example.pages.SchedulePage.class);
-        server.addHandler("/table", com.jettra.example.pages.TablePage.class);
         server.addHandler("/textbox", com.jettra.example.pages.TextBoxPage.class);
         server.addHandler("/time", com.jettra.example.pages.TimePage.class);
         server.addHandler("/timeline", com.jettra.example.pages.TimelinePage.class);
@@ -78,7 +78,7 @@ public class WebExampleMain {
         server.addHandler("/modal", com.jettra.example.pages.ModalPage.class);
         server.addHandler("/notification", com.jettra.example.pages.NotificationPage.class);
         server.addHandler("/menubar", com.jettra.example.pages.MenuBarPage.class);
-
+    server.addHandler("/persona", com.jettra.example.pages.PersonaPage.class);
         server.addHandler("/selectoneicon", com.jettra.example.pages.SelectOneIconPage.class);
         server.addHandler("/grid", com.jettra.example.pages.GridPage.class);
         server.addHandler("/sessiontimeout", com.jettra.example.pages.SessionTimeoutDialogPage.class);

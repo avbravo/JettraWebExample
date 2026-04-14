@@ -14,9 +14,6 @@ import io.jettra.wui.validations.JettraValidations;
 import com.jettra.server.JettraServer;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -100,12 +97,11 @@ public class PersonaPage extends DashboardBasePage {
 
         // Table
         io.jettra.wui.complex.Datatable table = new io.jettra.wui.complex.Datatable();
-        table.addHeaderRow(new Row(
-            new TD(msg.getProperty("th.name")),
-            new TD(msg.getProperty("th.address")),
-            new TD(msg.getProperty("th.actions"))
-        ));
-
+  
+ table.addHeaderRow(msg.getProperty("th.name"),
+            msg.getProperty("th.address"),
+            msg.getProperty("th.actions")
+        );
         List<PersonaModel> all = PersonaRepository.findAll();
         int pageSize = 10;
         int totalPages = (int) Math.ceil((double)all.size() / pageSize);
@@ -200,14 +196,16 @@ public class PersonaPage extends DashboardBasePage {
         this.modalAction = new TextBox("hidden", "action");
         this.modalId = new TextBox("hidden", "personaId");
         
-        this.groupNombre = new Div(); groupNombre.addClass("form-group");
+        this.groupNombre = new Div();
+        groupNombre.addClass("form-group");
         groupNombre.add(new Label("nombre", msg.getProperty("lbl.name")));
         TextBox inputNombre = new TextBox("text", "nombre");
         inputNombre.setId("personaNombre").addClass("j-input");
         JettraValidations.apply(inputNombre, PersonaModel.class, "nombre");
         groupNombre.add(inputNombre);
 
-        this.groupDireccion = new Div(); groupDireccion.addClass("form-group");
+        this.groupDireccion = new Div();
+        groupDireccion.addClass("form-group");
         groupDireccion.add(new Label("direccion", msg.getProperty("lbl.address")));
         TextBox inputDireccion = new TextBox("text", "direccion");
         inputDireccion.setId("personaDireccion").addClass("j-input");

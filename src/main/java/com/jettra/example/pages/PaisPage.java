@@ -83,11 +83,10 @@ public class PaisPage extends DashboardBasePage {
 
         // Table
         io.jettra.wui.complex.Datatable table = new io.jettra.wui.complex.Datatable();
-        table.addHeaderRow(new io.jettra.wui.components.Row(
-            new io.jettra.wui.components.TD(msg.getProperty("th.code", "Código")),
-            new io.jettra.wui.components.TD(msg.getProperty("th.name", "Nombre")),
-            new io.jettra.wui.components.TD(msg.getProperty("th.actions", "Acciones"))
-        ));
+        table.addHeaderRow(msg.getProperty("th.code", "Código"),
+            msg.getProperty("th.name", "Nombre"),
+            msg.getProperty("th.actions", "Acciones")
+        );
 
         List<PaisModel> all = paisRepository.findAll();
         for (PaisModel p : all) {
@@ -117,6 +116,8 @@ public class PaisPage extends DashboardBasePage {
                 new io.jettra.wui.components.TD(p.getName()),
                 actionsTd
             ));
+
+            
         }
         mainContent.add(table);
         center.add(mainContent);

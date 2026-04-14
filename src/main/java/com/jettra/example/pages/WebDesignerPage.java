@@ -375,7 +375,7 @@ public class WebDesignerPage extends DashboardBasePage {
         // Charts
         addPaletteCategory(palette, "Charts", new String[]{"ChartsBar", "ChartsDoughnut", "ChartsLine", "ChartsPie", "ChartsRadar"});
         // Layout & Display
-        addPaletteCategory(palette, "Layout", new String[]{"Grid", "Panel", "Board", "Card", "Avatar", "Carousel", "Table", "TabView", "Tab", "Modal", "Tree", "TreeItem", "Div", "LayoutDisplay", "Map"});
+        addPaletteCategory(palette, "Layout", new String[]{"Grid", "Panel", "Board", "Card", "Avatar", "Carousel", "Datatable", "TabView", "Tab", "Modal", "Tree", "TreeItem", "Div", "LayoutDisplay", "Map"});
 
         return palette;
     }
@@ -739,8 +739,8 @@ public class WebDesignerPage extends DashboardBasePage {
                     case 'Card':
                         content = '<div class="j-component j-card" style="padding:0; border:1px solid var(--jettra-accent); border-radius:8px; background:rgba(0,0,0,0.4); display:flex; flex-direction:column; gap:10px;"><div style="padding:15px; border-bottom:1px solid rgba(255,255,255,0.1);"><h3 style="margin:0;color:var(--jettra-accent);" class="card-title-mock">Card Title</h3><p style="margin:0;font-size:12px;color:#aaa" class="card-subtitle-mock"></p><p style="margin:5px 0 0;font-size:13px;color:rgba(255,255,255,0.8)" class="card-content-mock"></p></div><div class="canvas-container" style="flex:1; border:0; min-height:50px; padding:15px; background:transparent;"></div></div>';
                         break;
-                    case 'Table':
-                        content = '<div class="j-table-container j-component" style="padding:0; border-radius:12px; overflow:hidden;"><table style="width:100%; border-collapse:collapse; text-align:left; font-size:0.9rem;"><thead style="background:rgba(0,255,255,0.05); border-bottom:1px solid var(--jettra-accent);"><tr><th style="padding:12px; color:var(--jettra-text);">Col 1</th><th style="padding:12px; color:var(--jettra-text);">Col 2</th></tr></thead><tbody><tr style="border-bottom:1px solid var(--jettra-border);"><td style="padding:10px; color:var(--jettra-text);">Data 1</td><td style="padding:10px; color:var(--jettra-text);">Data 2</td></tr></tbody></table></div>';
+                    case 'Datatable':
+                        content = '<div class="j-datatable-container j-component" style="padding:0; border-radius:12px; overflow:hidden; border:1px solid rgba(0,255,255,0.1);"><table style="width:100%; border-collapse:collapse; text-align:left; font-size:0.9rem;"><thead style="background:rgba(0,255,255,0.05); border-bottom:1px solid var(--jettra-accent);"><tr><th style="padding:12px; color:var(--jettra-text);">Col 1</th><th style="padding:12px; color:var(--jettra-text);">Col 2</th></tr></thead><tbody><tr style="border-bottom:1px solid var(--jettra-border);"><td class="canvas-container" style="padding:10px; color:var(--jettra-text); border-left:1px dashed rgba(255,255,255,0.1); min-height:40px;"></td><td class="canvas-container" style="padding:10px; color:var(--jettra-text); border-left:1px dashed rgba(255,255,255,0.1); min-height:40px;"></td></tr></tbody></table></div>';
                         break;
                     case 'Image':
                         content = '<div class="j-component" style="padding:0; overflow:hidden; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.2); min-height:100px; border-radius:8px;"><span style="color:#666;">[Image Placeholder]</span></div>';
@@ -1026,11 +1026,11 @@ public class WebDesignerPage extends DashboardBasePage {
                     `;
                 }
 
-                if (type === 'Table') {
+                if (type === 'Datatable') {
                     const columnsArr = props.columnsList || ['Col 1', 'Col 2'];
                     html += `
                         <div class="inspector-row">
-                            <span class="inspector-label">Table Columns</span>
+                            <span class="inspector-label">Datatable Columns</span>
                             <div style="display:flex; flex-direction:column; gap:5px; margin-bottom:5px;">
                                 ${columnsArr.map((col, idx) => `
                                     <div style="display:flex; gap:5px; align-items:center;">
@@ -1208,7 +1208,18 @@ public class WebDesignerPage extends DashboardBasePage {
                 if (tbody) {
                     const rows = tbody.querySelectorAll('tr');
                     rows.forEach(tr => {
-                        tr.innerHTML = cols.map((c, i) => `<td style="padding:10px; color:var(--jettra-text);">Data ${i+1}</td>`).join('');
+                        let existingTds = Array.from(tr.querySelectorAll('td'));
+                        tr.innerHTML = '';
+                        cols.forEach((c, i) => {
+                            if (i < existingTds.length) {
+                                tr.appendChild(existingTds[i]);
+                            } else {
+                                let td = document.createElement('td');
+                                td.className = 'canvas-container';
+                                td.style = 'padding:10px; border-left:1px dashed rgba(255,255,255,0.1); min-height:40px;';
+                                tr.appendChild(td);
+                            }
+                        });
                     });
                 }
                 window.updateGeneratedCode();
@@ -1660,7 +1671,7 @@ public class WebDesignerPage extends DashboardBasePage {
                 code += `        });\\n`;
                 code += `        main.add(addBtn);\\n\\n`;
                 code += `        Datatable table = new Datatable();\\n`;
-                code += `        table.addHeaderRow(new Row(\\n            ${tblHeaders.join(', ')},\\n            new TD("Acciones")\\n        ));\\n\\n`;
+                code += `        table.addHeaderRow(\\n            ${tblHeaders.map(h => h.replace(/new TD\\(|\\)/g, '')).join(',\\n            ')},\\n            "Acciones"\\n        );\\n\\n`;
                 code += `        List<${mName}> all = repository.findAll();\n`;
                 code += `        for (${mName} p : all) {\n`;
                 code += `            TD actionsTd = new TD(); actionsTd.setStyle("display", "flex").setStyle("gap", "10px");\n`;
@@ -2000,13 +2011,27 @@ public class WebDesignerPage extends DashboardBasePage {
                                  out += `        ${container}.add(${v});\\n`;
                                  break;
                              }
-                             case 'Table': {
-                                 out += `        Table ${v} = new Table();\\n`;
+                             case 'Datatable': {
+                                 out += `        Datatable ${v} = new Datatable();\\n`;
                                  if (props.columnsList && props.columnsList.length > 0) {
                                      const colsStr = props.columnsList.map(c => `"${c}"`).join(", ");
                                      out += `        ${v}.addHeaderRow(${colsStr});\\n`;
                                  } else {
                                      out += `        ${v}.addHeaderRow("Col 1", "Col 2");\\n`;
+                                 }
+                                 const cells = it.querySelectorAll('tbody td');
+                                 if (cells.length > 0) {
+                                     out += `        io.jettra.wui.components.Row row_${v} = new io.jettra.wui.components.Row();\\n`;
+                                     cells.forEach((td, idx) => {
+                                         let tdVar = v + "_td_" + idx;
+                                         out += `        io.jettra.wui.components.TD ${tdVar} = new io.jettra.wui.components.TD();\\n`;
+                                         const kids = td.querySelectorAll(':scope > .canvas-item, :scope > div > .canvas-item');
+                                         if (kids.length > 0) {
+                                             out += walk(kids, tdVar);
+                                         }
+                                         out += `        row_${v}.add(${tdVar});\\n`;
+                                     });
+                                     out += `        ${v}.addRow(row_${v});\\n`;
                                  }
                                  out += handleCommon(v);
                                  out += handleEvents(v);
