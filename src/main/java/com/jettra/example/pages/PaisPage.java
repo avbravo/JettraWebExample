@@ -66,49 +66,57 @@ public class PaisPage extends DashboardBasePage {
         Div mainContent = new Div();
         mainContent.setStyle("padding", "20px");
 
-        Header title = new Header(2, msg.getProperty("subtitle.pais"));
-        title.setStyle("color", "var(--jettra-accent)").setStyle("margin-bottom", "20px");
+        Header title = new Header(2, msg.getProperty("subtitle.pais"))
+            .setStyle("color", "var(--jettra-accent)")
+            .setStyle("margin-bottom", "20px");
         mainContent.add(title);
 
         setupModal(); // Initialize components before using them in listeners
 
-        Button addBtn = new Button("➕ " + msg.getProperty("btn.add.pais", "Añadir País"));
-        addBtn.setId("addBtn").addClass("j-btn").setStyle("background-color", "#0f5132");
-        addBtn.addClickListener(() -> {
-            this.pais.setCode("");
-            this.pais.setName("");
-            showModal(msg.getProperty("modal.add.pais.title", "Nuevo País"), "save");
-        });
+        Button addBtn = new Button("➕ " + msg.getProperty("btn.add.pais", "Añadir País"))
+            .setId("addBtn")
+            .addClass("j-btn")
+            .setStyle("background-color", "#0f5132")
+            .addClickListener(() -> {
+                this.pais.setCode("");
+                this.pais.setName("");
+                showModal(msg.getProperty("modal.add.pais.title", "Nuevo País"), "save");
+            });
         mainContent.add(addBtn);
 
         // Table
-        io.jettra.wui.complex.Datatable table = new io.jettra.wui.complex.Datatable();
-        table.addHeaderRow(msg.getProperty("th.code", "Código"),
-            msg.getProperty("th.name", "Nombre"),
-            msg.getProperty("th.actions", "Acciones")
-        );
+        io.jettra.wui.complex.Datatable table = new io.jettra.wui.complex.Datatable()
+            .addHeaderRow(msg.getProperty("th.code", "Código"),
+                msg.getProperty("th.name", "Nombre"),
+                msg.getProperty("th.actions", "Acciones")
+            );
 
         List<PaisModel> all = paisRepository.findAll();
         for (PaisModel p : all) {
-            io.jettra.wui.components.TD actionsTd = new io.jettra.wui.components.TD();
-            actionsTd.setStyle("display", "flex").setStyle("gap", "10px");
+            io.jettra.wui.components.TD actionsTd = new io.jettra.wui.components.TD()
+                .setStyle("display", "flex")
+                .setStyle("gap", "10px");
             
-            Button editBtn = new Button("✏️");
-            editBtn.addClass("j-btn").setId("edit-" + p.getCode());
-            editBtn.addClickListener(() -> {
-                this.pais.setCode(p.getCode());
-                this.pais.setName(p.getName());
-                showModal(msg.getProperty("modal.edit.pais.title", "Editar País"), "save");
-            });
+            Button editBtn = new Button("✏️")
+                .addClass("j-btn")
+                .setId("edit-" + p.getCode())
+                .addClickListener(() -> {
+                    this.pais.setCode(p.getCode());
+                    this.pais.setName(p.getName());
+                    showModal(msg.getProperty("modal.edit.pais.title", "Editar País"), "save");
+                });
             
-            Button deleteBtn = new Button("🗑️");
-            deleteBtn.addClass("j-btn").setId("del-" + p.getCode());
-            deleteBtn.setStyle("color", "#ff5555").setStyle("border-color", "#ff5555").setStyle("background", "rgba(255,0,0,0.1)");
-            deleteBtn.addClickListener(() -> {
-                this.pais.setCode(p.getCode());
-                this.pais.setName(p.getName());
-                showModal(msg.getProperty("modal.delete.pais.title", "¿Eliminar País?"), "delete");
-            });
+            Button deleteBtn = new Button("🗑️")
+                .addClass("j-btn")
+                .setId("del-" + p.getCode())
+                .setStyle("color", "#ff5555")
+                .setStyle("border-color", "#ff5555")
+                .setStyle("background", "rgba(255,0,0,0.1)")
+                .addClickListener(() -> {
+                    this.pais.setCode(p.getCode());
+                    this.pais.setName(p.getName());
+                    showModal(msg.getProperty("modal.delete.pais.title", "¿Eliminar País?"), "delete");
+                });
             
             actionsTd.add(editBtn).add(deleteBtn);
             table.addRow(new io.jettra.wui.components.Row(
@@ -116,8 +124,6 @@ public class PaisPage extends DashboardBasePage {
                 new io.jettra.wui.components.TD(p.getName()),
                 actionsTd
             ));
-
-            
         }
         mainContent.add(table);
         center.add(mainContent);
@@ -151,29 +157,38 @@ public class PaisPage extends DashboardBasePage {
         this.modalAction = new TextBox("hidden", "modalAction");
         this.modalAction.setId("modalAction");
         
-        Div g1 = new Div(); g1.addClass("form-group"); g1.add(new Label("code", msg.getProperty("th.code", "Código")));
-        TextBox inputCode = new TextBox("text", "code");
-        inputCode.setId("paisCode").addClass("j-input");
+        Div g1 = new Div()
+            .addClass("form-group")
+            .add(new Label("code", msg.getProperty("th.code", "Código")));
+        TextBox inputCode = new TextBox("text", "code")
+            .setId("paisCode")
+            .addClass("j-input");
         JettraValidations.apply(inputCode, PaisModel.class, "code");
         g1.add(inputCode);
 
-        Div g2 = new Div(); g2.addClass("form-group"); g2.add(new Label("name", msg.getProperty("th.name", "Nombre")));
-        TextBox inputName = new TextBox("text", "name");
-        inputName.setId("paisName").addClass("j-input");
+        Div g2 = new Div()
+            .addClass("form-group")
+            .add(new Label("name", msg.getProperty("th.name", "Nombre")));
+        TextBox inputName = new TextBox("text", "name")
+            .setId("paisName")
+            .addClass("j-input");
         JettraValidations.apply(inputName, PaisModel.class, "name");
         g2.add(inputName);
 
-        Div groupActions = new Div();
-        groupActions.addClass("modal-actions");
+        Div groupActions = new Div()
+            .addClass("modal-actions");
         
-        Button cancelBtn = new Button(msg.getProperty("btn.close", "CERRAR"));
-        cancelBtn.setProperty("type", "button");
-        cancelBtn.addClass("j-btn").setStyle("background", "#555").setStyle("border", "none");
-        cancelBtn.setProperty("onclick", "document.getElementById('crudModal').style.display='none'; return false;");
+        Button cancelBtn = new Button(msg.getProperty("btn.close", "CERRAR"))
+            .setProperty("type", "button")
+            .addClass("j-btn")
+            .setStyle("background", "#555")
+            .setStyle("border", "none")
+            .setProperty("onclick", "document.getElementById('crudModal').style.display='none'; return false;");
 
-        this.modalSubmitBtn = new Button(msg.getProperty("btn.save", "Guardar"));
-        this.modalSubmitBtn.setId("modalSubmitBtn").addClass("j-btn");
-        this.modalSubmitBtn.setProperty("type", "submit");
+        this.modalSubmitBtn = new Button(msg.getProperty("btn.save", "Guardar"))
+            .setId("modalSubmitBtn")
+            .addClass("j-btn")
+            .setProperty("type", "submit");
 
         groupActions.add(cancelBtn).add(this.modalSubmitBtn);
         form.add(this.modalAction).add(g1).add(g2).add(groupActions);

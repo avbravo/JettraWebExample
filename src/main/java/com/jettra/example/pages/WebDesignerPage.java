@@ -1757,297 +1757,126 @@ public class WebDesignerPage extends DashboardBasePage {
                         const props = JSON.parse(it.getAttribute('data-props'));
                         const v = props.id && props.id.trim() !== "" ? props.id : (type.toLowerCase() + "_" + Math.floor(Math.random()*10000));
                         
-                        const handleCommon = (compVar) => {
-                            let out = "";
-                            if (props.update) out += `        ${compVar}.setUpdate("${props.update}");\\n`;
-                            return out;
-                        };
-
-                        const handleEvents = (compVar) => {
-                            let evOut = "";
-                            Object.keys(props.events).forEach(ev => {
+                        const chainProps = () => {
+                            let c = "";
+                            if (props.id && props.id.trim() !== "") c += `.setId("${props.id}")`;
+                            if (props.update) c += `.setUpdate("${props.update}")`;
+                            if (props.cssClass) c += `.addClass("${props.cssClass}")`;
+                            
+                            // Events
+                            Object.keys(props.events || {}).forEach(ev => {
                                 const eventCode = props.events[ev].replace(/\\\\n/g, '\\n');
-                                evOut += `        ${compVar}.${ev}(${eventCode});\\n`;
+                                c += `\\n            .${ev}(${eventCode})`;
                             });
-                            return evOut;
+                            return c;
                         };
 
                         switch(type) {
                             case 'Divide': out += `        ${container}.add(new Divide());\\n`; break;
                             case 'Separator': out += `        ${container}.add(new Separator());\\n`; break;
-                            case 'Header': out += `        ${container}.add(new Header(1, "${props.text}"));\\n`; break;
-                            case 'Paragraph': out += `        ${container}.add(new Paragraph("${props.text}"));\\n`; break;
-                            case 'Span': out += `        ${container}.add(new Span("${props.text}"));\\n`; break;
-                            case 'Label': out += `        ${container}.add(new Label("${props.text}"));\\n`; break;
+                            case 'Header': out += `        ${container}.add(new Header(${props.level || 1}, "${props.text}")${chainProps()});\\n`; break;
+                            case 'Paragraph': out += `        ${container}.add(new Paragraph("${props.text}")${chainProps()});\\n`; break;
+                            case 'Span': out += `        ${container}.add(new Span("${props.text}")${chainProps()});\\n`; break;
+                            case 'Label': out += `        ${container}.add(new Label("${props.text}")${chainProps()});\\n`; break;
                             case 'Button': 
-                                out += `        ${type} ${v} = new ${type}("${props.text}");\\n`;
-                                if (props.btnStyle) out += `        ${v}.setStyle(${type}.Style.${props.btnStyle});\\n`;
-                                if (props.icon) out += `        ${v}.setIcon("${props.icon}");\\n`;
-                                out += handleCommon(v);
-                                out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
+                                out += `        ${container}.add(new Button("${props.text}")${chainProps()}`;
+                                if (props.btnStyle) out += `.setStyle(Button.Style.${props.btnStyle})`;
+                                if (props.icon) out += `.setIcon("${props.icon}")`;
+                                out += `);\\n`;
                                 break;
                             case 'TextBox':
                             case 'TextArea':
-                                out += `        ${type} ${v} = new ${type}("${props.text || type}", "${props.text || type}");\\n`;
-                                out += handleCommon(v);
-                                out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
+                                out += `        ${container}.add(new ${type}("${props.text || type}", "${props.text || type}")${chainProps()});\\n`;
                                 break;
                             case 'Clock':
-                                out += `        Clock ${v} = new Clock("${props.text || 'Clock'}");\\n`;
-                                out += handleCommon(v);
-                                out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
+                                out += `        ${container}.add(new Clock("${props.text || 'Clock'}")${chainProps()});\\n`;
                                 break;
                             case 'Avatar':
-                                out += `        Avatar ${v} = new Avatar();\\n`;
-                                if (props.text) out += `        ${v}.setText("${props.text}");\\n`;
-                                if (props.icon) out += `        ${v}.setIcon("${props.icon}");\\n`;
-                                out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
+                                out += `        Avatar ${v} = new Avatar()${chainProps()}`;
+                                if (props.text) out += `.setText("${props.text}")`;
+                                if (props.icon) out += `.setIcon("${props.icon}")`;
+                                out += `;\\n        ${container}.add(${v});\\n`;
                                 break;
                             case 'ProgressBar':
-                                out += `        ProgressBar ${v} = new ProgressBar(${props.value || 0}, ${props.max || 100});\\n`;
-                                if (props.color) out += `        ${v}.setColor("${props.color}");\\n`;
-                                if (props.indeterminate) out += `        ${v}.setIndeterminate(true);\\n`;
-                                if (props.showPercent === false) out += `        ${v}.setShowPercent(false);\\n`;
-                                out += handleCommon(v);
-                                out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
+                                out += `        ${container}.add(new ProgressBar(${props.value || 0}, ${props.max || 100})${chainProps()}`;
+                                if (props.color) out += `.setColor("${props.color}")`;
+                                if (props.indeterminate) out += `.setIndeterminate(true)`;
+                                out += `);\\n`;
                                 break;
                             case 'Spinner':
-                                out += `        Spinner ${v} = new Spinner("${v}", ${props.value || 0});\\n`;
-                                if (props.min !== undefined && props.min !== "") out += `        ${v}.setMin(${props.min});\\n`;
-                                if (props.max !== undefined && props.max !== "") out += `        ${v}.setMax(${props.max});\\n`;
-                                if (props.step !== undefined && props.step !== "") out += `        ${v}.setStep(${props.step});\\n`;
-                                out += handleCommon(v);
-                                out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
-                                break;
-                            case 'ScheduleControl': {
-                                out += `        ScheduleControl ${v} = new ScheduleControl("${v}");\\n`;
-                                if (props.binding) out += `        ${v}.setValue(model.get${props.binding.charAt(0).toUpperCase() + props.binding.slice(1)}());\\n`;
-                                if (props.showTimeRemaining) out += `        ${v}.setShowTimeRemaining(true);\\n`;
-                                if (props.onTimeReached) out += `        ${v}.setOnTimeReached("${props.onTimeReached}");\\n`;
-                                out += handleCommon(v);
-                                out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
-                                break;
-                            }
-                            case 'ChartsBar':
-                            case 'ChartsDoughnut':
-                            case 'ChartsLine':
-                            case 'ChartsPie':
-                            case 'ChartsRadar': {
-                                out += `        ${type} ${v} = new ${type}("${v}");\\n`;
-                                const lArg = props.labels ? `"${props.labels.split(',').map(s => s.trim()).join('", "')}"` : '"Label 1", "Label 2"';
-                                const dLabel = props.datasetLabel ? props.datasetLabel : "Data";
-                                const dData = props.data ? props.data : "10, 20";
-                                const dBg = props.bgColor ? props.bgColor : "#00ffff";
-                                out += `        ${v}.setLabels(${lArg});\\n`;
-                                out += `        ${v}.addDataset("${dLabel}", new Number[]{${dData}}, new String[]{"${dBg}"}, new String[]{"${dBg}"});\\n`;
-                                out += handleCommon(v);
-                                out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
-                                break;
-                            }
-                            case 'Loading':
-                                out += `        Loading ${v} = new Loading();\\n`;
-                                if (props.size) out += `        ${v}.setSize(Loading.Size.${props.size});\\n`;
-                                if (props.color) out += `        ${v}.setColor("${props.color}");\\n`;
-                                out += handleCommon(v);
-                                out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
-                                break;
-                            case 'Modal': {
-                                const mId = props.idGen || "modal_" + Math.floor(Math.random()*1000);
-                                out += `        Modal ${v} = new Modal("${mId}");\\n`;
-                                const kidsM = it.querySelectorAll(':scope > .canvas-container > .canvas-item');
-                                if (kidsM.length > 0) out += walk(kidsM, v);
-                                out += handleCommon(v);
-                                out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
-                                break;
-                            }
-                            case 'Card': {
-                                out += `        Card ${v} = new Card();\\n`;
-                                if (props.title) out += `        ${v}.setTitle("${props.title}");\\n`;
-                                if (props.subtitle) out += `        ${v}.setSubtitle("${props.subtitle}");\\n`;
-                                if (props.content) out += `        ${v}.setContentText("${props.content}");\\n`;
-                                if (props.imageUrl) out += `        ${v}.setImageUrl("${props.imageUrl}");\\n`;
-                                const kidsCard = it.querySelectorAll(':scope > .canvas-container > .canvas-item, :scope > div > .canvas-container > .canvas-item');
-                                if (kidsCard.length > 0) out += walk(kidsCard, v);
-                                out += handleCommon(v);
-                                out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
-                                break;
-                            }
-                            case 'MenuItem':
-                            case 'TreeItem':
-                            case 'Tab':
-                                out += `        ${type} ${v} = new ${type}("${props.text || type}");\\n`;
-                                const kidsNested = it.querySelectorAll(':scope > .canvas-container > .canvas-item, :scope > div > .canvas-container > .canvas-item, :scope > span > .canvas-container > .canvas-item');
-                                if (kidsNested.length > 0) out += walk(kidsNested, v);
-                                out += handleCommon(v);
-                                out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
+                                out += `        ${container}.add(new Spinner("${v}", ${props.value || 0})${chainProps()}`;
+                                if (props.min !== undefined && props.min !== "") out += `.setMin(${props.min})`;
+                                if (props.max !== undefined && props.max !== "") out += `.setMax(${props.max})`;
+                                out += `);\\n`;
                                 break;
                             case 'SelectOne':
                             case 'SelectMany':
                             case 'SelectOneIcon':
-                                out += `        ${type} ${v} = new ${type}("${v}");\\n`;
-                                if (props.default) out += `        ${v}.setDefault("${props.default}");\\n`;
+                                out += `        ${type} ${v} = new ${type}("${v}")${chainProps()}`;
                                 if (props.options) {
                                     const opts = props.options.split(',');
                                     opts.forEach(o => {
                                         const parts = o.split(':');
                                         const optVal = parts[0] ? parts[0].trim() : 'val';
                                         const optLabel = parts[1] ? parts[1].trim() : optVal;
-                                        if (type === 'SelectOneIcon') {
-                                           out += `        ${v}.addOption("${optVal}", "${optLabel}", "${props.icon || '\u2B50'}");\\n`;
-                                        } else {
-                                           out += `        ${v}.addOption("${optVal}", "${optLabel}");\\n`;
-                                        }
+                                        out += `\\n            .addOption("${optVal}", "${optLabel}")`;
                                     });
                                 }
-                                out += handleCommon(v);
-                                out += handleEvents(v);
+                                out += `;\\n        ${container}.add(${v});\\n`;
+                                break;
+                            case 'Modal': {
+                                const mId = props.idGen || "modal_" + Math.floor(Math.random()*1000);
+                                out += `        Modal ${v} = new Modal("${mId}")${chainProps()};\\n`;
+                                const kidsM = it.querySelectorAll(':scope > .canvas-container > .canvas-item');
+                                if (kidsM.length > 0) out += walk(kidsM, v);
                                 out += `        ${container}.add(${v});\\n`;
                                 break;
+                            }
+                            case 'Card': {
+                                out += `        Card ${v} = new Card()${chainProps()}`;
+                                if (props.title) out += `.setTitle("${props.title}")`;
+                                if (props.subtitle) out += `.setSubtitle("${props.subtitle}")`;
+                                if (props.content) out += `.setContentText("${props.content}")`;
+                                out += `;\\n`;
+                                const kidsCard = it.querySelectorAll(':scope > .canvas-container > .canvas-item, :scope > div > .canvas-container > .canvas-item');
+                                if (kidsCard.length > 0) out += walk(kidsCard, v);
+                                out += `        ${container}.add(${v});\\n`;
+                                break;
+                            }
                             case 'Panel':
                             case 'Grid':
                             case 'Board':
-                            case 'MenuBar':
-                            case 'RadioGroupButton':
-                            case 'CheckBoxGroup':
-                            case 'Tree':
-                            case 'TabView':
                             case 'Div':
-                            case 'LayoutDisplay':
-                                if (type === 'RadioGroupButton' || type === 'CheckBoxGroup') {
-                                    out += `        ${type} ${v} = new ${type}("${props.name || v}");\\n`;
+                            case 'TabView':
+                            case 'Datatable': {
+                                out += `        ${type} ${v} = new ${type}()${chainProps()};\\n`;
+                                if (type === 'Datatable') {
+                                    if (props.columnsList && props.columnsList.length > 0) {
+                                        const colsStr = props.columnsList.map(c => `"${c}"`).join(", ");
+                                        out += `        ${v}.addHeaderRow(${colsStr});\\n`;
+                                    }
+                                    const cells = it.querySelectorAll('tbody td');
+                                    if (cells.length > 0) {
+                                        out += `        Row row_${v} = new Row();\\n`;
+                                        cells.forEach((td, idx) => {
+                                            let tdVar = v + "_td_" + idx;
+                                            out += `        TD ${tdVar} = new TD();\\n`;
+                                            const kids = td.querySelectorAll(':scope > .canvas-item, :scope > div > .canvas-item');
+                                            if (kids.length > 0) out += walk(kids, tdVar);
+                                            out += `        row_${v}.add(${tdVar});\\n`;
+                                        });
+                                        out += `        ${v}.addRow(row_${v});\\n`;
+                                    }
                                 } else {
-                                    out += `        ${type} ${v} = new ${type}("${v}");\\n`;
+                                    const kids = it.querySelectorAll(':scope > .canvas-container > .canvas-item, :scope > div > .canvas-container > .canvas-item');
+                                    if (kids.length > 0) out += walk(kids, v);
                                 }
-                                if (props.columns && (type === 'Grid' || type === 'Panel')) out += `        ${v}.setColumns(${props.columns});\\n`;
-                                const kids = it.querySelectorAll(':scope > .canvas-container > .canvas-item, :scope > div > .canvas-container > .canvas-item');
-                                if (kids.length > 0) out += walk(kids, v);
-                                if (props.icon) out += `        // Try using icon property if supported for ${type}\\n        try { ${v}.getClass().getMethod("setIcon", String.class).invoke(${v}, "${props.icon}"); } catch(Exception ignored) {}\\n`;
-                                out += handleCommon(v);
-                                out += handleEvents(v);
                                 out += `        ${container}.add(${v});\\n`;
                                 break;
-                            case 'DatePicker':
-                            case 'Time':
-                                out += `        ${type} ${v} = new ${type}("${v}", "${props.text || type}");\\n`;
-                                out += handleCommon(v);
-                                out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
-                                break;
-                            case 'Calendar':
-                            case 'Schedule':
-                            case 'Timeline':
-                            case 'Organigram':
-                                out += `        ${type} ${v} = new ${type}();\\n`;
-                                out += handleCommon(v);
-                                out += handleEvents(v);
-                                out += `        ${container}.add(${v});\\n`;
-                                break;
-                            case 'Map':
-                                 out += `        Map ${v} = new Map("${v}");\\n`;
-                                 out += `        ${v}.setCenter(${props.lat || 0.0}, ${props.lng || 0.0}, ${props.zoom || 13});\\n`;
-                                 if (props.markerTitle) out += `        ${v}.setMarker("${props.markerTitle}");\\n`;
-                                 if (props.enableSearch) out += `        ${v}.setEnableSearch(true);\\n`;
-                                 if (props.enableRelief) out += `        ${v}.setEnableRelief(true);\\n`;
-                                 out += handleCommon(v);
-                                 out += handleEvents(v);
-                                 out += `        ${container}.add(${v});\\n`;
-                                 break;
-                             case 'QR':
-                                 out += `        QR ${v} = new QR("${v}");\\n`;
-                                 if (props.text) out += `        ${v}.setText("${props.text}");\\n`;
-                                 if (props.width) out += `        ${v}.setWidth(${props.width});\\n`;
-                                 if (props.height) out += `        ${v}.setHeight(${props.height});\\n`;
-                                 if (props.colorDark) out += `        ${v}.setColorDark("${props.colorDark}");\\n`;
-                                 if (props.colorLight) out += `        ${v}.setColorLight("${props.colorLight}");\\n`;
-                                 out += handleCommon(v);
-                                 out += handleEvents(v);
-                                 out += `        ${container}.add(${v});\\n`;
-                                 break;
-                             case 'BarCode':
-                                 out += `        BarCode ${v} = new BarCode("${v}");\\n`;
-                                 if (props.text) out += `        ${v}.setText("${props.text}");\\n`;
-                                 if (props.format) out += `        ${v}.setFormat("${props.format}");\\n`;
-                                 if (props.lineColor) out += `        ${v}.setLineColor("${props.lineColor}");\\n`;
-                                 out += handleCommon(v);
-                                 out += handleEvents(v);
-                                 out += `        ${container}.add(${v});\\n`;
-                                 break;
-                            case 'OTPValidator': {
-                                 out += `        OTPValidator ${v} = new OTPValidator("${v}");\\n`;
-                                 if (props.amountOfDigits) out += `        ${v}.setAmountOfDigits(${props.amountOfDigits});\\n`;
-                                 out += handleCommon(v);
-                                 out += handleEvents(v);
-                                 out += `        ${container}.add(${v});\\n`;
-                                 break;
-                             }
-                             case 'Catcha': {
-                                 out += `        Catcha ${v} = new Catcha("${v}");\\n`;
-                                 if (props.amountOfImagesToValidate) out += `        ${v}.setAmountOfImagesToValidate(${props.amountOfImagesToValidate});\\n`;
-                                 out += handleCommon(v);
-                                 out += handleEvents(v);
-                                 out += `        ${container}.add(${v});\\n`;
-                                 break;
-                             }
-                             case 'CreditCard': {
-                                 out += `        CreditCard ${v} = new CreditCard("${v}");\\n`;
-                                 if (props.formAction) out += `        ${v}.setFormAction("${props.formAction}");\\n`;
-                                 if (props.submitText) out += `        ${v}.setSubmitText("${props.submitText}");\\n`;
-                                 const kidsCC = it.querySelectorAll(':scope > .canvas-container > .canvas-item, :scope > div > .canvas-container > .canvas-item');
-                                 if (kidsCC.length > 0) out += walk(kidsCC, v);
-                                 out += handleCommon(v);
-                                 out += handleEvents(v);
-                                 out += `        ${container}.add(${v});\\n`;
-                                 break;
-                             }
-                             case 'Datatable': {
-                                 out += `        Datatable ${v} = new Datatable();\\n`;
-                                 if (props.columnsList && props.columnsList.length > 0) {
-                                     const colsStr = props.columnsList.map(c => `"${c}"`).join(", ");
-                                     out += `        ${v}.addHeaderRow(${colsStr});\\n`;
-                                 } else {
-                                     out += `        ${v}.addHeaderRow("Col 1", "Col 2");\\n`;
-                                 }
-                                 const cells = it.querySelectorAll('tbody td');
-                                 if (cells.length > 0) {
-                                     out += `        io.jettra.wui.components.Row row_${v} = new io.jettra.wui.components.Row();\\n`;
-                                     cells.forEach((td, idx) => {
-                                         let tdVar = v + "_td_" + idx;
-                                         out += `        io.jettra.wui.components.TD ${tdVar} = new io.jettra.wui.components.TD();\\n`;
-                                         const kids = td.querySelectorAll(':scope > .canvas-item, :scope > div > .canvas-item');
-                                         if (kids.length > 0) {
-                                             out += walk(kids, tdVar);
-                                         }
-                                         out += `        row_${v}.add(${tdVar});\\n`;
-                                     });
-                                     out += `        ${v}.addRow(row_${v});\\n`;
-                                 }
-                                 out += handleCommon(v);
-                                 out += handleEvents(v);
-                                 out += `        ${container}.add(${v});\\n`;
-                                 break;
-                             }
-                             default: {
-                                 if (props.text && props.text !== type && type !== 'Spinner') {
-                                     out += `        ${type} ${v} = new ${type}("${props.text}");\\n`;
-                                 } else {
-                                     out += `        ${type} ${v} = new ${type}("${v}");\\n`;
-                                 }
-                                 out += handleCommon(v);
-                                 out += handleEvents(v);
-                                 out += `        ${container}.add(${v});\\n`;
-                             }
+                            }
+                            default: {
+                                out += `        ${container}.add(new ${type}("${props.text || v}")${chainProps()});\\n`;
+                            }
                         }
                     });
                     return out;

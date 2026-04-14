@@ -71,37 +71,43 @@ public class PersonaPage extends DashboardBasePage {
         Div mainContent = new Div();
         mainContent.setStyle("padding", "20px");
 
-        Header title = new Header(2, msg.getProperty("subtitle.persona"));
-        title.setStyle("color", "var(--jettra-accent)").setStyle("margin-bottom", "20px");
+        Header title = new Header(2, msg.getProperty("subtitle.persona"))
+            .setStyle("color", "var(--jettra-accent)")
+            .setStyle("margin-bottom", "20px");
         mainContent.add(title);
 
         setupModal();
 
-        Div actionContainer = new Div();
-        actionContainer.setStyle("display", "flex").setStyle("justify-content", "space-between").setStyle("margin-bottom", "20px");
+        Div actionContainer = new Div()
+            .setStyle("display", "flex")
+            .setStyle("justify-content", "space-between")
+            .setStyle("margin-bottom", "20px");
 
-        Button addBtn = new Button("➕ " + msg.getProperty("btn.add"));
-        addBtn.setId("addBtn").addClass("j-btn").setStyle("background-color", "#0f5132");
-        addBtn.addClickListener(() -> {
-            this.persona.setId("");
-            this.persona.setNombre("");
-            this.persona.setDireccion("");
-            showModal(msg.getProperty("modal.add.title"), "save");
-        });
+        Button addBtn = new Button("➕ " + msg.getProperty("btn.add"))
+            .setId("addBtn")
+            .addClass("j-btn")
+            .setStyle("background-color", "#0f5132")
+            .addClickListener(() -> {
+                this.persona.setId("");
+                this.persona.setNombre("");
+                this.persona.setDireccion("");
+                showModal(msg.getProperty("modal.add.title"), "save");
+            });
 
-        Button printBtn = new Button("🖨️ " + msg.getProperty("btn.print"));
-        printBtn.addClass("j-btn").setProperty("onclick", "window.print()");
+        Button printBtn = new Button("🖨️ " + msg.getProperty("btn.print"))
+            .addClass("j-btn")
+            .setProperty("onclick", "window.print()");
 
         actionContainer.add(addBtn).add(printBtn);
         mainContent.add(actionContainer);
 
         // Table
-        io.jettra.wui.complex.Datatable table = new io.jettra.wui.complex.Datatable();
-  
- table.addHeaderRow(msg.getProperty("th.name"),
-            msg.getProperty("th.address"),
-            msg.getProperty("th.actions")
-        );
+        io.jettra.wui.complex.Datatable table = new io.jettra.wui.complex.Datatable()
+            .addHeaderRow(msg.getProperty("th.name"),
+                msg.getProperty("th.address"),
+                msg.getProperty("th.actions")
+            );
+
         List<PersonaModel> all = PersonaRepository.findAll();
         int pageSize = 10;
         int totalPages = (int) Math.ceil((double)all.size() / pageSize);
@@ -112,26 +118,32 @@ public class PersonaPage extends DashboardBasePage {
         List<PersonaModel> paginated = (start >= all.size()) ? List.of() : all.subList(Math.max(0, start), Math.max(0, end));
 
         for (PersonaModel p : paginated) {
-            TD actionsTd = new TD();
-            actionsTd.setStyle("display", "flex").setStyle("gap", "10px");
+            TD actionsTd = new TD()
+                .setStyle("display", "flex")
+                .setStyle("gap", "10px");
             
-            Button editBtn = new Button("✏️");
-            editBtn.setId("edit-" + p.getId()).addClass("j-btn");
-            editBtn.addClickListener(() -> {
-                this.persona.setId(p.getId());
-                this.persona.setNombre(p.getNombre());
-                this.persona.setDireccion(p.getDireccion());
-                showModal(msg.getProperty("modal.edit.title"), "save");
-            });
+            Button editBtn = new Button("✏️")
+                .setId("edit-" + p.getId())
+                .addClass("j-btn")
+                .addClickListener(() -> {
+                    this.persona.setId(p.getId());
+                    this.persona.setNombre(p.getNombre());
+                    this.persona.setDireccion(p.getDireccion());
+                    showModal(msg.getProperty("modal.edit.title"), "save");
+                });
             
-            Button deleteBtn = new Button("🗑️");
-            deleteBtn.setId("del-" + p.getId()).addClass("j-btn").setStyle("color", "#ff5555").setStyle("border-color", "#ff5555").setStyle("background", "rgba(255,0,0,0.1)");
-            deleteBtn.addClickListener(() -> {
-                this.persona.setId(p.getId());
-                this.persona.setNombre(p.getNombre());
-                this.persona.setDireccion(p.getDireccion());
-                showModal(msg.getProperty("modal.delete.title"), "delete");
-            });
+            Button deleteBtn = new Button("🗑️")
+                .setId("del-" + p.getId())
+                .addClass("j-btn")
+                .setStyle("color", "#ff5555")
+                .setStyle("border-color", "#ff5555")
+                .setStyle("background", "rgba(255,0,0,0.1)")
+                .addClickListener(() -> {
+                    this.persona.setId(p.getId());
+                    this.persona.setNombre(p.getNombre());
+                    this.persona.setDireccion(p.getDireccion());
+                    showModal(msg.getProperty("modal.delete.title"), "delete");
+                });
             
             actionsTd.add(editBtn).add(deleteBtn);
             table.addRow(new Row(
@@ -144,17 +156,20 @@ public class PersonaPage extends DashboardBasePage {
         mainContent.add(table);
 
         // Simple Pager
-        Div pager = new Div();
-        pager.setStyle("margin-top", "20px").setStyle("display", "flex").setStyle("justify-content", "center").setStyle("gap", "15px");
+        Div pager = new Div()
+            .setStyle("margin-top", "20px")
+            .setStyle("display", "flex")
+            .setStyle("justify-content", "center")
+            .setStyle("gap", "15px");
         if (pageNumber > 1) {
-            Link prev = new Link("?lang=" + lang + "&page=" + (pageNumber - 1), "« " + msg.getProperty("pager.prev"));
-            prev.addClass("j-btn");
+            Link prev = new Link("?lang=" + lang + "&page=" + (pageNumber - 1), "« " + msg.getProperty("pager.prev"))
+                .addClass("j-btn");
             pager.add(prev);
         }
         pager.add(new Span("Page " + pageNumber + " of " + totalPages));
         if (pageNumber < totalPages) {
-            Link next = new Link("?lang=" + lang + "&page=" + (pageNumber + 1), msg.getProperty("pager.next") + " »");
-            next.addClass("j-btn");
+            Link next = new Link("?lang=" + lang + "&page=" + (pageNumber + 1), msg.getProperty("pager.next") + " »")
+                .addClass("j-btn");
             pager.add(next);
         }
         mainContent.add(pager);
