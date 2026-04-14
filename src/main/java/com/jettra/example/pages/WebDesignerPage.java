@@ -1000,6 +1000,24 @@ public class WebDesignerPage extends DashboardBasePage {
                     `;
                 }
 
+                if (type === 'Table') {
+                    const columnsArr = props.columnsList || ['Col 1', 'Col 2'];
+                    html += `
+                        <div class="inspector-row">
+                            <span class="inspector-label">Table Columns</span>
+                            <div style="display:flex; flex-direction:column; gap:5px; margin-bottom:5px;">
+                                ${columnsArr.map((col, idx) => `
+                                    <div style="display:flex; gap:5px; align-items:center;">
+                                        <input type="text" class="inspector-input" style="flex:1" value="${col}" onchange="window.updateTableColumn(${idx}, this.value)">
+                                        <button class="j-btn j-btn-danger" style="padding:4px 8px; font-size:10px; flex:0 0 auto;" onclick="window.removeTableColumn(${idx})">X</button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <button class="j-btn j-btn-primary" style="width:100%; font-size:11px; padding:6px; margin-top:5px;" onclick="window.addTableColumn()">+ Add Column</button>
+                        </div>
+                    `;
+                }
+
                 if (type === 'Clock') {
                     html += `
                         <div class="inspector-row" style="display:flex; justify-content:space-between; align-items:center;">
@@ -1122,6 +1140,52 @@ public class WebDesignerPage extends DashboardBasePage {
                     window.updateInspector();
                     window.updateGeneratedCode();
                 }
+            };
+
+            window.updateTableColumn = function(idx, value) {
+                if (!selectedItem) return;
+                const props = JSON.parse(selectedItem.getAttribute('data-props'));
+                if (!props.columnsList) props.columnsList = ['Col 1', 'Col 2'];
+                props.columnsList[idx] = value;
+                selectedItem.setAttribute('data-props', JSON.stringify(props));
+                window.renderTableComponent(selectedItem, props);
+            };
+            
+            window.removeTableColumn = function(idx) {
+                if (!selectedItem) return;
+                const props = JSON.parse(selectedItem.getAttribute('data-props'));
+                if (!props.columnsList) props.columnsList = ['Col 1', 'Col 2'];
+                if (props.columnsList.length <= 1) return; // Evitar tabla sin columnas
+                props.columnsList.splice(idx, 1);
+                selectedItem.setAttribute('data-props', JSON.stringify(props));
+                window.renderTableComponent(selectedItem, props);
+                window.updateInspector();
+            };
+            
+            window.addTableColumn = function() {
+                if (!selectedItem) return;
+                const props = JSON.parse(selectedItem.getAttribute('data-props'));
+                if (!props.columnsList) props.columnsList = ['Col 1', 'Col 2'];
+                props.columnsList.push('New Col');
+                selectedItem.setAttribute('data-props', JSON.stringify(props));
+                window.renderTableComponent(selectedItem, props);
+                window.updateInspector();
+            };
+            
+            window.renderTableComponent = function(el, props) {
+                const cols = props.columnsList || ['Col 1', 'Col 2'];
+                const theadTr = el.querySelector('thead tr');
+                if (theadTr) {
+                    theadTr.innerHTML = cols.map(c => `<th style="padding:12px; color:var(--jettra-text);">${c}</th>`).join('');
+                }
+                const tbody = el.querySelector('tbody');
+                if (tbody) {
+                    const rows = tbody.querySelectorAll('tr');
+                    rows.forEach(tr => {
+                        tr.innerHTML = cols.map((c, i) => `<td style="padding:10px; color:var(--jettra-text);">Data ${i+1}</td>`).join('');
+                    });
+                }
+                window.updateGeneratedCode();
             };
 
             window.updateProp = function(key, value) {
