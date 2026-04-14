@@ -600,6 +600,16 @@ public class WebDesignerPage extends DashboardBasePage {
                         window.addComponentToCanvas(type, target);
                     }
                 };
+
+                const inspector = document.getElementById('property-inspector');
+                if (inspector) {
+                    inspector.addEventListener('keydown', function(ev) {
+                        if (ev.key === 'Enter' || ev.keyCode === 13) {
+                            ev.preventDefault();
+                            return false;
+                        }
+                    });
+                }
             }
 
             if (document.readyState === 'loading') {
@@ -1412,6 +1422,12 @@ public class WebDesignerPage extends DashboardBasePage {
                             const draggable = isPage ? 'draggable="true" ondragstart="window.dragProjectFile(event)" data-path="'+child._path.replace(/\\\\/g, '/')+'"' : '';
                             const pageClass = isPage ? 'file-page' : (isModel ? 'file-model' : '');
                              
+                            let icon = child._isFile ? '\uD83D\uDCC4' : '\uD83D\uDCC1';
+                            if (key.endsWith('.java')) icon = '\u2615';
+                            else if (key.endsWith('.md')) icon = '\uD83D\uDCDD';
+                            else if (key.endsWith('.css') || key.endsWith('.html')) icon = '\uD83C\uDF10';
+                            let color = child._isFile ? '#a9b7c6' : '#e5c07b';
+
                             html += `<div class="tree-node ${pageClass}" ${draggable} style="padding-left:${depth * 12}px; cursor:pointer; color:${color}; font-size:11px; margin-bottom:4px; display:flex; align-items:center; gap:5px;"`;
                             if (child._isFile) {
                                 html += ` onclick="window.loadFileContent('${child._path.replace(/\\\\/g, '/')}')"`;
