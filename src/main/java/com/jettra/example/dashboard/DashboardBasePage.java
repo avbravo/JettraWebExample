@@ -37,7 +37,7 @@ public abstract class DashboardBasePage extends JettraDashboardPage {
 
         // --- Categories and Components ---
         addCategory(es ? "Tipografía" : "Typography", new String[]{"Header", "Paragraph", "Span", "Label", "Separator", "Icon", "Typography"}, compIcon);
-        addCategory(es ? "Formularios" : "Forms", new String[]{"Button", "Catcha", "CheckBox", "CheckBoxGroup", "CreditCard", "Form", "Forms", "OTPValidator", "RadioButton", "RadioGroupButton", "ScheduleControl", "SelectOne", "SelectMany", "SelectOneIcon", "Spinner", "TextBox", "TextArea", "ToggleSwitch"}, compIcon);
+        addCategory(es ? "Formularios" : "Forms", new String[]{"Button", "Catcha", "CheckBox", "CheckBoxGroup", "CreditCard", "Form", "FormGroup", "Forms", "OTPValidator", "RadioButton", "RadioGroupButton", "ScheduleControl", "SelectOne", "SelectMany", "SelectOneIcon", "Spinner", "TextBox", "TextArea", "ToggleSwitch"}, compIcon);
         addCategory(es ? "Fecha y Tiempo" : "Date", new String[]{"Calendar", "DatePicker", "Organigram", "Schedule", "Time", "Timeline"}, compIcon);
         addCategory(es ? "Navegación" : "Navigation", new String[]{"Link", "Menu", "MenuBar", "Navigation"}, compIcon);
         addCategory(es ? "Retroalimentación" : "Feedback", new String[]{"Alert", "Modal", "Notification", "SessionTimeout", "Feedback"}, compIcon);

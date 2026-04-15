@@ -548,11 +548,11 @@ public class WebDesignerPage extends DashboardBasePage {
 
             function setupCanvasHandlers() {
                 const canvas = document.getElementById('canvas-drop-area');
+                const modalList = document.getElementById('modal-list-container');
                 if (!canvas) return;
                 
-                // Ensure event listeners are attached correctly for capturing drop inside ANY container
                 document.body.ondragover = function(ev) {
-                    if (ev.target.closest('#canvas-drop-area')) {
+                    if (ev.target.closest('#canvas-drop-area') || ev.target.closest('#modal-list-container')) {
                         ev.preventDefault();
                         ev.dataTransfer.dropEffect = "move";
                     }
@@ -560,7 +560,8 @@ public class WebDesignerPage extends DashboardBasePage {
 
                 document.body.ondrop = function(ev) {
                     const canvasSection = ev.target.closest('#canvas-drop-area');
-                    if (!canvasSection) return;
+                    const modalSection = ev.target.closest('#modal-list-container');
+                    if (!canvasSection && !modalSection) return;
                     
                     ev.preventDefault();
                     ev.stopPropagation();
@@ -568,7 +569,7 @@ public class WebDesignerPage extends DashboardBasePage {
                     const type = ev.dataTransfer.getData("type");
                     const moveId = ev.dataTransfer.getData("move-id");
                     const projectFile = ev.dataTransfer.getData("project-file");
-                    const target = ev.target.closest('.canvas-container') || canvasSection;
+                    const target = ev.target.closest('.canvas-container') || canvasSection || modalSection;
                     
                     if (projectFile) {
                         ev.preventDefault();
@@ -1976,7 +1977,7 @@ public class WebDesignerPage extends DashboardBasePage {
 
                     let parentEl = varMap[currentVar];
                     if (currentVar === 'center' || currentVar === 'container') parentEl = canvas; 
-                    if (!parentEl && (currentVar === 'center' || currentVar === 'mainContent' || currentVar === 'crudModal')) parentEl = canvas;
+                    if (!parentEl && (currentVar === 'center' || currentVar === 'mainContent' || currentVar === 'crudModal' || currentVar === 'this' || !currentVar)) parentEl = canvas;
 
                     // Support addHeaderRow for Datatable
                     if (cleanLine.includes(".addHeaderRow")) {
