@@ -363,7 +363,7 @@ public class WebDesignerPage extends DashboardBasePage {
         // Typography
         addPaletteCategory(palette, "Typography", new String[]{"Header", "Paragraph", "Span", "Label", "Separator", "Divide"});
         // Forms
-        addPaletteCategory(palette, "Forms", new String[]{"Button", "CheckBox", "CheckBoxGroup", "CreditCard", "RadioButton", "RadioGroupButton", "ScheduleControl", "SelectOne", "SelectMany", "SelectOneIcon", "TextBox", "TextArea", "ToggleSwitch", "FileUpload", "FolderSelector", "OTPValidator", "Catcha"});
+        addPaletteCategory(palette, "Forms", new String[]{"FormGroup", "Button", "CheckBox", "CheckBoxGroup", "CreditCard", "RadioButton", "RadioGroupButton", "ScheduleControl", "SelectOne", "SelectMany", "SelectOneIcon", "TextBox", "TextArea", "ToggleSwitch", "FileUpload", "FolderSelector", "OTPValidator", "Catcha"});
         // Date
         addPaletteCategory(palette, "Date", new String[]{"DatePicker", "Time", "Calendar", "Schedule", "Organigram", "Timeline"});
         // Navigation
@@ -726,6 +726,9 @@ public class WebDesignerPage extends DashboardBasePage {
                     case 'Organigram': content = '<div style="text-align:center; padding:10px;"><div style="display:inline-block; padding:10px; border:1px solid var(--jettra-accent); border-radius:6px; background:rgba(0,255,255,0.05);">Root Node</div><div style="border-left:1px dashed var(--jettra-border); height:20px; margin:0 auto; width:1px;"></div><div style="display:inline-block; padding:10px; border:1px solid var(--jettra-border); border-radius:6px; opacity:0.8;">Child Node</div></div>'; break;
                     case 'Panel': 
                         content = '<div class="j-component j-panel" style="padding:0; overflow:hidden;"><div class="j-panel-header" style="background:rgba(0,255,255,0.05); padding:10px 15px; border-bottom:1px solid var(--jettra-border); font-weight:bold; color:var(--jettra-accent)">Panel Title</div><div class="canvas-container j-panel-body" style="padding:15px; display:flex; flex-direction:column; gap:10px; min-height:50px;"></div></div>'; 
+                        break;
+                    case 'FormGroup':
+                        content = '<div class="canvas-container" style="padding:15px; border:1px dashed var(--jettra-accent); min-height:60px; background:rgba(0,255,255,0.02); border-radius:10px;"><label style="font-weight:bold; color:var(--jettra-accent); display:block; margin-bottom:10px; font-size:10px; text-transform:uppercase;">Form Group</label></div>';
                         break;
                     case 'Grid':
                         content = '<div class="canvas-container" style="display:grid; grid-template-columns:1fr 1fr; gap:15px; min-height:50px;"></div>'; 
@@ -1760,6 +1763,11 @@ public class WebDesignerPage extends DashboardBasePage {
                         const chainProps = () => {
                             let c = "";
                             if (props.id && props.id.trim() !== "") c += `.setId("${props.id}")`;
+                            if (props.binding && props.binding.trim() !== "") {
+                                if (type === 'TextBox' || type === 'TextArea') {
+                                    c += `\\n            .bind("${props.binding}")`;
+                                }
+                            }
                             if (props.update) c += `.setUpdate("${props.update}")`;
                             if (props.cssClass) c += `.addClass("${props.cssClass}")`;
                             
@@ -1771,13 +1779,28 @@ public class WebDesignerPage extends DashboardBasePage {
                             return c;
                         };
 
+                        const simpleTypes = ['Divide', 'Separator', 'Header', 'Paragraph', 'Span', 'Label', 'Clock', 'ProgressBar', 'Spinner', 'Catcha', 'Clock', 'Capture', 'Catcha', 'CAPTURE'];
+                        
+                        if (simpleTypes.includes(type)) {
+                            let init = "";
+                            if (type === 'Divide') init = `new Divide()`;
+                            else if (type === 'Separator') init = `new Separator()`;
+                            else if (type === 'Header') init = `new Header(${props.level || 1}, "${props.text}")`;
+                            else if (type === 'Paragraph') init = `new Paragraph("${props.text}")`;
+                            else if (type === 'Span') init = `new Span("${props.text}")`;
+                            else if (type === 'Label') init = `new Label("${props.text}")`;
+                            else if (type === 'Clock') init = `new Clock("${props.text || 'Clock'}")`;
+                            else if (type === 'ProgressBar') init = `new ProgressBar(${props.value || 0}, ${props.max || 100})`;
+                            else if (type === 'Spinner') init = `new Spinner("${v}", ${props.value || 0})`;
+                            else init = `new ${type}()`;
+
+                            if (init) {
+                                out += `        ${container}.add(${init}${chainProps()});\\n`;
+                                return;
+                            }
+                        }
+
                         switch(type) {
-                            case 'Divide': out += `        ${container}.add(new Divide());\\n`; break;
-                            case 'Separator': out += `        ${container}.add(new Separator());\\n`; break;
-                            case 'Header': out += `        ${container}.add(new Header(${props.level || 1}, "${props.text}")${chainProps()});\\n`; break;
-                            case 'Paragraph': out += `        ${container}.add(new Paragraph("${props.text}")${chainProps()});\\n`; break;
-                            case 'Span': out += `        ${container}.add(new Span("${props.text}")${chainProps()});\\n`; break;
-                            case 'Label': out += `        ${container}.add(new Label("${props.text}")${chainProps()});\\n`; break;
                             case 'Button': 
                                 out += `        ${container}.add(new Button("${props.text}")${chainProps()}`;
                                 if (props.btnStyle) out += `.setStyle(Button.Style.${props.btnStyle})`;
@@ -1788,31 +1811,16 @@ public class WebDesignerPage extends DashboardBasePage {
                             case 'TextArea':
                                 out += `        ${container}.add(new ${type}("${props.text || type}", "${props.text || type}")${chainProps()});\\n`;
                                 break;
-                            case 'Clock':
-                                out += `        ${container}.add(new Clock("${props.text || 'Clock'}")${chainProps()});\\n`;
-                                break;
                             case 'Avatar':
-                                out += `        Avatar ${v} = new Avatar()${chainProps()}`;
+                                out += `        ${container}.add(new Avatar()${chainProps()}`;
                                 if (props.text) out += `.setText("${props.text}")`;
                                 if (props.icon) out += `.setIcon("${props.icon}")`;
-                                out += `;\\n        ${container}.add(${v});\\n`;
-                                break;
-                            case 'ProgressBar':
-                                out += `        ${container}.add(new ProgressBar(${props.value || 0}, ${props.max || 100})${chainProps()}`;
-                                if (props.color) out += `.setColor("${props.color}")`;
-                                if (props.indeterminate) out += `.setIndeterminate(true)`;
-                                out += `);\\n`;
-                                break;
-                            case 'Spinner':
-                                out += `        ${container}.add(new Spinner("${v}", ${props.value || 0})${chainProps()}`;
-                                if (props.min !== undefined && props.min !== "") out += `.setMin(${props.min})`;
-                                if (props.max !== undefined && props.max !== "") out += `.setMax(${props.max})`;
                                 out += `);\\n`;
                                 break;
                             case 'SelectOne':
                             case 'SelectMany':
                             case 'SelectOneIcon':
-                                out += `        ${type} ${v} = new ${type}("${v}")${chainProps()}`;
+                                out += `        ${container}.add(new ${type}("${v}")${chainProps()}`;
                                 if (props.options) {
                                     const opts = props.options.split(',');
                                     opts.forEach(o => {
@@ -1822,7 +1830,7 @@ public class WebDesignerPage extends DashboardBasePage {
                                         out += `\\n            .addOption("${optVal}", "${optLabel}")`;
                                     });
                                 }
-                                out += `;\\n        ${container}.add(${v});\\n`;
+                                out += `);\\n`;
                                 break;
                             case 'Modal': {
                                 const mId = props.idGen || "modal_" + Math.floor(Math.random()*1000);
@@ -1843,6 +1851,7 @@ public class WebDesignerPage extends DashboardBasePage {
                                 out += `        ${container}.add(${v});\\n`;
                                 break;
                             }
+                            case 'FormGroup':
                             case 'Panel':
                             case 'Grid':
                             case 'Board':
@@ -1915,8 +1924,7 @@ public class WebDesignerPage extends DashboardBasePage {
 
                     let currentVar = null;
                     
-                    // Match object instantiation (e.g., io.jettra.wui.complex.Modal codeModal = new io.jettra.wui.complex.Modal("clock-code-modal");)
-                    // Group 1: Type name, Group 2: Variable name, Group 3: Constructor args
+                    // Match object instantiation
                     let mInst = /(?:[a-zA-Z0-9_.]+\\.)?([A-Z][a-zA-Z0-9_]*)\\s+([a-zA-Z0-9_]+)\\s*=\\s*new\\s+(?:[a-zA-Z0-9_.]+\\.)?[A-Z][a-zA-Z0-9_]*\\s*\\((.*?)\\)/.exec(cleanLine);
                     
                     if (mInst) {
@@ -1927,7 +1935,6 @@ public class WebDesignerPage extends DashboardBasePage {
                         
                         currentVar = vname;
                         
-                        // We skip non-UI things if necessary, but window.addComponentToCanvas handles known types
                         let tempParent = document.createElement('div');
                         window.addComponentToCanvas(type, tempParent);
                         let el = tempParent.lastElementChild;
@@ -1935,31 +1942,32 @@ public class WebDesignerPage extends DashboardBasePage {
                             el.setAttribute('data-var', vname);
                             varMap[vname] = el;
                             
-                            let props = JSON.parse(el.getAttribute('data-props') || "{}");
+                            let props = JSON.stringify(Object.assign(JSON.parse(el.getAttribute('data-props') || "{}"), {id: vname}));
+                            el.setAttribute('data-props', props);
+                            let pObj = JSON.parse(props);
+
                             if (args && args.trim().length > 0) {
                                 let cleanParams = args.replace(/"/g, '').split(',');
                                 if (cleanParams.length > 0) {
                                     if (['Header','Paragraph','Button','Clock','Span','Label','Alert','Notification','Link','Downloader','CheckBox','RadioButton','ToggleSwitch','MenuItem','TreeItem','Tab','Card'].includes(type)) {
-                                        props.text = cleanParams.length > 1 ? cleanParams[1].trim() : cleanParams[0].trim();
+                                        pObj.text = cleanParams.length > 1 ? cleanParams[1].trim() : cleanParams[0].trim();
                                     }
                                     if (type === 'Modal') {
-                                        let mName = cleanParams.length > 1 ? cleanParams[1].trim() : (cleanParams.length > 0 ? cleanParams[0].trim() : 'Modal Component');
-                                        props.text = mName;
-                                        props.idGen = cleanParams[0].trim();
+                                        pObj.idGen = cleanParams[0].trim();
+                                        pObj.text = cleanParams.length > 1 ? cleanParams[1].trim() : pObj.idGen;
                                     }
-                                    if (type === 'Board') props.text = cleanParams.length > 1 ? cleanParams[1].trim() : (cleanParams.length > 0 ? cleanParams[0].trim() : 'New Board');
-                                    if (['Panel','Grid','Div','LayoutDisplay','TabView','Tree','MenuBar'].includes(type)){
-                                        props.columns = parseInt(cleanParams[0].trim()) || 2;
+                                    if (type === 'Board') pObj.text = cleanParams.length > 1 ? cleanParams[1].trim() : (cleanParams.length > 0 ? cleanParams[0].trim() : 'New Board');
+                                    if (['Panel','Grid','Div','LayoutDisplay','TabView','Tree','MenuBar','FormGroup'].includes(type)){
+                                        if (cleanParams[0] && !isNaN(parseInt(cleanParams[0]))) pObj.columns = parseInt(cleanParams[0]);
                                     }
-                                    if (type === 'ProgressBar') { props.value = parseInt(cleanParams[0])||0; props.max = parseInt(cleanParams[1])||100; }
+                                    if (type === 'ProgressBar') { pObj.value = parseInt(cleanParams[0])||0; pObj.max = parseInt(cleanParams[1])||100; }
                                 }
                             }
-                            el.setAttribute('data-props', JSON.stringify(props));
+                            el.setAttribute('data-props', JSON.stringify(pObj));
                             const inner = el.querySelector('h3, h2, h1, p, button, label, .j-avatar, .j-panel-header, span');
-                            if (props.text && inner) inner.innerText = props.text;
+                            if (pObj.text && inner) inner.innerText = pObj.text;
                         }
                     } else {
-                        // Extract starting variable from chains (e.g., container.add(...))
                         let firstVarMatch = /^([a-zA-Z0-9_]+)\\./.exec(cleanLine);
                         if (firstVarMatch) currentVar = firstVarMatch[1];
                     }
@@ -1968,8 +1976,19 @@ public class WebDesignerPage extends DashboardBasePage {
 
                     let parentEl = varMap[currentVar];
                     if (currentVar === 'center' || currentVar === 'container') parentEl = canvas; 
-                    if (!parentEl && currentVar === 'center') parentEl = canvas;
-                    if (!parentEl && currentVar === 'codeModal') parentEl = canvas;
+                    if (!parentEl && (currentVar === 'center' || currentVar === 'mainContent' || currentVar === 'crudModal')) parentEl = canvas;
+
+                    // Support addHeaderRow for Datatable
+                    if (cleanLine.includes(".addHeaderRow")) {
+                        let headerMatch = /\\.addHeaderRow\\((.*?)\\)/.exec(cleanLine);
+                        if (headerMatch && parentEl && parentEl.getAttribute('data-type') === 'Datatable') {
+                            let cols = headerMatch[1].split(',').map(c => c.replace(/"/g, '').trim().split('.').pop().replace('msg.getProperty(', '').replace(')', '')); // Rough extraction
+                            let props = JSON.parse(parentEl.getAttribute('data-props') || "{}");
+                            props.columnsList = cols;
+                            parentEl.setAttribute('data-props', JSON.stringify(props));
+                            window.renderTableComponent(parentEl, props);
+                        }
+                    }
 
                     // Match all .add() calls
                     let addMatches = [...cleanLine.matchAll(/\\.add\\s*\\((.*?)\\)/g)];
@@ -1998,8 +2017,9 @@ public class WebDesignerPage extends DashboardBasePage {
                                        if (props.text && inner) inner.innerText = props.text;
                                    }
                                }
-                           } else if(!childArg.includes(".")) {
-                               let childEl = varMap[childArg];
+                           } else if(!childArg.includes(".") || childArg.startsWith("this.") || childArg.startsWith("p.")) {
+                               let vName = childArg.replace("this.", "").replace("p.", "");
+                               let childEl = varMap[vName];
                                if (childEl) {
                                    let targetContainer = parentEl;
                                    if (parentEl !== canvas && parentEl.classList.contains('canvas-item')) {
@@ -2017,20 +2037,26 @@ public class WebDesignerPage extends DashboardBasePage {
                         }
                     });
 
-                    // Match all .setXxx() calls
-                    let setMatches = [...cleanLine.matchAll(/\\.set([A-Z][a-zA-Z0-9_]*)\\s*\\((.*?)\\)/g)];
-                    setMatches.forEach(mSet => {
-                       let method = mSet[1];
-                       let args = mSet[2].replace(/"/g, '').trim();
+                    // Match all .setXxx() / .addClass() / .setId() calls
+                    let propMatches = [...cleanLine.matchAll(/\\.(set|add|bind)([A-Z][a-zA-Z0-9_]*)\\s*\\((.*?)\\)/g)];
+                    propMatches.forEach(mProp => {
+                       let prefix = mProp[1];
+                       let method = mProp[2];
+                       let args = mProp[3].replace(/"/g, '').trim();
                        let el = varMap[currentVar];
                        if (el) {
                            let props = JSON.parse(el.getAttribute('data-props') || "{}");
-                           if (method === 'Text') {
-                               props.text = args;
+                           if (method === 'Content' || method === 'Text' || (prefix === 'set' && method === 'Id')) props.text = args;
+                           if (method === 'Id') props.id = args;
+                           if (method === 'Class') props.cssClass = args;
+                           if (method === 'Update') props.update = args;
+                           if (method === 'Binding' || prefix === 'bind') props.binding = args;
+                           
+                           el.setAttribute('data-props', JSON.stringify(props));
+                           if (props.text) {
                                const inner = el.querySelector('h3, h2, h1, p, button, label, span');
                                if (inner) inner.innerText = props.text;
                            }
-                           el.setAttribute('data-props', JSON.stringify(props));
                        }
                     });
                 });
