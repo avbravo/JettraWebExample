@@ -157,8 +157,7 @@ public class PaisPage extends DashboardBasePage {
         this.modalAction = new TextBox("hidden", "modalAction");
         this.modalAction.setId("modalAction");
         
-        Div g1 = new Div()
-            .addClass("form-group")
+        FormGroup g1 = new FormGroup()
             .add(new Label("code", msg.getProperty("th.code", "Código")));
         TextBox inputCode = new TextBox("text", "code")
             .setId("paisCode")
@@ -166,8 +165,7 @@ public class PaisPage extends DashboardBasePage {
         JettraValidations.apply(inputCode, PaisModel.class, "code");
         g1.add(inputCode);
 
-        Div g2 = new Div()
-            .addClass("form-group")
+        FormGroup g2 = new FormGroup()
             .add(new Label("name", msg.getProperty("th.name", "Nombre")));
         TextBox inputName = new TextBox("text", "name")
             .setId("paisName")
