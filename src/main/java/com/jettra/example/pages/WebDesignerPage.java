@@ -10,7 +10,7 @@ import io.jettra.wui.components.*;
  */
 public class WebDesignerPage extends DashboardBasePage {
 
-    // Properties field removed as it was unused
+    private static String viewModelName = "GenericModel";
 
     public WebDesignerPage() {
         super("Jettra Web Designer");
@@ -91,7 +91,13 @@ public class WebDesignerPage extends DashboardBasePage {
         toggleCodeBtn.setProperty("type", "button");
         toggleCodeBtn.setProperty("onclick", "window.toggleCodeView()");
         
-        canvasHeaderActions.add(toggleSidebarBtn).add(previewBtn).add(crudBtn).add(toggleCodeBtn);
+        Button mobileBtn = new Button("\uD83D\uDCF1 Mobile"); // Phone icon
+        mobileBtn.addClass("j-btn");
+        mobileBtn.setStyle("font-size", "11px").setStyle("padding", "5px 12px").setStyle("border-color", "var(--jettra-accent)");
+        mobileBtn.setProperty("type", "button");
+        mobileBtn.setProperty("onclick", "window.toggleMobileView()");
+        
+        canvasHeaderActions.add(toggleSidebarBtn).add(mobileBtn).add(previewBtn).add(crudBtn).add(toggleCodeBtn);
         canvasHeader.add(canvasTitle).add(canvasHeaderActions);
         canvasArea.add(canvasHeader);
 
@@ -105,6 +111,7 @@ public class WebDesignerPage extends DashboardBasePage {
         canvasPlaceholder.setStyle("color", "rgba(0,255,255,0.2)").setStyle("text-align", "center").setStyle("margin-top", "100px");
         canvasDropArea.add(canvasPlaceholder);
 
+        canvasDropArea.add(new Div().setProperty("id", "mobile-notch").addClass("mobile-notch"));
         canvasArea.add(canvasDropArea);
 
         // --- NEW: Modal Tools Area ---
@@ -488,11 +495,50 @@ public class WebDesignerPage extends DashboardBasePage {
                 border: 1px solid rgba(255, 255, 255, 0.1);
             }
             @keyframes spin { 100% { transform: rotate(360deg); } }
+            .mobile-designer-frame {
+                width: 375px !important;
+                margin: 20px auto !important;
+                border: 12px solid #1a1a1a !important;
+                border-top: 45px solid #1a1a1a !important;
+                border-bottom: 45px solid #1a1a1a !important;
+                border-radius: 50px !important;
+                height: 720px !important;
+                box-shadow: 0 0 0 2px #333, 0 30px 60px rgba(0,0,0,0.8) !important;
+                overflow-y: auto !important;
+                background: #000 !important;
+                position: relative;
+                transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            }
+            .mobile-designer-frame::before { 
+                content: ''; position: absolute; top: -30px; left: 50%; transform: translateX(-50%); width: 80px; height: 6px; background: #333; border-radius: 10px; 
+            }
+            .mobile-designer-frame::after { 
+                content: ''; position: absolute; bottom: -35px; left: 50%; transform: translateX(-50%); width: 35px; height: 35px; border: 2px solid #333; border-radius: 50%; 
+            }
+            .mobile-notch {
+                position: absolute;
+                top: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 150px;
+                height: 25px;
+                background: #1a1a1a;
+                border-bottom-left-radius: 20px;
+                border-bottom-right-radius: 20px;
+                z-index: 1000;
+                display: none;
+            }
+            .mobile-designer-frame .mobile-notch { display: block; }
         """);
         
-        String scriptPart1 = """
+        String scriptPart1 = ("""
+            window.viewModelName = '%s';
+            window.availableModels = [];
+            window.modelFields = [];
+            
             // Designer GLOBALS
             function drag(ev) {
+""").formatted(viewModelName) + """
                 ev.dataTransfer.setData("type", ev.currentTarget.getAttribute("data-type"));
                 ev.dataTransfer.effectAllowed = "move";
             };
@@ -552,16 +598,18 @@ public class WebDesignerPage extends DashboardBasePage {
                 if (!canvas) return;
                 
                 document.body.ondragover = function(ev) {
-                    if (ev.target.closest('#canvas-drop-area') || ev.target.closest('#modal-list-container')) {
+                    if (ev.target.closest('#canvas-drop-area') || ev.target.closest('#modal-list-container') || ev.target.closest('#code-view-container')) {
                         ev.preventDefault();
-                        ev.dataTransfer.dropEffect = "move";
+                        ev.dataTransfer.dropEffect = "copy";
                     }
                 };
 
                 document.body.ondrop = function(ev) {
                     const canvasSection = ev.target.closest('#canvas-drop-area');
                     const modalSection = ev.target.closest('#modal-list-container');
-                    if (!canvasSection && !modalSection) return;
+                    const codeSection = ev.target.closest('#code-view-container');
+                    
+                    if (!canvasSection && !modalSection && !codeSection) return;
                     
                     ev.preventDefault();
                     ev.stopPropagation();
@@ -572,12 +620,19 @@ public class WebDesignerPage extends DashboardBasePage {
                     const target = ev.target.closest('.canvas-container') || canvasSection || modalSection;
                     
                     if (projectFile) {
-                        ev.preventDefault();
-                        if (projectFile.endsWith('Page.java')) {
+                        if (projectFile.endsWith('Page.java') || projectFile.endsWith('Model.java')) {
                             window.loadFileContent(projectFile);
-                        } else if (projectFile.endsWith('Model.java')) {
-                            window.selectModel(projectFile.split('/').pop().replace('.java', ''));
+                        } else if (projectFile.endsWith('.java')) {
+                             window.loadFileContent(projectFile);
                         }
+                        if (projectFile.endsWith('Model.java')) {
+                             window.selectModel(projectFile.split('/').pop().replace('.java', ''));
+                        }
+                        return;
+                    }
+
+                    if (codeSection && !canvasSection && !modalSection) {
+                        // If specifically dropped in code section, we already loaded content via projectFile check above
                         return;
                     }
 
@@ -639,6 +694,14 @@ public class WebDesignerPage extends DashboardBasePage {
                 window.restoreFilesFromCache();
             }
 
+            window.toggleMobileView = function() {
+                const canvas = document.getElementById('canvas-drop-area');
+                canvas.classList.toggle('mobile-designer-frame');
+                if (canvas.classList.contains('mobile-designer-frame')) {
+                    this.show3DMessage("Mobile Mode", "Designer optimized for 375px (iPhone SE/8/etc)");
+                }
+            };
+            
             window.addComponentToCanvas = function(type, parent, externalProps) {
                 const canvas = document.getElementById('canvas-drop-area');
                 const targetParent = parent || canvas;
@@ -657,17 +720,28 @@ public class WebDesignerPage extends DashboardBasePage {
 
                 const wrapper = document.createElement('div');
                 wrapper.className = 'canvas-item';
-                wrapper.id = 'ci_' + Date.now() + Math.floor(Math.random()*1000); // Important for inner dnd
+                wrapper.id = 'ci_' + Date.now() + Math.floor(Math.random()*1000);
                 wrapper.setAttribute('data-type', type);
                 
-                let defaultProps = externalProps || {text: type, columns: 2, events: {}, binding: ""};
+                let defaultProps = Object.assign({text: type, columns: 2, events: {}, binding: "", styles: {}, classes: []}, externalProps || {});
                 wrapper.setAttribute('data-props', JSON.stringify(defaultProps));
                 wrapper.setAttribute('draggable', 'true');
+                
+                // Apply classes
+                if (defaultProps.classes) {
+                    defaultProps.classes.forEach(c => wrapper.classList.add(c));
+                }
+                // Apply styles for realistic rendering
+                if (defaultProps.styles) {
+                    for (let s in defaultProps.styles) {
+                        wrapper.style[s] = defaultProps.styles[s];
+                    }
+                }
                 
                 wrapper.ondragstart = function(ev) {
                     ev.dataTransfer.setData("move-id", ev.target.id);
                     ev.dataTransfer.effectAllowed = "move";
-                    ev.stopPropagation(); // Stop parent from reacting
+                    ev.stopPropagation();
                 };
                 
                 wrapper.onclick = (e) => { e.stopPropagation(); selectElement(wrapper); };
@@ -794,7 +868,7 @@ public class WebDesignerPage extends DashboardBasePage {
                         <span class="inspector-label">Active View Model</span>
                         <select class="inspector-input" onchange="selectModel(this.value)">
                             <option value="">None</option>
-                            ${availableModels.map(m => `<option value="${m.name}" ${viewModelName === m.name ? 'selected' : ''}>${m.name}</option>`).join('')}
+                            ${availableModels.map(m => `<option value="${m.name}" ${window.viewModelName === m.name ? 'selected' : ''}>${m.name}</option>`).join('')}
                         </select>
                     </div>
                 `;
@@ -804,13 +878,11 @@ public class WebDesignerPage extends DashboardBasePage {
                         <span class="inspector-label">Component Type</span>
                         <div style="color:var(--jettra-accent); font-weight:bold">${type}</div>
                     </div>
-                    <div class="inspector-row">
-                        <span class="inspector-label">ID (Variables)</span>
-                        <input type="text" class="inspector-input" value="${props.id || ""}" placeholder="Comp ID" onchange="updateProp('id', this.value)">
+                        <input type="text" class="inspector-input" value="${props.id || ''}" placeholder="Comp ID" onchange="updateProp('id', this.value)">
                     </div>
                     <div class="inspector-row">
                         <span class="inspector-label">Text Content</span>
-                        <input type="text" class="inspector-input" value="${props.text || ""}" onchange="updateProp('text', this.value)">
+                        <input type="text" class="inspector-input" value="${props.text || ''}" onchange="updateProp('text', this.value)">
                     </div>
                 `;
 
@@ -844,7 +916,7 @@ public class WebDesignerPage extends DashboardBasePage {
                                     `<div class="icon-preset" style="cursor:pointer; padding:5px; text-align:center; border:1px solid ${props.icon === icon ? 'var(--jettra-accent)' : 'rgba(255,255,255,0.1)'}" onclick="updateProp('icon', '${icon}')">${icon}</div>`
                                 ).join('')}
                             </div>
-                            <input type="text" class="inspector-input" style="margin-top:5px" placeholder="Custom icon/unicode" value="${props.icon || ""}" onchange="updateProp('icon', this.value)">
+                            <input type="text" class="inspector-input" style="margin-top:5px" placeholder="Custom icon/unicode" value="${props.icon || ''}" onchange="updateProp('icon', this.value)">
                         </div>
                     `;
                 }
@@ -945,7 +1017,7 @@ public class WebDesignerPage extends DashboardBasePage {
                     html += `
                         <div class="inspector-row">
                             <span class="inspector-label">Group Name</span>
-                            <input type="text" class="inspector-input" value="${props.name || (type === "CheckBoxGroup" ? "checkboxGroup1" : "radioGroup1")}" onchange="updateProp('name', this.value)">
+                            <input type="text" class="inspector-input" value="${props.name || (type === 'CheckBoxGroup' ? 'checkboxGroup1' : 'radioGroup1')}" onchange="updateProp('name', this.value)">
                         </div>
                     `;
                 }
@@ -954,19 +1026,19 @@ public class WebDesignerPage extends DashboardBasePage {
                     html += `
                         <div class="inspector-row">
                             <span class="inspector-label">Labels (comma sep.)</span>
-                            <input type="text" class="inspector-input" value="${props.labels || "Label 1, Label 2"}" onchange="updateProp('labels', this.value)">
+                            <input type="text" class="inspector-input" value="${props.labels || 'Label 1, Label 2'}" onchange="updateProp('labels', this.value)">
                         </div>
                         <div class="inspector-row">
                             <span class="inspector-label">Dataset Label</span>
-                            <input type="text" class="inspector-input" value="${props.datasetLabel || "Data"}" onchange="updateProp('datasetLabel', this.value)">
+                            <input type="text" class="inspector-input" value="${props.datasetLabel || 'Data'}" onchange="updateProp('datasetLabel', this.value)">
                         </div>
                         <div class="inspector-row">
                             <span class="inspector-label">Data (comma sep. numbers)</span>
-                            <input type="text" class="inspector-input" value="${props.data || "10, 20"}" onchange="updateProp('data', this.value)">
+                            <input type="text" class="inspector-input" value="${props.data || '10, 20'}" onchange="updateProp('data', this.value)">
                         </div>
                         <div class="inspector-row">
                             <span class="inspector-label">Bg Color</span>
-                            <input type="color" class="inspector-input" value="${props.bgColor || "#00ffff"}" onchange="updateProp('bgColor', this.value)">
+                            <input type="color" class="inspector-input" value="${props.bgColor || '#00ffff'}" onchange="updateProp('bgColor', this.value)">
                         </div>
                     `;
                 }
@@ -1547,7 +1619,7 @@ public class WebDesignerPage extends DashboardBasePage {
                 let html = '<select class="j-input" style="padding:4px; font-size:11px" onchange="window.selectModel(this.value)">';
                 html += '<option value="">-- Select Model --</option>';
                 availableModels.forEach(m => {
-                    const selected = viewModelName === m.name ? 'selected' : '';
+                    const selected = window.viewModelName === m.name ? 'selected' : '';
                     html += `<option value="${m.name}" ${selected}>${m.name}</option>`;
                 });
                 html += '</select>';
@@ -1728,10 +1800,14 @@ public class WebDesignerPage extends DashboardBasePage {
                 window.show3DMessage("CRUD Generado", "Se ha generado la arquitectura MVC completa para " + baseName);
             };
 
+            window.initDesigner = function() {
+                window.jettraFileCache = {};
+            };
+
             window.clearDesigner = function() {
                 window.show3DConfirm("Limpiar", "\u00BFBorrar elementos?", () => {
                     document.getElementById('canvas-drop-area').innerHTML = '<div class="canvas-placeholder">Start dragging...</div>';
-                    selectedItem = null;
+                    window.selectedItem = null;
                     window.updateInspector();
                     window.updateGeneratedCode();
                 });
@@ -1751,7 +1827,7 @@ public class WebDesignerPage extends DashboardBasePage {
 
                 let code = `package com.jettra.example.pages;\\n\\nimport io.jettra.wui.complex.*;\\nimport io.jettra.wui.components.*;\\n\\n`;
                 code += `public class GeneratedPage extends DashboardBasePage {\\n`;
-                code += `    private ${viewModelName} model = ${viewModelName}.getInstance();\\n\\n`;
+                code += `    private ${window.viewModelName} model = ${window.viewModelName}.getInstance();\\n\\n`;
                 code += `    protected void initCenter(Center center, String username) {\\n`;
                 
                 function walk(items, container) {
@@ -1917,6 +1993,24 @@ public class WebDesignerPage extends DashboardBasePage {
                 let varMap = {}; 
                 const lines = code.split(/\\r?\\n/);
                 
+                // Extract Style content
+                let styleContent = "";
+                let inStyleStr = false;
+                lines.forEach(line => {
+                    if (line.includes("new Style(\"\"\"")) { inStyleStr = true; return; }
+                    if (inStyleStr && line.includes("\"\"\");")) { inStyleStr = false; return; }
+                    if (inStyleStr) styleContent += line + "\\n";
+                });
+                if (styleContent) {
+                    let styleEl = document.getElementById('designer-custom-css');
+                    if (!styleEl) {
+                        styleEl = document.createElement('style');
+                        styleEl.id = 'designer-custom-css';
+                        document.head.appendChild(styleEl);
+                    }
+                    styleEl.innerHTML = styleContent;
+                }
+                
                 let currentModalArea = mtArea;
 
                 lines.forEach(line => {
@@ -1925,14 +2019,14 @@ public class WebDesignerPage extends DashboardBasePage {
 
                     let currentVar = null;
                     
-                    // Match object instantiation
-                    let mInst = /(?:[a-zA-Z0-9_.]+\\.)?([A-Z][a-zA-Z0-9_]*)\\s+([a-zA-Z0-9_]+)\\s*=\\s*new\\s+(?:[a-zA-Z0-9_.]+\\.)?[A-Z][a-zA-Z0-9_]*\\s*\\((.*?)\\)/.exec(cleanLine);
+                    // Match object instantiation (including member assignments)
+                    let mInst = /(?:(?:[a-zA-Z0-9_.]+\\.)?([A-Z][a-zA-Z0-9_]*)\\s+)?(?:this\\.)?([a-zA-Z0-9_]+)\\s*=\\s*new\\s+(?:[a-zA-Z0-9_.]+\\.)?([A-Z][a-zA-Z0-9_]*)\\s*\\((.*?)\\)/.exec(cleanLine);
                     
                     if (mInst) {
                         foundAny = true;
-                        let type = mInst[1];
+                        let type = mInst[1] || mInst[3]; // Use local type or constructor type
                         let vname = mInst[2];
-                        let args = mInst[3];
+                        let args = mInst[4];
                         
                         currentVar = vname;
                         
@@ -1943,15 +2037,22 @@ public class WebDesignerPage extends DashboardBasePage {
                             el.setAttribute('data-var', vname);
                             varMap[vname] = el;
                             
-                            let props = JSON.stringify(Object.assign(JSON.parse(el.getAttribute('data-props') || "{}"), {id: vname}));
-                            el.setAttribute('data-props', props);
-                            let pObj = JSON.parse(props);
+                            let pObj = JSON.parse(el.getAttribute('data-props') || "{}");
+                            pObj.id = vname;
+                            if (!pObj.styles) pObj.styles = {};
+                            if (!pObj.classes) pObj.classes = [];
+
+                            // Extract chained properties in the same line
+                            const sMatches = [...cleanLine.matchAll(/\\.setStyle\\("([^"]+)",\\s*"([^"]+)"\\)/g)];
+                            sMatches.forEach(sm => { pObj.styles[sm[1]] = sm[2]; el.style[sm[1]] = sm[2]; });
+                            const cMatches = [...cleanLine.matchAll(/\\.addClass\\("([^"]+)"\\)/g)];
+                            cMatches.forEach(cm => { pObj.classes.push(cm[1]); el.classList.add(cm[1]); });
 
                             if (args && args.trim().length > 0) {
                                 let cleanParams = args.replace(/"/g, '').split(',');
                                 if (cleanParams.length > 0) {
                                     if (['Header','Paragraph','Button','Clock','Span','Label','Alert','Notification','Link','Downloader','CheckBox','RadioButton','ToggleSwitch','MenuItem','TreeItem','Tab','Card'].includes(type)) {
-                                        pObj.text = cleanParams.length > 1 ? cleanParams[1].trim() : cleanParams[0].trim();
+                                        pObj.text = cleanParams.length > 1 ? (cleanParams[1] ? cleanParams[1].trim() : cleanParams[0].trim()) : cleanParams[0].trim();
                                     }
                                     if (type === 'Modal') {
                                         pObj.idGen = cleanParams[0].trim();
@@ -1969,15 +2070,28 @@ public class WebDesignerPage extends DashboardBasePage {
                             if (pObj.text && inner) inner.innerText = pObj.text;
                         }
                     } else {
-                        let firstVarMatch = /^([a-zA-Z0-9_]+)\\./.exec(cleanLine);
+                        let firstVarMatch = /^(?:this\\.)?([a-zA-Z0-9_]+)\\./.exec(cleanLine);
                         if (firstVarMatch) currentVar = firstVarMatch[1];
                     }
 
                     if (!currentVar && !cleanLine.includes(".add")) return; 
 
                     let parentEl = varMap[currentVar];
-                    if (currentVar === 'center' || currentVar === 'container') parentEl = canvas; 
-                    if (!parentEl && (currentVar === 'center' || currentVar === 'mainContent' || currentVar === 'crudModal' || currentVar === 'this' || !currentVar)) parentEl = canvas;
+                    if (currentVar === 'center' || currentVar === 'mainContent' || currentVar === 'crudModal' || currentVar === 'this' || !currentVar) {
+                         if (!parentEl) parentEl = canvas;
+                    }
+                    
+                    // Ensure we don't drop in ourselves if something goes wrong
+                    if (parentEl === varMap[currentVar] && parentEl && parentEl === varMap[currentVar]) {
+                         // Ok
+                    }
+
+                    // Special case for modal logic in PaisPage.java
+                    if (cleanLine.includes('this.add(this.crudModal)')) {
+                         varMap['crudModal'] = varMap['crudModal'] || document.querySelector('[data-var="crudModal"]');
+                         if (varMap['crudModal']) canvas.appendChild(varMap['crudModal']);
+                         return;
+                    }
 
                     // Support addHeaderRow for Datatable
                     if (cleanLine.includes(".addHeaderRow")) {
