@@ -103,6 +103,8 @@ public class WebDesignerPage extends DashboardBasePage {
 
         Div canvasDropArea = new Div();
         canvasDropArea.setProperty("id", "canvas-drop-area");
+        canvasDropArea.setProperty("ondragover", "allowDrop(event)");
+        canvasDropArea.setProperty("ondrop", "drop(event)");
         canvasDropArea.setStyle("flex", "1").setStyle("display", "flex").setStyle("flex-direction", "column");
 
         Div canvasPlaceholder = new Div();
@@ -538,18 +540,24 @@ public class WebDesignerPage extends DashboardBasePage {
             
             // Designer GLOBALS
             function drag(ev) {
-""").formatted(viewModelName) + """
-                ev.dataTransfer.setData("type", ev.currentTarget.getAttribute("data-type"));
-                ev.dataTransfer.effectAllowed = "move";
+                console.log("DRAG START:", ev.currentTarget.getAttribute("data-type"));
+                const type = ev.currentTarget.getAttribute("data-type");
+                ev.dataTransfer.setData("type", type);
+                ev.dataTransfer.setData("text/plain", type);
+                ev.dataTransfer.effectAllowed = "copyMove";
             };
             function allowDrop(ev) {
                 ev.preventDefault();
+                ev.dataTransfer.dropEffect = "copy";
             };
             function drop(ev) {
+                console.log("DROP EVENT FIRED");
                 ev.preventDefault();
-                const type = ev.dataTransfer.getData("type");
+                ev.stopPropagation();
+                const type = ev.dataTransfer.getData("type") || ev.dataTransfer.getData("text/plain");
+                console.log("DROP TYPE:", type);
                 const canvas = document.getElementById('canvas-drop-area');
-                if (canvas) {
+                if (canvas && type) {
                     window.addComponentToCanvas(type, canvas);
                 }
             };
@@ -594,17 +602,20 @@ public class WebDesignerPage extends DashboardBasePage {
 
             function setupCanvasHandlers() {
                 const canvas = document.getElementById('canvas-drop-area');
-                const modalList = document.getElementById('modal-list-container');
-                if (!canvas) return;
+                if (!canvas) {
+                    console.error("Canvas drop area NOT found!");
+                    return;
+                }
+                console.log("Setting up canvas handlers...");
                 
-                document.body.ondragover = function(ev) {
+                document.body.addEventListener('dragover', function(ev) {
                     if (ev.target.closest('#canvas-drop-area') || ev.target.closest('#modal-list-container') || ev.target.closest('#code-view-container')) {
                         ev.preventDefault();
                         ev.dataTransfer.dropEffect = "copy";
                     }
-                };
+                });
 
-                document.body.ondrop = function(ev) {
+                document.body.addEventListener('drop', function(ev) {
                     const canvasSection = ev.target.closest('#canvas-drop-area');
                     const modalSection = ev.target.closest('#modal-list-container');
                     const codeSection = ev.target.closest('#code-view-container');
@@ -878,6 +889,8 @@ public class WebDesignerPage extends DashboardBasePage {
                         <span class="inspector-label">Component Type</span>
                         <div style="color:var(--jettra-accent); font-weight:bold">${type}</div>
                     </div>
+                    <div class="inspector-row">
+                        <span class="inspector-label">Component ID</span>
                         <input type="text" class="inspector-input" value="${props.id || ''}" placeholder="Comp ID" onchange="updateProp('id', this.value)">
                     </div>
                     <div class="inspector-row">
@@ -1456,7 +1469,7 @@ public class WebDesignerPage extends DashboardBasePage {
                 if (viewer) viewer.innerHTML = '';
             window.updateGeneratedCode();
             };
-        """;
+        """).formatted(viewModelName);
 
         String scriptPart2 = """
 
