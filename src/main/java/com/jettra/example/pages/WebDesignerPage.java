@@ -67,11 +67,11 @@ public class WebDesignerPage extends DashboardBasePage {
         Div canvasHeaderActions = new Div();
         canvasHeaderActions.setStyle("display", "flex").setStyle("gap", "10px");
         
-        Button previewBtn = new Button("Preview \uD83D\uDC41\uFE0F");
-        previewBtn.addClass("j-btn-secondary");
-        previewBtn.setStyle("font-size", "11px").setStyle("padding", "5px 12px");
-        previewBtn.setProperty("type", "button");
-        previewBtn.setProperty("onclick", "window.previewInterface()");
+        // Button previewBtn = new Button("Preview \uD83D\uDC41\uFE0F");
+        // previewBtn.addClass("j-btn-secondary");
+        // previewBtn.setStyle("font-size", "11px").setStyle("padding", "5px 12px");
+        // previewBtn.setProperty("type", "button");
+        // previewBtn.setProperty("onclick", "window.previewInterface()");
 
         Button crudBtn = new Button("CRUD \u26A1");
         crudBtn.addClass("j-btn-primary");
@@ -97,7 +97,7 @@ public class WebDesignerPage extends DashboardBasePage {
         mobileBtn.setProperty("type", "button");
         mobileBtn.setProperty("onclick", "window.toggleMobileView()");
         
-        canvasHeaderActions.add(toggleSidebarBtn).add(mobileBtn).add(previewBtn).add(crudBtn).add(toggleCodeBtn);
+        canvasHeaderActions.add(toggleSidebarBtn).add(mobileBtn).add(crudBtn).add(toggleCodeBtn);
         canvasHeader.add(canvasTitle).add(canvasHeaderActions);
         canvasArea.add(canvasHeader);
 
@@ -2010,8 +2010,8 @@ public class WebDesignerPage extends DashboardBasePage {
                 let styleContent = "";
                 let inStyleStr = false;
                 lines.forEach(line => {
-                    if (line.includes("new Style(\"\"\"")) { inStyleStr = true; return; }
-                    if (inStyleStr && line.includes("\"\"\");")) { inStyleStr = false; return; }
+                    if (line.includes('new Style(\"\"\"')) { inStyleStr = true; return; }
+                    if (inStyleStr && line.includes('\"\"\");')) { inStyleStr = false; return; }
                     if (inStyleStr) styleContent += line + "\\n";
                 });
                 if (styleContent) {
