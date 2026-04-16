@@ -8,6 +8,11 @@ public class WebExampleMain {
 
     @JettraConfigProperty(name = "app.title")
     private String appTitle;
+    @JettraConfigProperty(name = "server.port")
+    private String port;
+    @JettraConfigProperty(name = "server.contextpath")
+    private String contextpath;
+   
 
     public void initUI() {
         ConfigInjector.inject(this);
@@ -18,6 +23,9 @@ public class WebExampleMain {
         WebExampleMain app = new WebExampleMain();
         app.initUI();
 
+        // Configurar la ruta de redirección en ErrorPage, usando contextpath (y el puerto implícitamente por el host)
+        io.jettra.wui.complex.ErrorPage.path = "http://localhost:" + app.port + app.contextpath;
+        
         System.out.println("Levantando servidor de enrutamiento JettraServer empotrado...");
         JettraServer server = new JettraServer();
         server.setErrorPage("/error");
@@ -35,30 +43,33 @@ public class WebExampleMain {
         // Register pages as classes to ensure a fresh, isolated instance per request
         server.addHandler("/error", io.jettra.wui.complex.ErrorPage.class);
         server.addHandler("/", com.jettra.example.pages.LoginPage.class);
+        //
         server.addHandler("/alert", com.jettra.example.pages.AlertPage.class);
         server.addHandler("/avatar", com.jettra.example.pages.AvatarPage.class);
         server.addHandler("/avatargroup", com.jettra.example.pages.AvatarGroupPage.class);
-        server.addHandler("/spinner", com.jettra.example.pages.SpinnerPage.class);
-        server.addHandler("/icons", com.jettra.example.pages.IconsPage.class);
-        server.addHandler("/draw", com.jettra.example.pages.DrawPage.class);
-        server.addHandler("/kanban", com.jettra.example.pages.KanbanPage.class);
+        server.addHandler("/barcode", com.jettra.example.pages.BarCodePage.class);
         server.addHandler("/board", com.jettra.example.pages.BoardPage.class);
         server.addHandler("/button", com.jettra.example.pages.ButtonPage.class);
         server.addHandler("/calendar", com.jettra.example.pages.CalendarPage.class);
         server.addHandler("/card", com.jettra.example.pages.CardPage.class);
+        server.addHandler("/carousel", com.jettra.example.pages.CarouselPage.class);
         server.addHandler("/checkbox", com.jettra.example.pages.CheckBoxPage.class);
         server.addHandler("/checkboxgroup", com.jettra.example.pages.CheckBoxGroupPage.class);
         server.addHandler("/clock", com.jettra.example.pages.ClockPage.class);
+        server.addHandler("/catcha", com.jettra.example.pages.CatchaPage.class);
+        server.addHandler("/creditcard", com.jettra.example.pages.CreditCardPage.class);
+        server.addHandler("/formgroup", com.jettra.example.pages.FormGroupPage.class);
         server.addHandler("/dashboard", com.jettra.example.dashboard.DashboardPage.class);
         server.addHandler("/header", com.jettra.example.pages.HeaderPage.class);
         server.addHandler("/icon", com.jettra.example.pages.IconPage.class);
+        server.addHandler("/icons", com.jettra.example.pages.IconsPage.class);
+        server.addHandler("/draw", com.jettra.example.pages.DrawPage.class);
+        server.addHandler("/kanban", com.jettra.example.pages.KanbanPage.class);
         server.addHandler("/image", com.jettra.example.pages.ImagePage.class);
         server.addHandler("/layoutdisplay", com.jettra.example.dashboard.LayoutDisplayPage.class);
         server.addHandler("/login", com.jettra.example.pages.LoginPage.class);
         server.addHandler("/logout", com.jettra.example.pages.LoginPage.class);
         server.addHandler("/loading", com.jettra.example.pages.LoadingPage.class);
-    
-
         server.addHandler("/datepicker", com.jettra.example.pages.DatePickerPage.class);
         server.addHandler("/datatable", com.jettra.example.pages.DataTablePage.class);
         server.addHandler("/label", com.jettra.example.pages.LabelPage.class);
@@ -72,13 +83,11 @@ public class WebExampleMain {
         server.addHandler("/textbox", com.jettra.example.pages.TextBoxPage.class);
         server.addHandler("/time", com.jettra.example.pages.TimePage.class);
         server.addHandler("/timeline", com.jettra.example.pages.TimelinePage.class);
-
         server.addHandler("/toggleswitch", com.jettra.example.pages.ToggleSwitchPage.class);
-        server.addHandler("/carousel", com.jettra.example.pages.CarouselPage.class);
         server.addHandler("/modal", com.jettra.example.pages.ModalPage.class);
         server.addHandler("/notification", com.jettra.example.pages.NotificationPage.class);
         server.addHandler("/menubar", com.jettra.example.pages.MenuBarPage.class);
-    server.addHandler("/persona", com.jettra.example.pages.PersonaPage.class);
+        server.addHandler("/persona", com.jettra.example.pages.PersonaPage.class);
         server.addHandler("/selectoneicon", com.jettra.example.pages.SelectOneIconPage.class);
         server.addHandler("/grid", com.jettra.example.pages.GridPage.class);
         server.addHandler("/sessiontimeout", com.jettra.example.pages.SessionTimeoutDialogPage.class);
@@ -115,12 +124,8 @@ public class WebExampleMain {
         server.addHandler("/chartsline", com.jettra.example.pages.ChartsLinePage.class);
         server.addHandler("/schedulecontrol", com.jettra.example.pages.ScheduleControlPage.class);
         server.addHandler("/qr", com.jettra.example.pages.QRPage.class);
-        server.addHandler("/barcode", com.jettra.example.pages.BarCodePage.class);
         server.addHandler("/otpvalidator", com.jettra.example.pages.OTPValidatorPage.class);
-        server.addHandler("/catcha", com.jettra.example.pages.CatchaPage.class);
-        server.addHandler("/creditcard", com.jettra.example.pages.CreditCardPage.class);
-        server.addHandler("/formgroup", com.jettra.example.pages.FormGroupPage.class);
-
+        server.addHandler("/spinner", com.jettra.example.pages.SpinnerPage.class);
         server.start();
     }
 }
