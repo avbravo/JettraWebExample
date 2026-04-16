@@ -682,7 +682,7 @@ public class WebDesignerPage extends DashboardBasePage {
                     } else if (type) {
                         window.addComponentToCanvas(type, target);
                     }
-                };
+                });
 
                 const inspector = document.getElementById('property-inspector');
                 if (inspector) {
