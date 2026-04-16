@@ -534,7 +534,7 @@ public class WebDesignerPage extends DashboardBasePage {
         """);
         
         String scriptPart1 = ("""
-            window.viewModelName = '%s';
+            window.viewModelName = '---VIEWMODEL_NAME---';
             window.availableModels = [];
             window.modelFields = [];
             
@@ -1469,7 +1469,7 @@ public class WebDesignerPage extends DashboardBasePage {
                 if (viewer) viewer.innerHTML = '';
             window.updateGeneratedCode();
             };
-        """).formatted(viewModelName);
+        """).replace("---VIEWMODEL_NAME---", viewModelName);
 
         String scriptPart2 = """
 
