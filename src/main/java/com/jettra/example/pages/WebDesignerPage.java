@@ -877,10 +877,11 @@ public class WebDesignerPage extends DashboardBasePage {
                 let html = `
                     <div class="view-model-row">
                         <span class="inspector-label">Active View Model</span>
-                        <select class="inspector-input" onchange="selectModel(this.value)">
+                        <select class="inspector-input" onchange="window.selectModel(this.value)">
                             <option value="">None</option>
                             ${availableModels.map(m => `<option value="${m.name}" ${window.viewModelName === m.name ? 'selected' : ''}>${m.name}</option>`).join('')}
                         </select>
+                        <div style="margin-top:5px; font-size:11px; color:#4ade80; font-weight:bold;">Modelo Actual: ${window.viewModelName || 'Ninguno'}</div>
                     </div>
                 `;
 
@@ -955,7 +956,7 @@ public class WebDesignerPage extends DashboardBasePage {
                             <span class="inspector-label">Bind to Model Field</span>
                             <select class="inspector-input" onchange="updateProp('binding', this.value)">
                                 <option value="">No Binding</option>
-                                ${modelFields.map(f => `<option value="${f}" ${props.binding === f ? 'selected' : ''}>${f}</option>`).join('')}
+                                ${modelFields.map(f => `<option value="${f.name}" ${props.binding === f.name ? 'selected' : ''}>${f.name}</option>`).join('')}
                             </select>
                         </div>
                     `;
@@ -1636,6 +1637,7 @@ public class WebDesignerPage extends DashboardBasePage {
                     html += `<option value="${m.name}" ${selected}>${m.name}</option>`;
                 });
                 html += '</select>';
+                html += `<div style="margin-top:5px; font-size:11px; color:#4ade80; font-weight:bold;">Modelo Actual: ${window.viewModelName || 'Ninguno'}</div>`;
                 container.innerHTML = html;
             };
 
