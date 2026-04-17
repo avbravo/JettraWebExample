@@ -537,6 +537,8 @@ public class WebDesignerPage extends DashboardBasePage {
             window.viewModelName = '---VIEWMODEL_NAME---';
             window.availableModels = [];
             window.modelFields = [];
+            window.currentModel = null;
+            window.selectedItem = null;
             
             // Designer GLOBALS
             function drag(ev) {
@@ -567,14 +569,9 @@ public class WebDesignerPage extends DashboardBasePage {
             window.allowDrop = allowDrop;
             window.drop = drop;
 
-            var selectedItem = null;
-            var currentModel = null;
-            var modelFields = [];
-            var availableModels = [];
-            var viewModelName = "BaseViewModel";
-            var activeEventProperty = null;
-            var projectFilesMap = {};
             window.isSyncing = false;
+            window.activeEventProperty = null;
+            window.projectFilesMap = {};
 
             setInterval(() => {
                 document.querySelectorAll('.live-clock').forEach(el => {
@@ -856,9 +853,9 @@ public class WebDesignerPage extends DashboardBasePage {
             };
 
             window.selectElement = function(el) {
-                if (selectedItem) selectedItem.classList.remove('selected');
-                selectedItem = el;
-                selectedItem.classList.add('selected');
+                if (window.selectedItem) window.selectedItem.classList.remove('selected');
+                window.selectedItem = el;
+                window.selectedItem.classList.add('selected');
                 window.updateInspector();
             };
 
@@ -868,9 +865,9 @@ public class WebDesignerPage extends DashboardBasePage {
             };
 
             window.updateInspector = function() {
-                if (!selectedItem) return;
-                const type = selectedItem.getAttribute('data-type');
-                const props = JSON.parse(selectedItem.getAttribute('data-props'));
+                if (!window.selectedItem) return;
+                const type = window.selectedItem.getAttribute('data-type');
+                const props = JSON.parse(window.selectedItem.getAttribute('data-props'));
                 const inspector = document.getElementById('inspector-properties');
                 if (!inspector) return;
                 
@@ -879,7 +876,7 @@ public class WebDesignerPage extends DashboardBasePage {
                         <span class="inspector-label">Active View Model</span>
                         <select class="inspector-input" onchange="window.selectModel(this.value)">
                             <option value="">None</option>
-                            ${availableModels.map(m => `<option value="${m.name}" ${window.viewModelName === m.name ? 'selected' : ''}>${m.name}</option>`).join('')}
+                            ${window.availableModels.map(m => `<option value="${m.name}" ${window.viewModelName === m.name ? 'selected' : ''}>${m.name}</option>`).join('')}
                         </select>
                         <div style="margin-top:5px; font-size:11px; color:#4ade80; font-weight:bold;">Modelo Actual: ${window.viewModelName || 'Ninguno'}</div>
                     </div>
@@ -892,29 +889,29 @@ public class WebDesignerPage extends DashboardBasePage {
                     </div>
                     <div class="inspector-row">
                         <span class="inspector-label">Component ID</span>
-                        <input type="text" class="inspector-input" value="${props.id || ''}" placeholder="Comp ID" onchange="updateProp('id', this.value)">
+                        <input type="text" class="inspector-input" value="${props.id || ''}" placeholder="Comp ID" onchange="window.updateProp('id', this.value)">
                     </div>
                     <div class="inspector-row">
                         <span class="inspector-label">Text Content</span>
-                        <input type="text" class="inspector-input" value="${props.text || ''}" onchange="updateProp('text', this.value)">
+                        <input type="text" class="inspector-input" value="${props.text || ''}" onchange="window.updateProp('text', this.value)">
                     </div>
                 `;
 
                 if (type === 'SelectOne' || type === 'SelectMany') {
-                    const labelEl = selectedItem.querySelector('label');
-                    const selectEl = selectedItem.querySelector('select');
+                    const labelEl = window.selectedItem.querySelector('label');
+                    const selectEl = window.selectedItem.querySelector('select');
                     html += `
                         <div class="inspector-row">
                             <span class="inspector-label">Label</span>
-                            <input type="text" class="inspector-input" value="${labelEl ? labelEl.innerText : 'Select'}" onchange="updateProp('label', this.value)">
+                            <input type="text" class="inspector-input" value="${labelEl ? labelEl.innerText : 'Select'}" onchange="window.updateProp('label', this.value)">
                         </div>
                         <div class="inspector-row">
                             <span class="inspector-label">Options (val:lab,...)</span>
-                            <input type="text" class="inspector-input" value="${Array.from(selectEl.querySelectorAll('option')).map(o => o.value + ':' + o.innerText).join(',')}" onchange="updateProp('options', this.value)">
+                            <input type="text" class="inspector-input" value="${Array.from(selectEl.querySelectorAll('option')).map(o => o.value + ':' + o.innerText).join(',')}" onchange="window.updateProp('options', this.value)">
                         </div>
                         <div class="inspector-row">
                             <span class="inspector-label">Default Value</span>
-                            <input type="text" class="inspector-input" value="${selectEl.dataset.default || ''}" onchange="updateProp('default', this.value)">
+                            <input type="text" class="inspector-input" value="${selectEl.dataset.default || ''}" onchange="window.updateProp('default', this.value)">
                         </div>
                     `;
                 }
@@ -927,10 +924,10 @@ public class WebDesignerPage extends DashboardBasePage {
                             <span class="inspector-label">Icon</span>
                             <div style="display:grid; grid-template-columns: repeat(5, 1fr); gap:5px; margin-top:5px;">
                                 ${['\uD83D\uDC64','\uD83D\uDC65','\uD83C\uDFE0','\u2619','\uD83D\uDD14','\uD83D\uDCE7','\uD83D\uDCC1','\uD83D\uDCCA','\uD83D\uDE80','\uD83C\uDF19','\u2600\uFE0F','\u2795','\u270F\uFE0F','\uD83D\uDDD1\uFE0F','\u2705'].map(icon => 
-                                    `<div class="icon-preset" style="cursor:pointer; padding:5px; text-align:center; border:1px solid ${props.icon === icon ? 'var(--jettra-accent)' : 'rgba(255,255,255,0.1)'}" onclick="updateProp('icon', '${icon}')">${icon}</div>`
+                                    `<div class="icon-preset" style="cursor:pointer; padding:5px; text-align:center; border:1px solid ${props.icon === icon ? 'var(--jettra-accent)' : 'rgba(255,255,255,0.1)'}" onclick="window.updateProp('icon', '${icon}')">${icon}</div>`
                                 ).join('')}
                             </div>
-                            <input type="text" class="inspector-input" style="margin-top:5px" placeholder="Custom icon/unicode" value="${props.icon || ''}" onchange="updateProp('icon', this.value)">
+                            <input type="text" class="inspector-input" style="margin-top:5px" placeholder="Custom icon/unicode" value="${props.icon || ''}" onchange="window.updateProp('icon', this.value)">
                         </div>
                     `;
                 }
@@ -939,7 +936,7 @@ public class WebDesignerPage extends DashboardBasePage {
                     html += `
                         <div class="inspector-row">
                             <span class="inspector-label">Button Style</span>
-                            <select class="inspector-input" onchange="updateProp('btnStyle', this.value)">
+                            <select class="inspector-input" onchange="window.updateProp('btnStyle', this.value)">
                                 <option value="PRIMARY" ${props.btnStyle === 'PRIMARY' ? 'selected' : ''}>PRIMARY</option>
                                 <option value="SECONDARY" ${props.btnStyle === 'SECONDARY' ? 'selected' : ''}>SECONDARY</option>
                                 <option value="HELP" ${props.btnStyle === 'HELP' ? 'selected' : ''}>HELP</option>
@@ -950,13 +947,15 @@ public class WebDesignerPage extends DashboardBasePage {
                     `;
                 }
 
-                if (type === 'TextBox' || type === 'Label') {
+                // Components that support model binding
+                const bindableComponents = ['TextBox', 'TextArea', 'Label', 'SelectOne', 'SelectMany', 'CheckBox', 'RadioButton', 'DatePicker', 'Time', 'Spinner'];
+                if (bindableComponents.includes(type)) {
                     html += `
                         <div class="inspector-row">
                             <span class="inspector-label">Bind to Model Field</span>
-                            <select class="inspector-input" onchange="updateProp('binding', this.value)">
+                            <select class="inspector-input" onchange="window.updateProp('binding', this.value)">
                                 <option value="">No Binding</option>
-                                ${modelFields.map(f => `<option value="${f.name}" ${props.binding === f.name ? 'selected' : ''}>${f.name}</option>`).join('')}
+                                ${window.modelFields.map(f => `<option value="${f.name}" ${props.binding === f.name ? 'selected' : ''}>${f.name}</option>`).join('')}
                             </select>
                         </div>
                     `;
@@ -998,7 +997,7 @@ public class WebDesignerPage extends DashboardBasePage {
                         </div>
                         <div class="inspector-row">
                             <span class="inspector-label">Enable Relief</span>
-                            <select class="inspector-input" onchange="updateProp('enableRelief', this.value === 'true')">
+                            <select class="inspector-input" onchange="window.updateProp('enableRelief', this.value === 'true')">
                                 <option value="false" ${props.enableRelief ? '' : 'selected'}>False</option>
                                 <option value="true" ${props.enableRelief ? 'selected' : ''}>True</option>
                             </select>
@@ -1210,9 +1209,9 @@ public class WebDesignerPage extends DashboardBasePage {
             };
 
             window.openEventEditor = function(evName) {
-                if (!selectedItem) return;
-                activeEventProperty = evName;
-                const props = JSON.parse(selectedItem.getAttribute('data-props'));
+                if (!window.selectedItem) return;
+                window.activeEventProperty = evName;
+                const props = JSON.parse(window.selectedItem.getAttribute('data-props'));
                 const currentCode = props.events[evName] || "e -> { \\n    // Enter code here \\n}";
                 
                 document.getElementById('event-code-input').value = currentCode.replace(/\\\\n/g, '\\n');
@@ -1222,11 +1221,11 @@ public class WebDesignerPage extends DashboardBasePage {
             };
 
             window.saveEventHandler = function() {
-                if (!selectedItem || !activeEventProperty) return;
-                const props = JSON.parse(selectedItem.getAttribute('data-props'));
+                if (!window.selectedItem || !window.activeEventProperty) return;
+                const props = JSON.parse(window.selectedItem.getAttribute('data-props'));
                 const newCode = document.getElementById('event-code-input').value;
-                props.events[activeEventProperty] = newCode.replace(/\\n/g, '\\\\n');
-                selectedItem.setAttribute('data-props', JSON.stringify(props));
+                props.events[window.activeEventProperty] = newCode.replace(/\\n/g, '\\\\n');
+                window.selectedItem.setAttribute('data-props', JSON.stringify(props));
                 
                 document.getElementById('event-editor-modal').style.display = 'none';
                 window.updateGeneratedCode();
@@ -1236,26 +1235,34 @@ public class WebDesignerPage extends DashboardBasePage {
             window.parseModelFieldsContent = function(content) {
                 const fieldRegex = /(?:private|protected|public)?\\s+([\\w<>]+)\\s+(\\w+);/g;
                 let match;
-                modelFields = [];
+                window.modelFields = [];
+                const seenFields = new Set();
                 while ((match = fieldRegex.exec(content)) !== null) {
-                    modelFields.push({ type: match[1], name: match[2] });
+                    const type = match[1];
+                    const name = match[2];
+                    if (!seenFields.has(name)) {
+                        window.modelFields.push({ type: type, name: name });
+                        seenFields.add(name);
+                    }
                 }
                 window.updateInspector();
                 window.updateGeneratedCode();
             };
 
             window.selectModel = function(name) {
-                viewModelName = name;
-                const model = availableModels.find(m => m.name === name);
+                window.viewModelName = name;
+                const model = window.availableModels.find(m => m.name === name);
                 if (model) {
-                    currentModel = model;
+                    window.currentModel = model;
                     window.parseModelFieldsContent(model.content);
                     window.show3DMessage("Model Attached", "Se ha vinculado el modelo " + name + " a la vista.");
                 } else {
-                    modelFields = [];
+                    window.currentModel = null;
+                    window.modelFields = [];
                     window.updateInspector();
                     window.updateGeneratedCode();
                 }
+                window.updateModelSelect();
             };
 
             window.updateTableColumn = function(idx, value) {
@@ -1625,19 +1632,19 @@ public class WebDesignerPage extends DashboardBasePage {
                 const container = document.getElementById('model-select-container');
                 if (!container) return;
                 
-                if (availableModels.length === 0) {
+                if (window.availableModels.length === 0) {
                     container.innerHTML = '<span style="color:#666; font-size:11px">No models found in project</span>';
                     return;
                 }
                 
                 let html = '<select class="j-input" style="padding:4px; font-size:11px" onchange="window.selectModel(this.value)">';
                 html += '<option value="">-- Select Model --</option>';
-                availableModels.forEach(m => {
+                window.availableModels.forEach(m => {
                     const selected = window.viewModelName === m.name ? 'selected' : '';
                     html += `<option value="${m.name}" ${selected}>${m.name}</option>`;
                 });
                 html += '</select>';
-                html += `<div style="margin-top:5px; font-size:11px; color:#4ade80; font-weight:bold;">Modelo Actual: ${window.viewModelName || 'Ninguno'}</div>`;
+                html += `<div style="margin-top:5px; font-size:11px; color:#4ade80; font-weight:bold; text-shadow: 0 0 5px rgba(74,222,128,0.2);">Modelo Actual: ${window.viewModelName || 'Ninguno'}</div>`;
                 container.innerHTML = html;
             };
 
