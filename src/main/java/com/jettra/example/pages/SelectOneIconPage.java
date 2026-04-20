@@ -51,8 +51,10 @@ public class SelectOneIconPage extends DashboardBasePage {
         
         String javaCode = "SelectOneIcon select = new SelectOneIcon(\"mySelect\", \"Lang\");\n" +
                           "select.addOption(\"EN\", \"English\");\n" +
-                          "select.addOption(\"ES\", \"Spanish\");";
-                          
+                          "select.addOption(\"ES\", \"Spanish\");\n\n" +
+                          "// Enable dynamic addition of items\n" +
+                          "select.setAllowAddItem(true);";
+        
         io.jettra.wui.core.UIComponent pre = new io.jettra.wui.core.UIComponent("pre") {};
         pre.setStyle("margin", "0");
         io.jettra.wui.core.UIComponent codeTag = new io.jettra.wui.core.UIComponent("code") {};
@@ -95,6 +97,21 @@ public class SelectOneIconPage extends DashboardBasePage {
         
         row1.add(sel);
         container.add(row1);
+
+        container.add(new Header(2, "Runtime Item Addition").setStyle("margin-top", "30px"));
+        container.add(new Paragraph("You can allow users to add their own icons or labels dynamically.").setStyle("margin-bottom", "20px"));
+        
+        Div row2 = new Div();
+        row2.setStyle("margin-bottom", "30px");
+        
+        SelectOneIcon addSelect = new SelectOneIcon("tag_sel", "Select Tag")
+            .setAllowAddItem(true)
+            .addOption("java", "Java", "☕")
+            .addOption("python", "Python", "🐍")
+            .addOption("js", "Javascript", "📜");
+        
+        row2.add(addSelect);
+        container.add(row2);
         
         center.add(container);
     }

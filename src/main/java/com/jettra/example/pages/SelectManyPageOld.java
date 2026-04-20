@@ -1,7 +1,6 @@
 package com.jettra.example.pages;
 
 import com.jettra.example.dashboard.DashboardBasePage;
-
 import io.jettra.wui.complex.Center;
 import io.jettra.wui.components.Button;
 import io.jettra.wui.components.Div;
@@ -13,9 +12,9 @@ import io.jettra.wui.core.UIComponent;
 /**
  * Showcase page for the new SelectMany component.
  */
-public class SelectManyPage extends DashboardBasePage {
+public class SelectManyPageOld extends DashboardBasePage {
 
-    public SelectManyPage() {
+    public SelectManyPageOld() {
         super("SelectMany Showcase");
     }
 
@@ -100,7 +99,9 @@ public class SelectManyPage extends DashboardBasePage {
                           "selectMany.setDefault(\"MAD\");\n\n" +
                           "// 3. Styling\n" +
                           "selectMany.setStyle(\"width\", \"300px\");\n" +
-                          "selectMany.setStyle(\"height\", \"150px\");\n";
+                          "selectMany.setStyle(\"height\", \"150px\");\n\n" +
+                          "// 4. Runtime Item Addition\n" +
+                          "selectMany.setAllowAddItem(true);\n";
                           
         UIComponent pre = new UIComponent("pre") {};
         pre.setStyle("margin", "0");
@@ -153,11 +154,10 @@ public class SelectManyPage extends DashboardBasePage {
         selectMany.addOption("BCN", "Barcelona");
         selectMany.addOption("ROM", "Roma");
         
+        selectMany.setAllowAddItem(true);
         selectMany.setDefault("MAD");
-        
         demoArea.add(selectMany);
         container.add(demoArea);
-      container.add(demoArea);
         
         center.add(container);
     }
