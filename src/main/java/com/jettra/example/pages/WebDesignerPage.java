@@ -2118,7 +2118,77 @@ public class WebDesignerPage extends DashboardBasePage {
                 
                 let foundAny = false;
                 let varMap = {}; 
-                const lines = code.split(/\\r?\\n/);
+
+                const parseJettraText = (txt) => {
+                    if (!txt) return "";
+                    let result = "";
+                    let parts = txt.split("+");
+                    parts.forEach(p => {
+                        let pt = p.trim();
+                        let propMatch = /msg\\.getProperty\\s*\\(\\s*"[^"]*?"\\s*,\\s*"([^"]*?)"\\s*\\)/.exec(pt);
+                        if (propMatch) {
+                            result += propMatch[1];
+                        } else {
+                            let strMatch = /"([^"]*?)"/.exec(pt);
+                            if (strMatch) result += strMatch[1];
+                            else result += pt.replace(/"/g, '').trim();
+                        }
+                    });
+                    return result;
+                };
+
+                const splitArgs = (argStr) => {
+                    let results = [];
+                    let current = "";
+                    let parenCount = 0;
+                    let inQuote = false;
+                    for (let i = 0; i < argStr.length; i++) {
+                        let c = argStr[i];
+                        if (c === '"' && argStr[i-1] !== '\\\\') inQuote = !inQuote;
+                        if (!inQuote) {
+                            if (c === '(') parenCount++;
+                            if (c === ')') parenCount--;
+                            if (c === ',' && parenCount === 0) {
+                                results.push(current.trim());
+                                current = "";
+                                continue;
+                            }
+                        }
+                        current += c;
+                    }
+                    if (current) results.push(current.trim());
+                    return results;
+                };
+
+                const extractBalanced = (str, token, fromPos = 0) => {
+                    let pos = str.indexOf(token, fromPos);
+                    if (pos === -1) return null;
+                    let start = pos + token.length;
+                    let count = 1;
+                    let i = start;
+                    while (i < str.length && count > 0) {
+                        if (str[i] === '(') count++;
+                        else if (str[i] === ')') count--;
+                        i++;
+                    }
+                    return count === 0 ? str.substring(start, i - 1) : null;
+                };
+
+                let rawLines = code.split(/\\r?\\n/);
+                let lines = [];
+                let currentBuffer = "";
+                rawLines.forEach(l => {
+                    let t = l.trim();
+                    if (t.length === 0 || t.startsWith("//")) return;
+                    // Join lines that start with . or if the previous line doesn't end with a statement terminator
+                    if (t.startsWith(".") || (currentBuffer.length > 0 && !currentBuffer.endsWith(";") && !currentBuffer.endsWith("{") && !currentBuffer.endsWith("}"))) {
+                        currentBuffer += " " + t;
+                    } else {
+                        if (currentBuffer) lines.push(currentBuffer);
+                        currentBuffer = t;
+                    }
+                });
+                if (currentBuffer) lines.push(currentBuffer);
                 
                 // Extract Style content
                 let styleContent = "";
@@ -2147,13 +2217,13 @@ public class WebDesignerPage extends DashboardBasePage {
                     let currentVar = null;
                     
                     // Match object instantiation (including member assignments)
-                    let mInst = /(?:(?:[a-zA-Z0-9_.]+\\.)?([A-Z][a-zA-Z0-9_]*)\\s+)?(?:this\\.)?([a-zA-Z0-9_]+)\\s*=\\s*new\\s+(?:[a-zA-Z0-9_.]+\\.)?([A-Z][a-zA-Z0-9_]*)\\s*\\((.*?)\\)/.exec(cleanLine);
+                    let mInstMatch = /(?:(?:[a-zA-Z0-9_.]+\\.)?([A-Z][a-zA-Z0-9_]*)\\s+)?(?:this\\.)?([a-zA-Z0-9_]+)\\s*=\\s*new\\s+(?:[a-zA-Z0-9_.]+\\.)?([A-Z][a-zA-Z0-9_]*)\\s*\\(/.exec(cleanLine);
                     
-                    if (mInst) {
+                    if (mInstMatch) {
                         foundAny = true;
-                        let type = mInst[1] || mInst[3]; // Use local type or constructor type
-                        let vname = mInst[2];
-                        let args = mInst[4];
+                        let type = mInstMatch[1] || mInstMatch[3];
+                        let vname = mInstMatch[2];
+                        let args = extractBalanced(cleanLine, mInstMatch[0], mInstMatch.index);
                         
                         currentVar = vname;
                         
@@ -2176,18 +2246,19 @@ public class WebDesignerPage extends DashboardBasePage {
                             cMatches.forEach(cm => { pObj.classes.push(cm[1]); el.classList.add(cm[1]); });
 
                             if (args && args.trim().length > 0) {
-                                let cleanParams = args.replace(/"/g, '').split(',');
+                                let cleanParams = splitArgs(args);
                                 if (cleanParams.length > 0) {
                                     if (['Header','Paragraph','Button','Clock','Span','Label','Alert','Notification','Link','Downloader','CheckBox','RadioButton','ToggleSwitch','MenuItem','TreeItem','Tab','Card'].includes(type)) {
-                                        pObj.text = cleanParams.length > 1 ? (cleanParams[1] ? cleanParams[1].trim() : cleanParams[0].trim()) : cleanParams[0].trim();
+                                        let textArg = cleanParams.length > 1 ? cleanParams[1] : cleanParams[0];
+                                        pObj.text = parseJettraText(textArg);
                                     }
                                     if (type === 'Modal') {
-                                        pObj.idGen = cleanParams[0].trim();
-                                        pObj.text = cleanParams.length > 1 ? cleanParams[1].trim() : pObj.idGen;
+                                        pObj.idGen = cleanParams[0].replace(/"/g, '');
+                                        pObj.text = cleanParams.length > 1 ? parseJettraText(cleanParams[1]) : pObj.idGen;
                                     }
-                                    if (type === 'Board') pObj.text = cleanParams.length > 1 ? cleanParams[1].trim() : (cleanParams.length > 0 ? cleanParams[0].trim() : 'New Board');
+                                    if (type === 'Board') pObj.text = cleanParams.length > 1 ? parseJettraText(cleanParams[1]) : (cleanParams.length > 0 ? parseJettraText(cleanParams[0]) : 'New Board');
                                     if (['Panel','Grid','Div','LayoutDisplay','TabView','Tree','MenuBar','FormGroup'].includes(type)){
-                                        if (cleanParams[0] && !isNaN(parseInt(cleanParams[0]))) pObj.columns = parseInt(cleanParams[0]);
+                                        if (cleanParams[0] && !isNaN(parseInt(cleanParams[0].replace(/"/g, '')))) pObj.columns = parseInt(cleanParams[0].replace(/"/g, ''));
                                     }
                                     if (type === 'ProgressBar') { pObj.value = parseInt(cleanParams[0])||0; pObj.max = parseInt(cleanParams[1])||100; }
                                 }
@@ -2222,9 +2293,11 @@ public class WebDesignerPage extends DashboardBasePage {
 
                     // Support addHeaderRow for Datatable
                     if (cleanLine.includes(".addHeaderRow")) {
-                        let headerMatch = /\\.addHeaderRow\\((.*?)\\)/.exec(cleanLine);
-                        if (headerMatch && parentEl && parentEl.getAttribute('data-type') === 'Datatable') {
-                            let cols = headerMatch[1].split(',').map(c => c.replace(/"/g, '').trim().split('.').pop().replace('msg.getProperty(', '').replace(')', '')); // Rough extraction
+                        let argContent = extractBalanced(cleanLine, ".addHeaderRow(", cleanLine.indexOf(".addHeaderRow"));
+                        if (argContent !== null && parentEl && parentEl.getAttribute('data-type') === 'Datatable') {
+                            let rawArgs = splitArgs(argContent);
+                            let cols = rawArgs.map(arg => parseJettraText(arg));
+                            
                             let props = JSON.parse(parentEl.getAttribute('data-props') || "{}");
                             props.columnsList = cols;
                             parentEl.setAttribute('data-props', JSON.stringify(props));
@@ -2233,15 +2306,19 @@ public class WebDesignerPage extends DashboardBasePage {
                     }
 
                     // Match all .add() calls
-                    let addMatches = [...cleanLine.matchAll(/\\.add\\s*\\((.*?)\\)/g)];
-                    addMatches.forEach(mAdd => {
-                        let childArg = mAdd[1].trim();
+                    let addRegex = /\\.add\\s*\\(/g;
+                    let addMatch;
+                    while ((addMatch = addRegex.exec(cleanLine)) !== null) {
+                        let childArg = extractBalanced(cleanLine, addMatch[0], addMatch.index);
+                        if (!childArg) continue;
+                        childArg = childArg.trim();
+                        
                         if (parentEl) {
                            if (childArg.startsWith("new ")) {
-                               let inlineTypeMatch = /new\\s+(?:[a-zA-Z0-9_.]+\\.)?([A-Z][a-zA-Z0-9_]*)\\s*\\((.*?)\\)/.exec(childArg);
+                               let inlineTypeMatch = /new\\s+(?:[a-zA-Z0-9_.]+\\.)?([A-Z][a-zA-Z0-9_]*)\\s*\\(/.exec(childArg);
                                if (inlineTypeMatch) {
                                    let type = inlineTypeMatch[1];
-                                   let args = inlineTypeMatch[2];
+                                   let args = extractBalanced(childArg, inlineTypeMatch[0]);
                                    let targetContainer = parentEl.querySelector('.canvas-container') || parentEl;
                                    
                                    window.addComponentToCanvas(type, targetContainer);
@@ -2249,9 +2326,10 @@ public class WebDesignerPage extends DashboardBasePage {
                                    if(el) {
                                        let props = JSON.parse(el.getAttribute('data-props') || "{}");
                                        if (args && args.trim().length > 0) {
-                                          let cleanParams = args.replace(/"/g, '').split(',');
+                                          let cleanParams = splitArgs(args);
                                           if (['Header','Paragraph','Button','Clock','Span','Label','Card'].includes(type)) {
-                                             props.text = cleanParams.length > 1 ? cleanParams[1].trim() : cleanParams[0].trim();
+                                             let textArg = cleanParams.length > 1 ? cleanParams[1] : cleanParams[0];
+                                             props.text = parseJettraText(textArg);
                                           }
                                        }
                                        el.setAttribute('data-props', JSON.stringify(props));
@@ -2277,7 +2355,7 @@ public class WebDesignerPage extends DashboardBasePage {
                                }
                            }
                         }
-                    });
+                    }
 
                     // Match all .setXxx() / .addClass() / .setId() calls
                     let propMatches = [...cleanLine.matchAll(/\\.(set|add|bind)([A-Z][a-zA-Z0-9_]*)\\s*\\((.*?)\\)/g)];
