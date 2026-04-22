@@ -1707,7 +1707,7 @@ public class WebDesignerPage extends DashboardBasePage {
                 // Requirement: Repository check
                 const repoFile = Object.keys(window.jettraFileCache).find(k => k.endsWith(repoName + ".java"));
                 if (!repoFile) {
-                    window.show3DMessage("Aviso", "No se entr\u00F3 la clase " + repoName + ".java en el proyecto actual.");
+                    window.show3DMessage("Aviso", "No se encontró la clase " + repoName + ".java en el proyecto actual.");
                 }
 
                 modelFields.forEach(field => {
@@ -1716,101 +1716,204 @@ public class WebDesignerPage extends DashboardBasePage {
                     const isList = field.type.includes('List');
                     const isCustom = /^[A-Z]/.test(field.type) && !['String','Integer','Double','Boolean','Long','Date'].includes(field.type);
                     
-                    tblHeaders.push(`new TD("${cName}")`);
-                    tblRows.push(`new TD(String.valueOf(p.get${cName}()))`);
+                    tblHeaders.push(`msg.getProperty("th.${vName}", "${cName}")`);
+                    tblRows.push(`new io.jettra.wui.components.TD(String.valueOf(p.get${cName}()))`);
                     
-                    modalFieldsCode += `        Div g_${vName} = new Div(); g_${vName}.addClass("form-group");\n`;
-                    modalFieldsCode += `        g_${vName}.add(new Label("${vName}", "${cName}"));\n`;
+                    modalFieldsCode += `        FormGroup g_${vName} = new FormGroup()\\n`;
+                    modalFieldsCode += `            .add(new Label("${vName}", msg.getProperty("th.${vName}", "${cName}")));\\n`;
                     
                     if (isList) {
-                        modalFieldsCode += `        SelectMany sel_${vName} = new SelectMany("${vName}").setInline(true);\n`;
-                        modalFieldsCode += `        sel_${vName}.setId("input_${vName}").addClass("j-input");\n`;
-                        modalFieldsCode += `        g_${vName}.add(sel_${vName});\n`;
+                        modalFieldsCode += `        SelectMany sel_${vName} = new SelectMany("${vName}").setInline(true);\\n`;
+                        modalFieldsCode += `        sel_${vName}.setId("input_${vName}").addClass("j-input");\\n`;
+                        modalFieldsCode += `        JettraValidations.apply(sel_${vName}, ${mName}.class, "${vName}");\\n`;
+                        modalFieldsCode += `        g_${vName}.add(sel_${vName});\\n`;
                     } else if (isCustom) {
-                        modalFieldsCode += `        SelectOne sel_${vName} = new SelectOne("${vName}", "");\n`;
-                        modalFieldsCode += `        sel_${vName}.setId("input_${vName}").addClass("j-input");\n`;
-                        modalFieldsCode += `        g_${vName}.add(sel_${vName});\n`;
+                        modalFieldsCode += `        SelectOne sel_${vName} = new SelectOne("${vName}", "");\\n`;
+                        modalFieldsCode += `        sel_${vName}.setId("input_${vName}").addClass("j-input");\\n`;
+                        modalFieldsCode += `        JettraValidations.apply(sel_${vName}, ${mName}.class, "${vName}");\\n`;
+                        modalFieldsCode += `        g_${vName}.add(sel_${vName});\\n`;
                     } else if (field.type === 'Date') {
-                        modalFieldsCode += `        DatePicker dp_${vName} = new DatePicker("${vName}", "${cName}");\n`;
-                        modalFieldsCode += `        dp_${vName}.setId("input_${vName}").addClass("j-input");\n`;
-                        modalFieldsCode += `        g_${vName}.add(dp_${vName});\n`;
+                        modalFieldsCode += `        DatePicker dp_${vName} = new DatePicker("${vName}", "${cName}");\\n`;
+                        modalFieldsCode += `        dp_${vName}.setId("input_${vName}").addClass("j-input");\\n`;
+                        modalFieldsCode += `        JettraValidations.apply(dp_${vName}, ${mName}.class, "${vName}");\\n`;
+                        modalFieldsCode += `        g_${vName}.add(dp_${vName});\\n`;
                     } else {
-                        modalFieldsCode += `        TextBox tb_${vName} = new TextBox("text", "${vName}");\n`;
-                        modalFieldsCode += `        tb_${vName}.setId("input_${vName}").addClass("j-input");\n`;
-                        modalFieldsCode += `        g_${vName}.add(tb_${vName});\n`;
+                        modalFieldsCode += `        TextBox tb_${vName} = new TextBox("text", "${vName}");\\n`;
+                        modalFieldsCode += `        tb_${vName}.setId("input_${vName}").addClass("j-input");\\n`;
+                        modalFieldsCode += `        JettraValidations.apply(tb_${vName}, ${mName}.class, "${vName}");\\n`;
+                        modalFieldsCode += `        g_${vName}.add(tb_${vName});\\n`;
                     }
-                    modalFieldsCode += `        form.add(g_${vName});\n\n`;
+                    modalFieldsCode += `        form.add(g_${vName});\\n\\n`;
                 });
 
-                let code = `package com.jettra.example.pages;\n\n`;
-                Array.from(imports).sort().forEach(imp => code += `import ${imp};\n`);
-                code += `@JettraPageSincronized(SyncType.ALL)\n`;
-                code += `public class ${baseName}Page extends DashboardBasePage {\n\n`;
-                code += `    @InjectViewModel\n    private ${mName} model;\n\n`;
-                code += `    @io.jettra.wui.core.annotations.Inject\n    private ${repoName} repository;\n\n`;
-                code += `    @InjectProperties(name = "messages")\n    private Properties msg;\n\n`;
-                code += `    private String lang = "es";\n\n`;
-                code += `    private Div crudModal;\n    private Header modalTitle;\n    private TextBox modalAction;\n    private Button modalSubmitBtn;\n\n`;
-                code += `    public ${baseName}Page() {\n        super("${baseName} Maintenance");\n    }\n\n`;
-                code += `    @Override\n    protected void onInit(Map<String, String> params) {\n`;
-                code += `        String lStr = params.get("lang");\n`;
-                code += `        if (lStr != null) this.lang = lStr;\n`;
-                code += `        super.onInit(params);\n`;
-                code += `    }\n\n`;
-                code += `    @Override\n    protected void initCenter(Center center, String username) {\n`;
-                code += `        Div main = new Div(); main.setStyle("padding", "20px");\n\n`;
-                code += `        Header title = new Header(2, "Mantenimiento de ${baseName}");\n`;
-                code += `        title.setStyle("color", "var(--jettra-accent)").setStyle("margin-bottom", "20px");\n`;
-                code += `        main.add(title);\n\n`;
-                code += `        Button addBtn = new Button("\\\\u2795 A\\u00F1adir ${baseName}");\\n`;
-                code += `        addBtn.addClass("j-btn-primary").addClickListener(() -> {\\n`;
-                code += `            this.model = new ${mName}();\\n`;
-                code += `            showModal("Nuevo ${baseName}", "save");\\n`;
-                code += `        });\\n`;
-                code += `        main.add(addBtn);\\n\\n`;
-                code += `        Datatable table = new Datatable();\\n`;
-                code += `        table.addHeaderRow(\\n            ${tblHeaders.map(h => h.replace(/new TD\\(|\\)/g, '')).join(',\\n            ')},\\n            "Acciones"\\n        );\\n\\n`;
-                code += `        List<${mName}> all = repository.findAll();\n`;
-                code += `        for (${mName} p : all) {\n`;
-                code += `            TD actionsTd = new TD(); actionsTd.setStyle("display", "flex").setStyle("gap", "10px");\n`;
-                code += `            Button editBtn = new Button("\\u270F\\uFE0F"); editBtn.addClass("j-btn").addClickListener(() -> {\n`;
-                code += `                this.model = p; showModal("Editar ${baseName}", "save");\n`;
-                code += `            });\n`;
-                code += `            actionsTd.add(editBtn);\\n`;
-                code += `            table.addRow(new Row(\\n                ${tblRows.join(', ')},\\n                actionsTd\\n            ));\\n`;
-                code += `        }\n`;
-                code += `        main.add(table);\n        center.add(main);\n        setupModal();\n    }\n\n`;
-                code += `    private void showModal(String title, String action) {\n`;
-                code += `        this.crudModal.setStyle("display", "flex");\n`;
-                code += `        this.modalTitle.setContent(title);\n`;
-                code += `        this.modalAction.setProperty("value", action);\n    }\n\n`;
+                let code = `package com.jettra.example.pages;\\n\\n`;
+                Array.from(imports).sort().forEach(imp => code += `import ${imp};\\n`);
+                code += `\\n@JettraPageSincronized(SyncType.ALL)\\n`;
+                code += `public class ${baseName}Page extends DashboardBasePage {\\n\\n`;
+                code += `    @InjectViewModel\\n    ${mName} model;\\n\\n`;
+                code += `    @io.jettra.wui.core.annotations.Inject\\n    private ${repoName} repository;\\n\\n`;
+                code += `    @InjectProperties(name = "messages")\\n    private Properties msg;\\n\\n`;
+                code += `    private String lang = "es";\\n\\n`;
+                code += `    private Div crudModal;\\n    private Header modalTitle;\\n    private TextBox modalAction;\\n    private Button modalSubmitBtn;\\n\\n`;
+                code += `    public ${baseName}Page() {\\n        super("Mantenimiento de ${baseName} (Pure MVC)");\\n    }\\n\\n`;
+                code += `    @Override\\n    protected void onInit(Map<String, String> params) {\\n`;
+                code += `        String lStr = params.get("lang");\\n`;
+                code += `        if (lStr != null) this.lang = lStr;\\n`;
+                code += `        super.onInit(params);\\n`;
+                code += `    }\\n\\n`;
+                code += `    @Override\\n    protected void initCenter(Center center, String username) {\\n`;
+                code += `        Style customStyles = new Style("\\n" +\\n`;
+                code += `            "            .crud-table { width: 100%; border-collapse: collapse; margin-top: 20px; color: #fff; }\\n" +\\n`;
+                code += `            "            .crud-table th, .crud-table td { padding: 12px; border: 1px solid rgba(0,255,255,0.3); text-align: left; }\\n" +\\n`;
+                code += `            "            .crud-table th { background: rgba(0,255,255,0.1); color: #0ff; }\\n" +\\n`;
+                code += `            "            \\n" +\\n`;
+                code += `            "            .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); justify-content: center; align-items: center;}\\n" +\\n`;
+                code += `            "            .modal-content { background-color: #0d1117; padding: 30px; border: 2px solid #0ff; width: 450px; border-radius: 12px; box-shadow: 0 0 50px rgba(0,255,255,0.4); color: #fff;}\\n" +\\n`;
+                code += `            "            .form-group { margin-bottom: 20px; }\\n" +\\n`;
+                code += `            "            .form-group label { display: block; margin-bottom: 8px; color: #0ff; }\\n" +\\n`;
+                code += `            "            .modal-actions { display: flex; justify-content: flex-end; gap: 15px; margin-top: 25px; }\\n" +\\n`;
+                code += `            "            ");\\n\\n`;
+                code += `        center.add(customStyles);\\n        \\n`;
+                code += `        Div mainContent = new Div();\\n`;
+                code += `        mainContent.setStyle("padding", "20px");\\n\\n`;
+                code += `        Header title = new Header(2, msg.getProperty("subtitle.${baseName.toLowerCase()}", "Mantenimiento de ${baseName}"))\\n`;
+                code += `            .setStyle("color", "var(--jettra-accent)")\\n`;
+                code += `            .setStyle("margin-bottom", "20px");\\n`;
+                code += `        mainContent.add(title);\\n\\n`;
+                code += `        setupModal(); // Initialize components before using them in listeners\\n\\n`;
+                code += `        Button addBtn = new Button("\\u2795 " + msg.getProperty("btn.add.${baseName.toLowerCase()}", "A\\u00F1adir ${baseName}"))\\n`;
+                code += `            .setId("addBtn")\\n`;
+                code += `            .addClass("j-btn")\\n`;
+                code += `            .setStyle("background-color", "#0f5132")\\n`;
+                code += `            .addClickListener(() -> {\\n`;
+                modelFields.forEach(field => {
+                    const cName = field.name.charAt(0).toUpperCase() + field.name.slice(1);
+                    if (field.type === 'String') code += `                this.model.set${cName}("");\\n`;
+                    else if (field.type === 'Integer' || field.type === 'Long' || field.type === 'Double') code += `                this.model.set${cName}(null);\\n`;
+                    else code += `                this.model.set${cName}(null);\\n`;
+                });
+                code += `                showModal(msg.getProperty("modal.add.${baseName.toLowerCase()}.title", "Nuevo ${baseName}"), "save");\\n`;
+                code += `            });\\n`;
+                code += `        mainContent.add(addBtn);\\n\\n`;
+                code += `        // Table\\n`;
+                code += `        io.jettra.wui.complex.Datatable table = new io.jettra.wui.complex.Datatable()\\n`;
+                code += `            .addHeaderRow(\\n`;
+                code += `                ${tblHeaders.join(',\\n                ')},\\n`;
+                code += `                msg.getProperty("th.actions", "Acciones")\\n`;
+                code += `            );\\n\\n`;
+                code += `        List<${mName}> all = repository.findAll();\\n`;
+                code += `        for (${mName} p : all) {\\n`;
+                code += `            io.jettra.wui.components.TD actionsTd = new io.jettra.wui.components.TD()\\n`;
+                code += `                .setStyle("display", "flex")\\n`;
+                code += `                .setStyle("gap", "10px");\\n`;
+                code += `            \\n`;
                 
-                code += `    @Override\n    protected void onPost(Map<String, String> params) {\n`;
-                code += `        String action = params.get("action");\n`;
-                code += `        // logic to handle save/delete based on action\n`;
-                code += `        // boolean result = ${repoName}.handleAction(action, params);\n`;
-                code += `        // if (result) {\n`;
-                code += `        //    JettraSyncManager.notifyChange("${mName}", SyncType.UPDATE, getLoggedUser(currentExchange));\n`;
-                code += `        //    try { redirect(currentExchange, JettraServer.resolvePath("/${baseName.toLowerCase()}")); } catch (Exception e) {}\n`;
-                code += `        // }\n`;
-                code += `    }\n\n`;
+                const keyGetter = modelFields.length > 0 ? "get" + modelFields[0].name.charAt(0).toUpperCase() + modelFields[0].name.slice(1) + "()" : "getId()";
+                
+                code += `            Button editBtn = new Button("\\u270F\\uFE0F")\\n`;
+                code += `                .addClass("j-btn")\\n`;
+                code += `                .setId("edit-" + p.${keyGetter})\\n`;
+                code += `                .addClickListener(() -> {\\n`;
+                modelFields.forEach(field => {
+                    const cName = field.name.charAt(0).toUpperCase() + field.name.slice(1);
+                    code += `                    this.model.set${cName}(p.get${cName}());\\n`;
+                });
+                code += `                    showModal(msg.getProperty("modal.edit.${baseName.toLowerCase()}.title", "Editar ${baseName}"), "save");\\n`;
+                code += `                });\\n`;
+                code += `            \\n`;
+                code += `            Button deleteBtn = new Button("\\uD83D\\uDDD1\\uFE0F")\\n`;
+                code += `                .addClass("j-btn")\\n`;
+                code += `                .setId("del-" + p.${keyGetter})\\n`;
+                code += `                .setStyle("color", "#ff5555")\\n`;
+                code += `                .setStyle("border-color", "#ff5555")\\n`;
+                code += `                .setStyle("background", "rgba(255,0,0,0.1)")\\n`;
+                code += `                .addClickListener(() -> {\\n`;
+                modelFields.forEach(field => {
+                    const cName = field.name.charAt(0).toUpperCase() + field.name.slice(1);
+                    code += `                    this.model.set${cName}(p.get${cName}());\\n`;
+                });
+                code += `                    showModal(msg.getProperty("modal.delete.${baseName.toLowerCase()}.title", "\\u00BFEliminar ${baseName}?"), "delete");\\n`;
+                code += `                });\\n`;
+                code += `            \\n`;
+                code += `            actionsTd.add(editBtn).add(deleteBtn);\\n`;
+                code += `            table.addRow(new io.jettra.wui.components.Row(\\n`;
+                code += `                ${tblRows.join(',\\n                ')},\\n`;
+                code += `                actionsTd\\n`;
+                code += `            ));\\n`;
+                code += `        }\\n`;
+                code += `        mainContent.add(table);\\n        center.add(mainContent);\\n    }\\n\\n`;
+                
+                code += `    private void showModal(String title, String action) {\\n`;
+                code += `        this.crudModal.setStyle("display", "flex");\\n`;
+                code += `        this.modalTitle.setContent(title);\\n`;
+                code += `        this.modalAction.setProperty("value", action);\\n`;
+                code += `        \\n`;
+                code += `        if ("delete".equals(action)) {\\n`;
+                code += `            this.modalSubmitBtn.setContent(msg.getProperty("btn.confirm", "\\u00A1Confirmar!"));\\n`;
+                code += `            this.modalSubmitBtn.setStyle("background-color", "rgba(255,0,0,0.6)");\\n`;
+                code += `        } else {\\n`;
+                code += `            this.modalSubmitBtn.setContent(msg.getProperty("btn.save", "Guardar"));\\n`;
+                code += `            this.modalSubmitBtn.setStyle("background-color", "");\\n`;
+                code += `        }\\n    }\\n\\n`;
 
-                code += `    private void setupModal() {\n`;
-                code += `        this.crudModal = new Div(); this.crudModal.setId("crudModal").addClass("j-modal-overlay");\n`;
-                code += `        this.crudModal.setStyle("display","none").setStyle("position","fixed").setStyle("z-index","9999").setStyle("background","rgba(0,0,0,0.8)");\n\n`;
-                code += `        Div content = new Div(); content.addClass("j-modal-content");\\n`;
-                code += `        this.modalTitle = new Header(3, "Operaci\\u00F3n");\\n`;
-                code += `        Form form = new Form("${baseName.toLowerCase()}Form", "");\n`;
-                code += `        this.modalAction = new TextBox("hidden", "action");\n\n`;
+                code += `    private void setupModal() {\\n`;
+                code += `        this.crudModal = new Div();\\n`;
+                code += `        this.crudModal.setId("crudModal").addClass("modal");\\n\\n`;
+                code += `        Div modalBody = new Div();\\n`;
+                code += `        modalBody.addClass("modal-content");\\n\\n`;
+                code += `        this.modalTitle = new Header(3, msg.getProperty("modal.operation", "Operaci\\u00F3n"));\\n`;
+                code += `        this.modalTitle.setId("modalTitle");\\n\\n`;
+                code += `        Form form = new Form("${baseName.toLowerCase()}Form", JettraServer.resolvePath("/${baseName.toLowerCase()}"));\\n`;
+                code += `        this.modalAction = new TextBox("hidden", "modalAction");\\n`;
+                code += `        this.modalAction.setId("modalAction");\\n\\n`;
                 code += modalFieldsCode;
-                code += `        Button cancelBtn = new Button("CANCELAR"); cancelBtn.addClass("j-btn");\n`;
-                code += `        cancelBtn.setProperty("onclick", "document.getElementById('crudModal').style.display='none'; return false;");\n`;
-                code += `        this.modalSubmitBtn = new Button("GUARDAR"); this.modalSubmitBtn.addClass("j-btn-primary");\n\n`;
-                code += `        Div footer = new Div(); footer.setStyle("display","flex").setStyle("justify-content","flex-end").setStyle("gap","10px");\\n`;
-                code += `        footer.add(cancelBtn).add(this.modalSubmitBtn);\\n`;
-                code += `        form.add(this.modalAction).add(footer);\\n`;
-                code += `        content.add(this.modalTitle).add(form);\\n`;
-                code += `        this.crudModal.add(content);\\n        this.add(this.crudModal);\\n    }\\n}\\n`;
+                code += `        Div groupActions = new Div()\\n`;
+                code += `            .addClass("modal-actions");\\n\\n`;
+                code += `        Button cancelBtn = new Button(msg.getProperty("btn.close", "CERRAR"))\\n`;
+                code += `            .setProperty("type", "button")\\n`;
+                code += `            .addClass("j-btn")\\n`;
+                code += `            .setStyle("background", "#555")\\n`;
+                code += `            .setStyle("border", "none")\\n`;
+                code += `            .setProperty("onclick", "document.getElementById('crudModal').style.display='none'; return false;");\\n\\n`;
+                code += `        this.modalSubmitBtn = new Button(msg.getProperty("btn.save", "Guardar"))\\n`;
+                code += `            .setId("modalSubmitBtn")\\n`;
+                code += `            .addClass("j-btn")\\n`;
+                code += `            .setProperty("type", "submit");\\n\\n`;
+                code += `        groupActions.add(cancelBtn).add(this.modalSubmitBtn);\\n`;
+                code += `        form.add(this.modalAction);\\n`;
+                modelFields.forEach(field => {
+                    const vName = field.name;
+                    code += `        form.add(g_${vName});\\n`;
+                });
+                code += `        form.add(groupActions);\\n`;
+                code += `        modalBody.add(this.modalTitle).add(form);\\n`;
+                code += `        this.crudModal.add(modalBody);\\n`;
+                code += `        this.add(this.crudModal);\\n    }\\n\\n`;
+
+                code += `    @Override\\n    protected void onPost(Map<String, String> params) {\\n`;
+                code += `        String action = params.get("modalAction");\\n`;
+                modelFields.forEach(field => {
+                    code += `        String ${field.name} = params.get("${field.name}");\\n`;
+                });
+                code += `        \\n`;
+                code += `        boolean changed = false;\\n`;
+                code += `        if (action != null) {\\n`;
+                code += `            if (action.equals("save")) {\\n`;
+                code += `                repository.save(model);\\n`;
+                code += `                changed = true;\\n`;
+                code += `            } else if (action.equals("delete")) {\\n`;
+                code += `                repository.delete(model.${keyGetter});\\n`;
+                code += `                changed = true;\\n`;
+                code += `            }\\n`;
+                code += `            JettraSyncManager.notifyChange("${mName}", SyncType.UPDATE, getLoggedUser(currentExchange));\\n`;
+                code += `        }\\n\\n`;
+                code += `        if (changed) {\\n`;
+                code += `            try {\\n`;
+                code += `                redirect(currentExchange, JettraServer.resolvePath("/${baseName.toLowerCase()}?lang=" + lang));\\n`;
+                code += `            } catch (IOException e) {\\n`;
+                code += `                System.err.println("Error during redirect: " + e.getMessage());\\n`;
+                code += `            }\\n`;
+                code += `        }\\n    }\\n}\\n`;
 
                 document.getElementById('generated-code-display').value = code;
                 document.getElementById('generated-code-hidden').value = code;
@@ -1818,6 +1921,8 @@ public class WebDesignerPage extends DashboardBasePage {
                 // Switch tab to code
                 const tab = document.querySelector('[data-tab="code"]');
                 if (tab) tab.click();
+                
+                window.syncCodeToCanvas();
                 
                 window.show3DMessage("CRUD Generado", "Se ha generado la arquitectura MVC completa para " + baseName);
             };
