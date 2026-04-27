@@ -64,6 +64,7 @@ public class WebExampleMain {
         server.addHandler("/icon", com.jettra.example.pages.IconPage.class);
         server.addHandler("/icons", com.jettra.example.pages.IconsPage.class);
         server.addHandler("/draw", com.jettra.example.pages.DrawPage.class);
+           server.addHandler("/deporte", com.jettra.example.pages.DeportePage.class);
         server.addHandler("/kanban", com.jettra.example.pages.KanbanPage.class);
         server.addHandler("/image", com.jettra.example.pages.ImagePage.class);
         server.addHandler("/layoutdisplay", com.jettra.example.dashboard.LayoutDisplayPage.class);
@@ -100,6 +101,7 @@ public class WebExampleMain {
         server.addHandler("/tabview", com.jettra.example.pages.TabViewPage.class);
         server.addHandler("/spinner", com.jettra.example.pages.SpinnerPage.class);
         server.addHandler("/pais", com.jettra.example.pages.PaisPage.class);
+        server.addHandler("/deporte", com.jettra.example.pages.DeportePage.class);
         server.addHandler("/webdesigner", com.jettra.example.pages.WebDesignerPage.class);
         server.addHandler("/map", com.jettra.example.pages.MapPage.class);
         server.addHandler("/panel", com.jettra.example.pages.PanelPage.class);

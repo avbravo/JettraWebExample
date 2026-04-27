@@ -1,3 +1,4 @@
+
 package com.jettra.example.model;
 
 import io.jettra.wui.core.annotations.JettraViewModel;

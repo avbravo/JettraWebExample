@@ -4,6 +4,7 @@ import com.jettra.example.dashboard.DashboardBasePage;
 import com.jettra.example.model.PersonaModel;
 import com.jettra.example.repository.PersonaRepository;
 import io.jettra.wui.complex.Center;
+import io.jettra.wui.complex.Modal;
 import io.jettra.wui.components.*;
 import io.jettra.wui.core.annotations.InjectProperties;
 import io.jettra.wui.core.annotations.InjectViewModel;
@@ -29,13 +30,13 @@ public class PersonaPage extends DashboardBasePage {
     private String lang = "es";
     private int pageNumber = 1;
 
-    private Div crudModal;
+    private Modal crudModal;
     private Header modalTitle;
     private TextBox modalAction;
     private TextBox modalId;
     private Button modalSubmitBtn;
-    private Div groupNombre;
-    private Div groupDireccion;
+    private FormGroup groupNombre;
+    private FormGroup groupDireccion;
     private Paragraph deleteMsg;
 
     public PersonaPage() {
@@ -57,36 +58,80 @@ public class PersonaPage extends DashboardBasePage {
 
     @Override
     protected void initCenter(Center center, String username) {
-  
-
         Style customStyles = new Style("""
-            .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); justify-content: center; align-items: center;}
-            .modal-content { background-color: #0d1117; padding: 30px; border: 2px solid #0ff; width: 450px; border-radius: 12px; box-shadow: 0 0 50px rgba(0,255,255,0.4); color: #fff;}
-            .form-group { margin-bottom: 20px; }
-            .form-group label { display: block; margin-bottom: 8px; color: #0ff; }
-            .modal-actions { display: flex; justify-content: flex-end; gap: 15px; margin-top: 25px; }
+            .modal-box { 
+                background-color: #161b22; 
+                padding: 25px; 
+                border: 1px solid var(--jettra-border); 
+                width: 95%; 
+                max-width: 500px; 
+                border-radius: 12px; 
+                box-shadow: 0 10px 50px rgba(0,0,0,0.6); 
+                color: #fff;
+                transition: all 0.3s ease;
+            }
+            .form-group { margin-bottom: 15px; }
+            .form-group label { display: block; margin-bottom: 5px; color: var(--jettra-accent); font-size: 14px; }
+            .modal-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: 20px; }
+            
+            /* 100% Responsive DataTable */
+            .j-datatable-container { 
+                width: 100%; 
+                max-width: 100vw;
+                border-radius: 8px; 
+                overflow: hidden; 
+                background: #0d1117;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            }
+            .j-datatable { 
+                width: 100%; 
+                border-collapse: collapse; 
+                table-layout: auto;
+            }
+            
+            @media (max-width: 768px) {
+                .modal-box { width: 98%; padding: 20px; }
+                .j-datatable { min-width: 550px; }
+            }
+            
+            @media (max-width: 600px) {
+                .modal-box { padding: 15px; border-radius: 8px; }
+                .j-datatable { min-width: 500px; }
+                .j-datatable-container { margin: 0; width: 100%; border-radius: 0; }
+                .form-group { margin-bottom: 12px; }
+            }
+            
+            @media (max-width: 480px) {
+                .modal-box { 
+                    width: 100%; 
+                    height: 100%; 
+                    max-width: 100vw; 
+                    max-height: 100vh; 
+                    border-radius: 0;
+                    top: 0 !important;
+                    left: 0 !important;
+                    transform: none !important;
+                    position: fixed;
+                }
+                .modal-actions { grid-template-columns: 1fr; }
+                .j-input { font-size: 16px !important; }
+                .j-datatable { min-width: 450px; }
+                .j-datatable td, .j-datatable th { padding: 10px 8px; font-size: 13px; }
+                .j-btn { padding: 10px; width: 100%; justify-content: center; }
+            }
             """);
         center.add(customStyles);
 
-        Div mainContent = new Div();
-        mainContent.setStyle("padding", "20px");
-
-        Header title = new Header(2, msg.getProperty("subtitle.persona"))
-            .setStyle("color", "var(--jettra-accent)")
-            .setStyle("margin-bottom", "20px");
-        mainContent.add(title);
+        Card mainCard = new Card()
+            .setTitle(msg.getProperty("subtitle.persona"))
+            .setWidth("100%");
 
         setupModal();
-
-        Div actionContainer = new Div()
-            .setStyle("display", "flex")
-            .setStyle("justify-content", "space-between")
-            .setStyle("margin-bottom", "20px");
 
         Button addBtn = new Button("➕ " + msg.getProperty("btn.add"))
             .setId("addBtn")
             .addClass("j-btn")
-            .setStyle("background-color", "#0f5132")
+            .setStyle("background-color", "#238636")
             .addClickListener(() -> {
                 this.persona.setId("");
                 this.persona.setNombre("");
@@ -94,19 +139,22 @@ public class PersonaPage extends DashboardBasePage {
                 showModal(msg.getProperty("modal.add.title"), "save");
             });
 
-        Button printBtn = new Button("🖨️ " + msg.getProperty("btn.print"))
-            .addClass("j-btn")
-            .setProperty("onclick", "window.print()");
-
-        actionContainer.add(addBtn).add(printBtn);
-        mainContent.add(actionContainer);
-
         // Table
-        io.jettra.wui.complex.Datatable table = new io.jettra.wui.complex.Datatable()
-            .addHeaderRow(msg.getProperty("th.name"),
-                msg.getProperty("th.address"),
-                msg.getProperty("th.actions")
-            );
+        io.jettra.wui.complex.Datatable table = new io.jettra.wui.complex.Datatable();
+        
+        Row headerRow = new Row();
+        headerRow.add(new TD(msg.getProperty("th.name")));
+        headerRow.add(new TD(msg.getProperty("th.address")));
+        
+        TD actionsTdHeader = new TD()
+            .setStyle("display", "flex")
+            .setStyle("justify-content", "space-between")
+            .setStyle("align-items", "center");
+        actionsTdHeader.add(new Span(msg.getProperty("th.actions")));
+        actionsTdHeader.add(addBtn.setStyle("margin", "0").setStyle("padding", "4px 8px").setStyle("font-size", "12px"));
+        
+        headerRow.add(actionsTdHeader);
+        table.addHeaderRow(headerRow);
 
         List<PersonaModel> all = PersonaRepository.findAll();
         int pageSize = 10;
@@ -136,7 +184,7 @@ public class PersonaPage extends DashboardBasePage {
                 .setId("del-" + p.getId())
                 .addClass("j-btn")
                 .setStyle("color", "#ff5555")
-                .setStyle("border-color", "#ff5555")
+                .setStyle("border-color", "rgba(255,0,0,0.3)")
                 .setStyle("background", "rgba(255,0,0,0.1)")
                 .addClickListener(() -> {
                     this.persona.setId(p.getId());
@@ -153,32 +201,35 @@ public class PersonaPage extends DashboardBasePage {
             ));
         }
 
-        mainContent.add(table);
+        mainCard.add(table);
 
         // Simple Pager
-        Div pager = new Div()
-            .setStyle("margin-top", "20px")
-            .setStyle("display", "flex")
-            .setStyle("justify-content", "center")
-            .setStyle("gap", "15px");
-        if (pageNumber > 1) {
-            Link prev = new Link("?lang=" + lang + "&page=" + (pageNumber - 1), "« " + msg.getProperty("pager.prev"))
-                .addClass("j-btn");
-            pager.add(prev);
+        if (totalPages > 1) {
+            Div pager = new Div()
+                .setStyle("margin-top", "20px")
+                .setStyle("display", "flex")
+                .setStyle("justify-content", "center")
+                .setStyle("gap", "15px")
+                .setStyle("align-items", "center");
+            
+            if (pageNumber > 1) {
+                pager.add(new Link("?lang=" + lang + "&page=" + (pageNumber - 1), "« " + msg.getProperty("pager.prev"))
+                    .addClass("j-btn"));
+            }
+            pager.add(new Span(msg.getProperty("pager.page", "Página") + " " + pageNumber + " / " + totalPages));
+            if (pageNumber < totalPages) {
+                pager.add(new Link("?lang=" + lang + "&page=" + (pageNumber + 1), msg.getProperty("pager.next") + " »")
+                    .addClass("j-btn"));
+            }
+            mainCard.add(pager);
         }
-        pager.add(new Span("Page " + pageNumber + " of " + totalPages));
-        if (pageNumber < totalPages) {
-            Link next = new Link("?lang=" + lang + "&page=" + (pageNumber + 1), msg.getProperty("pager.next") + " »")
-                .addClass("j-btn");
-            pager.add(next);
-        }
-        mainContent.add(pager);
 
-        center.add(mainContent);
+        center.add(new Div().setStyle("padding", "20px").add(mainCard));
+        center.add(this.crudModal);
     }
 
     private void showModal(String title, String action) {
-        this.crudModal.setStyle("display", "flex");
+        this.crudModal.setStyle("display", "block");
         this.modalTitle.setContent(title);
         this.modalAction.setProperty("value", action);
         this.modalId.setProperty("value", this.persona.getId());
@@ -188,39 +239,36 @@ public class PersonaPage extends DashboardBasePage {
             this.groupDireccion.setStyle("display", "none");
             this.deleteMsg.setStyle("display", "block");
             this.modalSubmitBtn.setContent(msg.getProperty("btn.confirm.delete"));
-            this.modalSubmitBtn.setStyle("background-color", "rgba(255,0,0,0.6)");
+            this.modalSubmitBtn.setStyle("background-color", "#da3633");
         } else {
             this.groupNombre.setStyle("display", "block");
             this.groupDireccion.setStyle("display", "block");
             this.deleteMsg.setStyle("display", "none");
             this.modalSubmitBtn.setContent(msg.getProperty("btn.save"));
-            this.modalSubmitBtn.setStyle("background-color", "");
+            this.modalSubmitBtn.setStyle("background-color", "#238636");
         }
     }
 
     private void setupModal() {
-        this.crudModal = new Div();
-        this.crudModal.setId("crudModal").addClass("modal");
+        this.crudModal = new Modal("crudModal");
+        this.crudModal.addClass("modal-box")
+            .setStyle("z-index", "9999")
+            .setStyle("background-color", "#161b22");
 
-        Div modalContent = new Div();
-        modalContent.addClass("modal-content");
-        
         this.modalTitle = new Header(3, "Operación");
         
         Form form = new Form("personaForm", JettraServer.resolvePath("/persona"));
         this.modalAction = new TextBox("hidden", "action");
         this.modalId = new TextBox("hidden", "personaId");
         
-        this.groupNombre = new Div();
-        groupNombre.addClass("form-group");
+        this.groupNombre = new FormGroup();
         groupNombre.add(new Label("nombre", msg.getProperty("lbl.name")));
         TextBox inputNombre = new TextBox("text", "nombre");
         inputNombre.setId("personaNombre").addClass("j-input");
         JettraValidations.apply(inputNombre, PersonaModel.class, "nombre");
         groupNombre.add(inputNombre);
 
-        this.groupDireccion = new Div();
-        groupDireccion.addClass("form-group");
+        this.groupDireccion = new FormGroup();
         groupDireccion.add(new Label("direccion", msg.getProperty("lbl.address")));
         TextBox inputDireccion = new TextBox("text", "direccion");
         inputDireccion.setId("personaDireccion").addClass("j-input");
@@ -228,14 +276,13 @@ public class PersonaPage extends DashboardBasePage {
         groupDireccion.add(inputDireccion);
 
         this.deleteMsg = new Paragraph(msg.getProperty("msg.confirm.delete"));
-        this.deleteMsg.setStyle("color", "#ff5555").setStyle("display", "none");
+        this.deleteMsg.setStyle("color", "#f85149").setStyle("display", "none");
 
-        Div actions = new Div();
-        actions.addClass("modal-actions");
+        Div actions = new Div().addClass("modal-actions");
         
         Button cancelBtn = new Button(msg.getProperty("btn.cancel"));
         cancelBtn.setProperty("type", "button");
-        cancelBtn.addClass("j-btn").setStyle("background", "#555");
+        cancelBtn.addClass("j-btn").setStyle("background", "#30363d");
         cancelBtn.setProperty("onclick", "document.getElementById('crudModal').style.display='none'; return false;");
 
         this.modalSubmitBtn = new Button(msg.getProperty("btn.save"));
@@ -245,9 +292,7 @@ public class PersonaPage extends DashboardBasePage {
         actions.add(cancelBtn).add(this.modalSubmitBtn);
         form.add(this.modalAction).add(this.modalId).add(groupNombre).add(groupDireccion).add(this.deleteMsg).add(actions);
         
-        modalContent.add(this.modalTitle).add(form);
-        this.crudModal.add(modalContent);
-        this.add(this.crudModal);
+        this.crudModal.add(this.modalTitle).add(form);
     }
 
     @Override
