@@ -62,71 +62,6 @@ public class DeportePage extends DashboardBasePage {
 
     @Override
     protected void initCenter(Center center, String username) {
-        Style customStyles = new Style(
-                """
-                        .modal-box { 
-                            background-color: #161b22; 
-                            padding: 25px; 
-                            border: 1px solid var(--jettra-border); 
-                            width: 95%; 
-                            max-width: 500px; 
-                            border-radius: 12px; 
-                            box-shadow: 0 10px 50px rgba(0,0,0,0.6); 
-                            color: #fff;
-                            transition: all 0.3s ease;
-                        }
-                        .form-group { margin-bottom: 15px; }
-                        .form-group label { display: block; margin-bottom: 5px; color: var(--jettra-accent); font-size: 14px; }
-                        .modal-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: 20px; }
-                        
-                        /* 100% Responsive DataTable */
-                        .j-datatable-container { 
-                            width: 100%; 
-                            max-width: 100vw;
-                            border-radius: 8px; 
-                            overflow: hidden; 
-                            background: #0d1117;
-                            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-                        }
-                        .j-datatable { 
-                            width: 100%; 
-                            border-collapse: collapse; 
-                            table-layout: auto;
-                        }
-                        
-                        @media (max-width: 768px) {
-                            .modal-box { width: 98%; padding: 20px; }
-                            .j-datatable { min-width: 550px; }
-                        }
-                        
-                        @media (max-width: 600px) {
-                            .modal-box { padding: 15px; border-radius: 8px; }
-                            .j-datatable { min-width: 500px; }
-                            .j-datatable-container { margin: 0; width: 100%; border-radius: 0; }
-                            .form-group { margin-bottom: 12px; }
-                        }
-                        
-                        @media (max-width: 480px) {
-                            .modal-box { 
-                                width: 100%; 
-                                height: 100%; 
-                                max-width: 100vw; 
-                                max-height: 100vh; 
-                                border-radius: 0;
-                                top: 0 !important;
-                                left: 0 !important;
-                                transform: none !important;
-                                position: fixed;
-                            }
-                            .modal-actions { grid-template-columns: 1fr; }
-                            .j-input { font-size: 16px !important; }
-                            .j-datatable { min-width: 450px; }
-                            .j-datatable td, .j-datatable th { padding: 10px 8px; font-size: 13px; }
-                            .j-btn { padding: 10px; width: 100%; justify-content: center; }
-                        }
-                        """);
-        center.add(customStyles);
-
         Card mainCard = new Card()
                 .setTitle(msg.getProperty("title.deporte"))
                 .setSubtitle(msg.getProperty("subtitle.deporte"))
@@ -156,11 +91,7 @@ public class DeportePage extends DashboardBasePage {
         headerRow.add(new TD(msg.getProperty("th.deporte")));
 
         TD actionsTdHeader = new TD();
-        actionsTdHeader.setStyle("display", "flex").setStyle("justify-content", "space-between").setStyle("align-items",
-                "center");
-        actionsTdHeader.add(new Span(msg.getProperty("th.actions")));
-        actionsTdHeader
-                .add(addBtn.setStyle("margin", "0").setStyle("padding", "4px 8px").setStyle("font-size", "12px"));
+        actionsTdHeader.add(addBtn);
 
         headerRow.add(actionsTdHeader);
         table.addHeaderRow(headerRow);
@@ -177,9 +108,7 @@ public class DeportePage extends DashboardBasePage {
                 : all.subList(Math.max(0, start), Math.max(0, end));
 
         for (DeporteModel d : paginated) {
-            TD actionsTd = new TD()
-                    .setStyle("display", "flex")
-                    .setStyle("gap", "8px");
+            TD actionsTd = new TD();
 
             Button editBtn = new Button("✏️")
                     .setId("editBtn_" + d.getCode())
@@ -192,10 +121,6 @@ public class DeportePage extends DashboardBasePage {
 
             Button deleteBtn = new Button("🗑️")
                     .setId("deleteBtn_" + d.getCode())
-
-                    .setStyle("color", "#f85149")
-                    .setStyle("border-color", "rgba(248,81,73,0.3)")
-                    .setStyle("background", "rgba(248,81,73,0.1)")
                     .addClickListener(() -> {
                         this.deporte.setCode(d.getCode());
                         this.deporte.setDeporte(d.getDeporte());
@@ -204,7 +129,7 @@ public class DeportePage extends DashboardBasePage {
 
             actionsTd.add(editBtn).add(deleteBtn);
             table.addRow(new Row(
-                    new TD(d.getCode()).setStyle("font-weight", "bold").setStyle("color", "var(--jettra-accent)"),
+                    new TD(d.getCode()),
                     new TD(d.getDeporte()),
                     actionsTd));
         }
@@ -213,12 +138,7 @@ public class DeportePage extends DashboardBasePage {
 
         // Pager
         if (totalPages > 1) {
-            Div pager = new Div()
-                    .setStyle("margin-top", "20px")
-                    .setStyle("display", "flex")
-                    .setStyle("justify-content", "center")
-                    .setStyle("gap", "10px")
-                    .setStyle("align-items", "center");
+            Div pager = new Div();
 
             if (pageNumber > 1) {
                 pager.add(new Link("?lang=" + lang + "&page=" + (pageNumber - 1), "« " + msg.getProperty("pager.prev"))
@@ -232,7 +152,7 @@ public class DeportePage extends DashboardBasePage {
             mainCard.add(pager);
         }
 
-        center.add(new Div().setStyle("padding", "20px").add(mainCard));
+        center.add(mainCard);
         center.add(this.crudModal);
     }
 
@@ -245,32 +165,23 @@ public class DeportePage extends DashboardBasePage {
 
         if (isEdit) {
             this.modalCode.setProperty("readonly", "true");
-            this.modalCode.setStyle("background", "#21262d").setStyle("color", "#8b949e");
         } else {
             this.modalCode.setProperty("readonly", "false");
-            this.modalCode.setStyle("background", "").setStyle("color", "");
         }
 
         if ("delete".equals(action)) {
             this.groupCode.setStyle("display", "none");
             this.groupDeporte.setStyle("display", "none");
-            this.deleteMsg.setStyle("display", "block");
             this.modalSubmitBtn.setContent(msg.getProperty("btn.confirm.delete"));
-            this.modalSubmitBtn.setStyle("background-color", "#da3633");
         } else {
             this.groupCode.setStyle("display", "block");
             this.groupDeporte.setStyle("display", "block");
-            this.deleteMsg.setStyle("display", "none");
             this.modalSubmitBtn.setContent(msg.getProperty("btn.save"));
-            this.modalSubmitBtn.setStyle("background-color", "#238636");
         }
     }
 
     private void setupModal() {
         this.crudModal = new Modal("crudModal");
-        this.crudModal.addClass("modal-box")
-                .setStyle("z-index", "9999")
-                .setStyle("background-color", "#161b22");
 
         this.modalTitle = new Header(3, "Operación");
 
@@ -298,7 +209,7 @@ public class DeportePage extends DashboardBasePage {
 
         Button cancelBtn = new Button(msg.getProperty("btn.cancel"));
         cancelBtn.setProperty("type", "button");
-        cancelBtn.addClass("j-btn").setStyle("background", "#30363d");
+        cancelBtn.addClass("j-btn");
         cancelBtn.setProperty("onclick", "document.getElementById('crudModal').style.display='none'; return false;");
 
         this.modalSubmitBtn = new Button(msg.getProperty("btn.save")).addClass("j-btn").setProperty("type", "submit");
