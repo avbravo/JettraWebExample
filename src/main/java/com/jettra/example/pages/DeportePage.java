@@ -182,6 +182,11 @@ public class DeportePage extends DashboardBasePage {
 
     private void setupModal() {
         this.crudModal = new Modal("crudModal");
+        this.crudModal.setStyle("background-color", "#161b22");
+        this.crudModal.setStyle("border", "1px solid #30363d");
+        this.crudModal.setStyle("border-radius", "8px");
+        this.crudModal.setStyle("padding", "24px");
+        this.crudModal.setStyle("box-shadow", "0 16px 32px rgba(0,0,0,0.9)");
 
         this.modalTitle = new Header(3, "Operación");
 
