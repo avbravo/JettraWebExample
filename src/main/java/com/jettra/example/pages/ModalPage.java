@@ -25,10 +25,10 @@ public class ModalPage extends DashboardBasePage {
         h1.setStyle("margin", "0");
         headerRow.add(h1);
         
-        Button codeBtn = new Button("Code");
-        codeBtn.addClass("j-btn");
-        codeBtn.setStyle("border-color", "var(--jettra-accent)").setStyle("color", "var(--jettra-accent)");
-        codeBtn.setProperty("onclick", "document.getElementById('code-modal-modal').style.display = 'flex'");
+        Button codeBtn = new Button("Code")
+            .setStyle("border-color", "var(--jettra-accent)")
+            .setStyle("color", "var(--jettra-accent)")
+            .setOnclick("document.getElementById('code-modal-modal').style.display = 'flex'");
         headerRow.add(codeBtn);
         
         container.add(headerRow);
@@ -70,14 +70,13 @@ public class ModalPage extends DashboardBasePage {
         Div modalActions = new Div();
         modalActions.setStyle("display", "flex").setStyle("justify-content", "flex-end").setStyle("gap", "10px");
         
-        Button copyBtn = new Button("Copy");
-        copyBtn.addClass("j-btn");
-        copyBtn.setProperty("onclick", "navigator.clipboard.writeText(document.getElementById('java-code-modal').innerText).then(() => { this.innerText='Copied!'; setTimeout(() => this.innerText='Copy', 2000); })");
+        Button copyBtn = new Button("Copy")
+            .setOnclick("navigator.clipboard.writeText(document.getElementById('java-code-modal').innerText).then(() => { this.innerText='Copied!'; setTimeout(() => this.innerText='Copy', 2000); })");
         
-        Button closeBtn = new Button("Close");
-        closeBtn.addClass("j-btn");
-        closeBtn.setStyle("background", "transparent").setStyle("border-color", "var(--jettra-border)");
-        closeBtn.setProperty("onclick", "document.getElementById('code-modal-modal').style.display = 'none'");
+        Button closeBtn = new Button("Close")
+            .setStyle("background", "transparent")
+            .setStyle("border-color", "var(--jettra-border)")
+            .setOnclick("document.getElementById('code-modal-modal').style.display = 'none'");
         
         modalActions.add(closeBtn).add(copyBtn);
         codeModal.add(modalActions);
@@ -91,9 +90,9 @@ public class ModalPage extends DashboardBasePage {
         Div row1 = new Div();
         row1.setStyle("margin-bottom", "30px");
         
-        Button openBtn = new Button("Open Demo Modal");
-        openBtn.addClass("j-btn j-btn-primary");
-        openBtn.setProperty("onclick", "document.getElementById('demo-modal').style.display = 'flex'");
+        Button openBtn = new Button("Open Demo Modal")
+            .primary()
+            .setOnclick("document.getElementById('demo-modal').style.display = 'flex'");
         
         io.jettra.wui.complex.Modal demoModal = new io.jettra.wui.complex.Modal("demo-modal")
                  .setPadding("40px")
@@ -103,13 +102,12 @@ public class ModalPage extends DashboardBasePage {
         demoModal.add(new Header(2, "Demo Warning"));
         demoModal.add(new Paragraph("Are you sure you want to perform this action?"));
         
-        Button confirmBtn = new Button("Confirm");
-        confirmBtn.addClass("j-btn j-btn-primary");
-        confirmBtn.setProperty("onclick", "document.getElementById('demo-modal').style.display = 'none'");
+        Button confirmBtn = new Button("Confirm")
+            .primary()
+            .setOnclick("document.getElementById('demo-modal').style.display = 'none'");
         
-        Button cancelBtn = new Button("Cancel");
-        cancelBtn.addClass("j-btn");
-        cancelBtn.setProperty("onclick", "document.getElementById('demo-modal').style.display = 'none'");
+        Button cancelBtn = new Button("Cancel")
+            .setOnclick("document.getElementById('demo-modal').style.display = 'none'");
         
         Div demoActions = new Div();
         demoActions.setStyle("display", "flex").setStyle("gap", "10px").setStyle("margin-top", "20px");

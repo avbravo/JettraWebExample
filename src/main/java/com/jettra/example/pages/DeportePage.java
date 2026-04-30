@@ -99,8 +99,7 @@ public class DeportePage extends DashboardBasePage {
 
         Button addBtn = new Button("➕ " + msg.getProperty("btn.add.deporte"))
                 .setId("addDeporteBtn")
-                .addClass("j-btn")
-                .setStyle("background-color", "#238636")
+                .setBackgroundColor("#238636")
                 .addClickListener(() -> {
                     this.deporte.setCode("");
                     this.deporte.setDeporte("");
@@ -185,30 +184,26 @@ public class DeportePage extends DashboardBasePage {
     }
 
     private void showModal(String title, String action, boolean isEdit) {
-        this.crudModal.setStyle("display", "flex");
+        this.crudModal.setDisplay("flex");
         this.modalTitle.setContent(title);
-        this.modalAction.setProperty("value", action);
-        this.modalCode.setProperty("value", this.deporte.getCode());
-        this.inputDeporte.setProperty("value", this.deporte.getDeporte());
+        this.modalAction.setValue(action);
+        this.modalCode.setValue(this.deporte.getCode());
+        this.inputDeporte.setValue(this.deporte.getDeporte());
 
-        if (isEdit) {
-            this.modalCode.setProperty("readonly", "true");
-        } else {
-            this.modalCode.setProperty("readonly", "false");
-        }
+        this.modalCode.setReadonly(isEdit);
 
         if ("delete".equals(action)) {
-            this.groupCode.setStyle("display", "none");
-            this.groupDeporte.setStyle("display", "none");
-            this.deleteMsg.setStyle("display", "block");
-            this.modalSubmitBtn.setContent(msg.getProperty("btn.confirm.delete"));
-            this.modalSubmitBtn.setStyle("background-color", "#da3633");
+            this.groupCode.setDisplay("none");
+            this.groupDeporte.setDisplay("none");
+            this.deleteMsg.setDisplay("block");
+            this.modalSubmitBtn.setContent(msg.getProperty("btn.confirm.delete"))
+                               .setBackgroundColor("#da3633");
         } else {
-            this.groupCode.setStyle("display", "block");
-            this.groupDeporte.setStyle("display", "block");
-            this.deleteMsg.setStyle("display", "none");
-            this.modalSubmitBtn.setContent(msg.getProperty("btn.save"));
-            this.modalSubmitBtn.setStyle("background-color", "#238636");
+            this.groupCode.setDisplay("block");
+            this.groupDeporte.setDisplay("block");
+            this.deleteMsg.setDisplay("none");
+            this.modalSubmitBtn.setContent(msg.getProperty("btn.save"))
+                               .setBackgroundColor("#238636");
         }
     }
 
@@ -225,32 +220,29 @@ public class DeportePage extends DashboardBasePage {
 
         this.groupCode = new FormGroup();
         groupCode.add(new Label("code", msg.getProperty("lbl.code")));
-        this.modalCode = new TextBox("text", "code");
-        this.modalCode.setId("deporteCode").addClass("j-input");
+        this.modalCode = new TextBox("text", "code").setId("deporteCode");
         JettraValidations.apply(this.modalCode, DeporteModel.class, "code");
         groupCode.add(this.modalCode);
 
         this.groupDeporte = new FormGroup();
         groupDeporte.add(new Label("deporte", msg.getProperty("lbl.deporte")));
-        this.inputDeporte = new TextBox("text", "deporte");
-        this.inputDeporte.setId("deporteName").addClass("j-input");
+        this.inputDeporte = new TextBox("text", "deporte").setId("deporteName");
         JettraValidations.apply(this.inputDeporte, DeporteModel.class, "deporte");
         groupDeporte.add(this.inputDeporte);
 
         this.deleteMsg = new Paragraph(msg.getProperty("msg.confirm.delete.deporte"));
-        this.deleteMsg.setStyle("color", "#f85149").setStyle("display", "none");
+        this.deleteMsg.setColor("#f85149").setDisplay("none");
 
         Div actions = new Div().addClass("modal-actions");
 
-        Button cancelBtn = new Button(msg.getProperty("btn.cancel"));
-        cancelBtn.setProperty("type", "button");
-        cancelBtn.addClass("j-btn").setStyle("background", "#30363d");
-        cancelBtn.setProperty("onclick", "document.getElementById('crudModal').style.display='none'; return false;");
+        Button cancelBtn = new Button(msg.getProperty("btn.cancel"))
+                .setType("button")
+                .setBackgroundColor("#30363d")
+                .setOnclick("document.getElementById('crudModal').style.display='none'; return false;");
 
         this.modalSubmitBtn = new Button(msg.getProperty("btn.save"))
-                .addClass("j-btn")
-                .setProperty("type", "submit")
-                .setStyle("background-color", "#238636");
+                .setType("submit")
+                .setBackgroundColor("#238636");
 
         actions.add(cancelBtn).add(this.modalSubmitBtn);
         form.add(this.modalAction).add(groupCode).add(groupDeporte).add(this.deleteMsg).add(actions);

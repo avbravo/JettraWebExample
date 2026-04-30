@@ -533,7 +533,7 @@ public class WebDesignerPage extends DashboardBasePage {
             .mobile-designer-frame .mobile-notch { display: block; }
         """);
         
-        String scriptPart1 = ("""
+        String sp1 = ("""
             window.viewModelName = '---VIEWMODEL_NAME---';
             window.availableModels = [];
             window.modelFields = [];
@@ -945,6 +945,43 @@ public class WebDesignerPage extends DashboardBasePage {
                                 <option value="INFO" ${props.btnStyle === 'INFO' ? 'selected' : ''}>INFO</option>
                             </select>
                         </div>
+                        <div class="inspector-row"><span class="inspector-label">Bg Color</span><input type="text" class="inspector-input" value="${props.backgroundColor || ''}" onchange="window.updateProp('backgroundColor', this.value)"></div>
+                        <div class="inspector-row"><span class="inspector-label">JS Onclick</span><input type="text" class="inspector-input" value="${props.onclick || ''}" onchange="window.updateProp('onclick', this.value)"></div>
+                        <div class="inspector-row">
+                            <span class="inspector-label">Type</span>
+                            <select class="inspector-input" onchange="window.updateProp('type', this.value)">
+                                <option value="button" ${props.type === 'button' ? 'selected' : ''}>button</option>
+                                <option value="submit" ${props.type === 'submit' ? 'selected' : ''}>submit</option>
+                                <option value="reset" ${props.type === 'reset' ? 'selected' : ''}>reset</option>
+                            </select>
+                        </div>
+                    `;
+                }
+
+                if (type === 'TextBox') {
+                    html += `
+                        <div class="inspector-row"><span class="inspector-label">Value</span><input type="text" class="inspector-input" value="${props.value || ''}" onchange="window.updateProp('value', this.value)"></div>
+                        <div class="inspector-row" style="display:flex; justify-content:space-between; align-items:center;">
+                            <span class="inspector-label">Read Only</span>
+                            <input type="checkbox" ${props.readonly ? 'checked' : ''} onchange="window.updateProp('readonly', this.checked)">
+                        </div>
+                        <div class="inspector-row">
+                            <span class="inspector-label">Display</span>
+                            <select class="inspector-input" onchange="window.updateProp('display', this.value)">
+                                <option value="block" ${props.display === 'block' ? 'selected' : ''}>block</option>
+                                <option value="none" ${props.display === 'none' ? 'selected' : ''}>none</option>
+                            </select>
+                        </div>
+                    `;
+                }
+
+                if (type === 'Modal') {
+                    html += `
+                        <div class="inspector-row"><span class="inspector-label">Padding</span><input type="text" class="inspector-input" value="${props.padding || '30px'}" onchange="window.updateProp('padding', this.value)"></div>
+                        <div class="inspector-row"><span class="inspector-label">Background Color</span><input type="text" class="inspector-input" value="${props.backgroundColor || '#161b22'}" onchange="window.updateProp('backgroundColor', this.value)"></div>
+                        <div class="inspector-row"><span class="inspector-label">Border</span><input type="text" class="inspector-input" value="${props.border || '1px solid #30363d'}" onchange="window.updateProp('border', this.value)"></div>
+                        <div class="inspector-row"><span class="inspector-label">Max Width</span><input type="text" class="inspector-input" value="${props.maxWidth || '90vw'}" onchange="window.updateProp('maxWidth', this.value)"></div>
+                        <div class="inspector-row"><span class="inspector-label">Z-Index</span><input type="text" class="inspector-input" value="${props.zIndex || '1000'}" onchange="window.updateProp('zIndex', this.value)"></div>
                     `;
                 }
 
@@ -961,7 +998,9 @@ public class WebDesignerPage extends DashboardBasePage {
                         </div>
                     `;
                 }
+        """).replace("---VIEWMODEL_NAME---", viewModelName);
 
+        String sp2 = ("""
                 if (type === 'Panel' || type === 'Grid') {
                     html += `
                         <div class="inspector-row">
@@ -1480,7 +1519,7 @@ public class WebDesignerPage extends DashboardBasePage {
             };
         """).replace("---VIEWMODEL_NAME---", viewModelName);
 
-        String scriptPart2 = """
+        String sp3 = """
 
             window.loadFiles = function(input) {
                 const viewer = document.getElementById('explorer-tree-view');
@@ -1927,7 +1966,9 @@ public class WebDesignerPage extends DashboardBasePage {
                 
                 window.show3DMessage("CRUD Generado", "Se ha generado la arquitectura MVC completa para " + baseName);
             };
+        """;
 
+        String sp4 = """
             window.initDesigner = function() {
                 window.jettraFileCache = {};
             };
@@ -1968,6 +2009,17 @@ public class WebDesignerPage extends DashboardBasePage {
                         const chainProps = () => {
                             let c = "";
                             if (props.id && props.id.trim() !== "") c += `.setId("${props.id}")`;
+                            if (props.backgroundColor) c += `\\n            .setBackgroundColor("${props.backgroundColor}")`;
+                            if (props.padding) c += `\\n            .setPadding("${props.padding}")`;
+                            if (props.border) c += `\\n            .setBorder("${props.border}")`;
+                            if (props.maxWidth) c += `\\n            .setMaxWidth("${props.maxWidth}")`;
+                            if (props.zIndex) c += `\\n            .setZIndex("${props.zIndex}")`;
+                            if (props.display && props.display !== "block") c += `\\n            .setDisplay("${props.display}")`;
+                            if (props.onclick) c += `\\n            .setOnclick("${props.onclick}")`;
+                            if (props.type && props.type !== "button") c += `\\n            .setType("${props.type}")`;
+                            if (props.value) c += `\\n            .setValue("${props.value}")`;
+                            if (props.readonly) c += `\\n            .setReadonly(true)`;
+                            
                             if (props.binding && props.binding.trim() !== "") {
                                 if (type === 'TextBox' || type === 'TextArea') {
                                     c += `\\n            .bind("${props.binding}")`;
@@ -2438,11 +2490,9 @@ public class WebDesignerPage extends DashboardBasePage {
 
         """;
         
-        Script script1 = new Script(scriptPart1);
-        Script script2 = new Script(scriptPart2);
+        Script script = new Script(sp1 + sp2 + sp3 + sp4);
         
         center.add(style);
-        center.add(script1);
-        center.add(script2);
+        center.add(script);
     }
 }
