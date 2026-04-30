@@ -533,7 +533,8 @@ public class WebDesignerPage extends DashboardBasePage {
             .mobile-designer-frame .mobile-notch { display: block; }
         """);
         
-        String sp1 = ("""
+        StringBuilder sb = new StringBuilder();
+        sb.append("""
             window.viewModelName = '---VIEWMODEL_NAME---';
             window.availableModels = [];
             window.modelFields = [];
@@ -998,17 +999,7 @@ public class WebDesignerPage extends DashboardBasePage {
                         </div>
                     `;
                 }
-        """).replace("---VIEWMODEL_NAME---", viewModelName);
-
-        String sp2 = ("""
-                if (type === 'Panel' || type === 'Grid') {
-                    html += `
-                        <div class="inspector-row">
-                            <span class="inspector-label">Columns</span>
-                            <input type="number" class="inspector-input" value="${props.columns || 2}" min="1" max="12" onchange="updateProp('columns', this.value)">
-                        </div>
-                    `;
-                }
+""").append("""
 
                 if (type === 'Map') {
                     html += `
@@ -1517,9 +1508,7 @@ public class WebDesignerPage extends DashboardBasePage {
                 if (viewer) viewer.innerHTML = '';
             window.updateGeneratedCode();
             };
-        """).replace("---VIEWMODEL_NAME---", viewModelName);
-
-        String sp3 = """
+        """).append("""
 
             window.loadFiles = function(input) {
                 const viewer = document.getElementById('explorer-tree-view');
@@ -1861,7 +1850,7 @@ public class WebDesignerPage extends DashboardBasePage {
                 code += `                    showModal(msg.getProperty("modal.edit.${baseName.toLowerCase()}.title", "Editar ${baseName}"), "save");\\n`;
                 code += `                });\\n`;
                 code += `            \\n`;
-                code += `            Button deleteBtn = new Button("\\uD83D\\uDDD1\\uFE0F")\\n`;
+                code += `            Button deleteBtn = new Button("\\uD83D\uDDD1\\uFE0F")\\n`;
                 code += `                .addClass("j-btn")\\n`;
                 code += `                .setId("del-" + p.${keyGetter})\\n`;
                 code += `                .setStyle("color", "#ff5555")\\n`;
@@ -1966,9 +1955,7 @@ public class WebDesignerPage extends DashboardBasePage {
                 
                 window.show3DMessage("CRUD Generado", "Se ha generado la arquitectura MVC completa para " + baseName);
             };
-        """;
 
-        String sp4 = """
             window.initDesigner = function() {
                 window.jettraFileCache = {};
             };
@@ -2488,9 +2475,9 @@ public class WebDesignerPage extends DashboardBasePage {
                 document.getElementById('preview-modal').style.display = 'block';
             };
 
-        """;
-        
-        Script script = new Script(sp1 + sp2 + sp3 + sp4);
+        """);
+         
+         Script script = new Script(sb.toString().replace("---VIEWMODEL_NAME---", viewModelName));
         
         center.add(style);
         center.add(script);
