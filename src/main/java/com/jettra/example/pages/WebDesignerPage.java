@@ -378,7 +378,7 @@ public class WebDesignerPage extends DashboardBasePage {
         // Navigation
         addPaletteCategory(palette, "Navigation", new String[]{"Link", "Menu", "MenuBar", "MenuItem"});
         // Feedback
-        addPaletteCategory(palette, "Feedback", new String[]{"ProgressBar", "Spinner", "Loading", "Alert", "Notification", "Clock"});
+        addPaletteCategory(palette, "Feedback", new String[]{"ProgressBar", "Spinner", "Loading", "Alert", "Notification", "Clock", "TrafficLight"});
         // Media & Files
         addPaletteCategory(palette, "Media", new String[]{"Downloader", "PDFViewer", "ViewMedia", "BarCode", "Draw"});
         // Charts
@@ -789,6 +789,7 @@ public class WebDesignerPage extends DashboardBasePage {
                     case 'Loading': content = '<div class="j-loading" style="display:inline-flex; align-items:center; justify-content:center; padding:10px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--jettra-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" /></svg></div>'; break;
                     case 'Alert': content = '<div style="background:rgba(255,0,0,0.1); border-left:4px solid #ff4444; padding:15px; border-radius:4px; color:#ff4444; display:flex; align-items:center; gap:10px;"><b>\\u26A0\\uFE0F</b><span>Alert Message</span></div>'; break;
                     case 'Notification': content = '<div style="background:rgba(0,255,255,0.1); border:1px solid var(--jettra-accent); padding:15px; border-radius:8px; color:var(--jettra-text); max-width:300px; box-shadow:0 4px 12px rgba(0,0,0,0.3);"><span>Notification Message</span></div>'; break;
+                    case 'TrafficLight': content = '<div class="j-component" style="display:inline-flex; flex-direction:column; gap:8px; padding:10px; background:#222; border-radius:15px; border:1px solid #444; width:fit-content;"><div style="width:25px;height:25px;border-radius:50%;background:#ff4444;box-shadow:0 0 10px #ff4444;"></div><div style="width:25px;height:25px;border-radius:50%;background:#111;"></div><div style="width:25px;height:25px;border-radius:50%;background:#111;"></div></div>'; break;
                     case 'Downloader': content = '<div style="display:inline-flex; align-items:center; gap:8px; padding:6px 12px; background:rgba(255,255,255,0.1); border-radius:4px; cursor:pointer;"><b>\uD83D\uDCBE</b><span>Download File</span></div>'; break;
                     case 'PDFViewer': content = '<div style="border:1px solid #aaa; background:#eee; color:#333; height:200px; display:flex; align-items:center; justify-content:center; border-radius:4px;"><span>PDF Document Preview</span></div>'; break;
                     case 'ViewMedia': content = '<div style="background:#000; color:#fff; height:200px; display:flex; align-items:center; justify-content:center; border-radius:4px;"><span>\u25B6 Media Player</span></div>'; break;
@@ -1983,7 +1984,7 @@ public class WebDesignerPage extends DashboardBasePage {
                             return c;
                         };
 
-                        const simpleTypes = ['Divide', 'Separator', 'Header', 'Paragraph', 'Span', 'Label', 'Clock', 'ProgressBar', 'Spinner', 'Catcha', 'Clock', 'Capture', 'Catcha', 'CAPTURE'];
+                        const simpleTypes = ['Divide', 'Separator', 'Header', 'Paragraph', 'Span', 'Label', 'Clock', 'ProgressBar', 'Spinner', 'Catcha', 'Clock', 'Capture', 'Catcha', 'CAPTURE', 'TrafficLight'];
                         
                         if (simpleTypes.includes(type)) {
                             let init = "";

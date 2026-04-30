@@ -67,6 +67,34 @@ public class DeportePage extends DashboardBasePage {
                 .setSubtitle(msg.getProperty("subtitle.deporte"))
                 .setWidth("100%");
 
+        Style customStyles = new Style("""
+            #crudModal { color: #fff; }
+            .form-group { margin-bottom: 15px; }
+            .form-group label { display: block; margin-bottom: 5px; color: #8b949e; font-size: 14px; }
+            .modal-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: 20px; }
+            
+            @media (max-width: 600px) {
+                #crudModal { width: 98%; padding: 20px; }
+            }
+            
+            @media (max-width: 480px) {
+                #crudModal { 
+                    width: 100%; 
+                    height: 100%; 
+                    max-width: 100vw; 
+                    max-height: 100vh; 
+                    border-radius: 0;
+                    top: 0 !important;
+                    left: 0 !important;
+                    transform: none !important;
+                    position: fixed;
+                }
+                .modal-actions { grid-template-columns: 1fr; }
+                .j-btn { width: 100%; justify-content: center; }
+            }
+            """);
+        center.add(customStyles);
+
         setupModal();
 
         Button addBtn = new Button("➕ " + msg.getProperty("btn.add.deporte"))
@@ -157,7 +185,7 @@ public class DeportePage extends DashboardBasePage {
     }
 
     private void showModal(String title, String action, boolean isEdit) {
-        this.crudModal.setStyle("display", "block");
+        this.crudModal.setStyle("display", "flex");
         this.modalTitle.setContent(title);
         this.modalAction.setProperty("value", action);
         this.modalCode.setProperty("value", this.deporte.getCode());
@@ -172,21 +200,23 @@ public class DeportePage extends DashboardBasePage {
         if ("delete".equals(action)) {
             this.groupCode.setStyle("display", "none");
             this.groupDeporte.setStyle("display", "none");
+            this.deleteMsg.setStyle("display", "block");
             this.modalSubmitBtn.setContent(msg.getProperty("btn.confirm.delete"));
+            this.modalSubmitBtn.setStyle("background-color", "#da3633");
         } else {
             this.groupCode.setStyle("display", "block");
             this.groupDeporte.setStyle("display", "block");
+            this.deleteMsg.setStyle("display", "none");
             this.modalSubmitBtn.setContent(msg.getProperty("btn.save"));
+            this.modalSubmitBtn.setStyle("background-color", "#238636");
         }
     }
 
     private void setupModal() {
-        this.crudModal = new Modal("crudModal");
-        this.crudModal.setStyle("background-color", "#161b22");
-        this.crudModal.setStyle("border", "1px solid #30363d");
-        this.crudModal.setStyle("border-radius", "8px");
-        this.crudModal.setStyle("padding", "24px");
-        this.crudModal.setStyle("box-shadow", "0 16px 32px rgba(0,0,0,0.9)");
+        this.crudModal = new Modal("crudModal")
+                .setPadding("35px")
+                .setMaxWidth("650px")
+                .setZIndex("9999");
 
         this.modalTitle = new Header(3, "Operación");
 
@@ -214,10 +244,13 @@ public class DeportePage extends DashboardBasePage {
 
         Button cancelBtn = new Button(msg.getProperty("btn.cancel"));
         cancelBtn.setProperty("type", "button");
-        cancelBtn.addClass("j-btn");
+        cancelBtn.addClass("j-btn").setStyle("background", "#30363d");
         cancelBtn.setProperty("onclick", "document.getElementById('crudModal').style.display='none'; return false;");
 
-        this.modalSubmitBtn = new Button(msg.getProperty("btn.save")).addClass("j-btn").setProperty("type", "submit");
+        this.modalSubmitBtn = new Button(msg.getProperty("btn.save"))
+                .addClass("j-btn")
+                .setProperty("type", "submit")
+                .setStyle("background-color", "#238636");
 
         actions.add(cancelBtn).add(this.modalSubmitBtn);
         form.add(this.modalAction).add(groupCode).add(groupDeporte).add(this.deleteMsg).add(actions);

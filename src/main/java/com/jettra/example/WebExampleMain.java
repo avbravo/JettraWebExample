@@ -127,6 +127,7 @@ public class WebExampleMain {
         server.addHandler("/schedulecontrol", com.jettra.example.pages.ScheduleControlPage.class);
         server.addHandler("/qr", com.jettra.example.pages.QRPage.class);
         server.addHandler("/otpvalidator", com.jettra.example.pages.OTPValidatorPage.class);
+        server.addHandler("/trafficlight", com.jettra.example.pages.TrafficLightPage.class);
         server.addHandler("/spinner", com.jettra.example.pages.SpinnerPage.class);
         server.start();
     }

@@ -28,18 +28,18 @@ public class ModalPage extends DashboardBasePage {
         Button codeBtn = new Button("Code");
         codeBtn.addClass("j-btn");
         codeBtn.setStyle("border-color", "var(--jettra-accent)").setStyle("color", "var(--jettra-accent)");
-        codeBtn.setProperty("onclick", "document.getElementById('code-modal-modal').style.display = 'block'");
+        codeBtn.setProperty("onclick", "document.getElementById('code-modal-modal').style.display = 'flex'");
         headerRow.add(codeBtn);
         
         container.add(headerRow);
         
         // --- Code Modal Dialog for Java Code ---
-        io.jettra.wui.complex.Modal codeModal = new io.jettra.wui.complex.Modal("code-modal-modal");
-        codeModal.setStyle("display", "none").setStyle("background", "var(--jettra-glass)")
-                 .setStyle("backdrop-filter", "blur(10px)")
-                 .setStyle("padding", "20px").setStyle("border-radius", "8px")
-                 .setStyle("width", "90%").setStyle("max-width", "800px")
-                 .setStyle("border", "1px solid var(--jettra-border)");
+        io.jettra.wui.complex.Modal codeModal = new io.jettra.wui.complex.Modal("code-modal-modal")
+                 .setZIndex("2000")
+                 .setMaxWidth("850px")
+                 .setPadding("25px")
+                 .setBackgroundColor("rgba(20, 30, 40, 0.95)")
+                 .setBorder("1px solid var(--jettra-accent)");
         
         codeModal.add(new Header(3, "Java Code Examples").setStyle("margin-top", "0").setStyle("color", "var(--jettra-accent)"));
         
@@ -48,9 +48,13 @@ public class ModalPage extends DashboardBasePage {
                      .setStyle("border-radius", "4px").setStyle("overflow-x", "auto")
                      .setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
         
-        String javaCode = "Modal m = new Modal(\"my-modal\");\n" +
-                          "m.add(new Header(3, \"Title\"));\n" +
-                          "m.add(new Paragraph(\"Body content...\"));";
+        String javaCode = "Modal m = new Modal(\"my-modal\")\n" +
+                          "     .setPadding(\"40px\")\n" +
+                          "     .setBackgroundColor(\"#1a1f26\")\n" +
+                          "     .setMaxWidth(\"700px\")\n" +
+                          "     .setZIndex(\"1050\")\n" +
+                          "     .add(new Header(3, \"Title\"))\n" +
+                          "     .add(new Button(\"Save\"));";
                           
         io.jettra.wui.core.UIComponent pre = new io.jettra.wui.core.UIComponent("pre") {};
         pre.setStyle("margin", "0");
@@ -89,12 +93,12 @@ public class ModalPage extends DashboardBasePage {
         
         Button openBtn = new Button("Open Demo Modal");
         openBtn.addClass("j-btn j-btn-primary");
-        openBtn.setProperty("onclick", "document.getElementById('demo-modal').style.display = 'block'");
+        openBtn.setProperty("onclick", "document.getElementById('demo-modal').style.display = 'flex'");
         
-        io.jettra.wui.complex.Modal demoModal = new io.jettra.wui.complex.Modal("demo-modal");
-        demoModal.setStyle("display", "none").setStyle("background", "var(--jettra-glass)")
-                 .setStyle("backdrop-filter", "blur(10px)").setStyle("padding", "30px")
-                 .setStyle("border-radius", "12px").setStyle("border", "1px solid var(--jettra-border)");
+        io.jettra.wui.complex.Modal demoModal = new io.jettra.wui.complex.Modal("demo-modal")
+                 .setPadding("40px")
+                 .setMaxWidth("600px")
+                 .setBoxShadow("0 0 60px rgba(0,255,255,0.3)");
         
         demoModal.add(new Header(2, "Demo Warning"));
         demoModal.add(new Paragraph("Are you sure you want to perform this action?"));
