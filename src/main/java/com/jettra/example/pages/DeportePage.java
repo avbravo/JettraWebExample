@@ -90,7 +90,7 @@ public class DeportePage extends DashboardBasePage {
                     position: fixed;
                 }
                 .modal-actions { grid-template-columns: 1fr; }
-                .j-btn { width: 100%; justify-content: center; }
+                .modal-actions .j-btn { width: 100%; justify-content: center; }
             }
             """);
         center.add(customStyles);
