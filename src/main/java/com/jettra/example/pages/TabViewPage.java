@@ -53,7 +53,7 @@ public class TabViewPage extends DashboardBasePage {
                      .setStyle("margin-bottom", "20px").setStyle("border", "1px solid rgba(255,255,255,0.1)");
         
         String javaCode = "TabView tv = new TabView(\"Main Configuration\")\n" +
-                          "    .setOrientation(TabView.Orientation.IZQUIERDA)\n" +
+                          "    .setOrientation(TabView.Orientation.LEFT)\n" +
                           "    .addTab(\"Basic\", new Paragraph(\"General settings...\"))\n" +
                           "    .addTab(\"Advanced\", new Paragraph(\"Complex options...\"));";
                           
@@ -87,18 +87,18 @@ public class TabViewPage extends DashboardBasePage {
         
         // --- Actual Component Demos ---
         
-        // Demo 1: Superior Orientation (Default)
-        container.add(new Header(2, "Default Orientation (Superior)").setStyle("margin-top", "30px"));
+        // Demo 1: Top Orientation (Default)
+        container.add(new Header(2, "Default Orientation (Top)").setStyle("margin-top", "30px"));
         TabView tvSuperior = new TabView("User Profile")
             .addTab("Basic Info", new Paragraph("Welcome to your profile. Here you can edit your basic information."))
             .addTab("Settings", new Paragraph("Configure your notifications and privacy preferences."))
             .addTab("Security", new Button("Change Password").primary());
         container.add(tvSuperior);
 
-        // Demo 2: Izquierda (Left) Orientation
+        // Demo 2: Left Orientation
         container.add(new Header(2, "Left Orientation (Sidebar)").setStyle("margin-top", "40px"));
         TabView tvLeft = new TabView("System Admin")
-            .setOrientation(TabView.Orientation.IZQUIERDA)
+            .setOrientation(TabView.Orientation.LEFT)
             .addTab("Users", new Paragraph("Manage system users and roles."))
             .addTab("Logs", new Paragraph("View application logs and errors."));
         
@@ -117,17 +117,17 @@ public class TabViewPage extends DashboardBasePage {
         tvLeft.addTab("Records", dt);
         container.add(tvLeft);
 
-        // Demo 3: Derecha (Right) and Inferior
+        // Demo 3: Right and Bottom
         Div row2 = new Div();
         row2.setStyle("display", "flex").setStyle("gap", "20px").setStyle("margin-top", "40px");
         
         TabView tvRight = new TabView("Right Tabs")
-            .setOrientation(TabView.Orientation.DERECHA)
+            .setOrientation(TabView.Orientation.RIGHT)
             .addTab("Tab A", new Paragraph("This is on the right."))
             .addTab("Tab B", new Paragraph("Another one."));
             
         TabView tvBottom = new TabView("Bottom Tabs")
-            .setOrientation(TabView.Orientation.INFERIOR)
+            .setOrientation(TabView.Orientation.BOTTOM)
             .addTab("Home", new Paragraph("Content on top..."))
             .addTab("Details", new Paragraph("...tabs on bottom."));
             

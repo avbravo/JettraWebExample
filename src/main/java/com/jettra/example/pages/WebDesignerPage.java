@@ -1139,6 +1139,20 @@ public class WebDesignerPage extends DashboardBasePage {
                     `;
                 }
 
+                if (type === 'TabView') {
+                    html += `
+                        <div class="inspector-row">
+                            <span class="inspector-label">Orientation</span>
+                            <select class="inspector-input" onchange="window.updateProp('orientation', this.value)">
+                                <option value="TOP" ${props.orientation === 'TOP' ? 'selected' : ''}>TOP</option>
+                                <option value="BOTTOM" ${props.orientation === 'BOTTOM' ? 'selected' : ''}>BOTTOM</option>
+                                <option value="LEFT" ${props.orientation === 'LEFT' ? 'selected' : ''}>LEFT</option>
+                                <option value="RIGHT" ${props.orientation === 'RIGHT' ? 'selected' : ''}>RIGHT</option>
+                            </select>
+                        </div>
+                    `;
+                }
+
                 if (type === 'CreditCard') {
                     html += `
                         <div class="inspector-row"><span class="inspector-label">Form Action</span><input type="text" class="inspector-input" value="${props.formAction || ''}" onchange="updateProp('formAction', this.value)"></div>
@@ -2103,6 +2117,9 @@ public class WebDesignerPage extends DashboardBasePage {
                             case 'TabView':
                             case 'Datatable': {
                                 out += `        ${type} ${v} = new ${type}()${chainProps()};\\n`;
+                                if (type === 'TabView' && props.orientation) {
+                                    out += `        ${v}.setOrientation(TabView.Orientation.${props.orientation});\\n`;
+                                }
                                 if (type === 'Datatable') {
                                     if (props.columnsList && props.columnsList.length > 0) {
                                         const colsStr = props.columnsList.map(c => `"${c}"`).join(", ");
