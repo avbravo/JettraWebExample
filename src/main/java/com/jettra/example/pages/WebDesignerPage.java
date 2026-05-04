@@ -796,7 +796,41 @@ public class WebDesignerPage extends DashboardBasePage {
                     case 'ViewMedia': content = '<div style="background:#000; color:#fff; height:200px; display:flex; align-items:center; justify-content:center; border-radius:4px;"><span>\u25B6 Media Player</span></div>'; break;
                     case 'BarCode': content = '<div class="j-component" style="padding:10px; text-align:center; border:1px dashed #fff;"><span style="font-family:monospace; font-size:24px; letter-spacing:2px">||| | || |||</span><br><span>BarCode</span></div>'; break;
                     case 'Carousel': content = '<div style="display:flex; gap:10px; overflow:hidden; padding:10px; background:rgba(0,0,0,0.2); border-radius:8px;"><div style="width:150px; height:80px; background:rgba(0,255,255,0.1); border:1px solid rgba(0,255,255,0.3); border-radius:8px; display:flex; align-items:center; justify-content:center;"><span>Slide 1</span></div></div>'; break;
-                    case 'TabView': content = '<div style="border:1px solid rgba(0,255,255,0.2); border-radius:8px; overflow:hidden;"><div style="display:flex; background:rgba(0,0,0,0.3); border-bottom:1px solid rgba(0,255,255,0.2);" class="tab-headers"><span style="padding:10px; color:#aaa; font-size:11px;">[Tab Headers]</span></div><div class="canvas-container" style="padding:10px; min-height:100px; background:rgba(0,255,255,0.02);"></div></div>'; break;
+                    case 'TabView': {
+                        const orient = defaultProps.orientation || 'TOP';
+                        let layoutStyle = 'display: flex; flex-direction: column;';
+                        let headerAreaStyle = 'display: flex; background: rgba(0,0,0,0.3); flex-direction: column;';
+                        let tabsStyle = 'display: flex; flex-wrap: wrap;';
+                        let containerStyle = 'padding: 10px; min-height: 100px; background: rgba(0,255,255,0.02); flex: 1;';
+                        
+                        if (orient === 'BOTTOM') {
+                            layoutStyle = 'display: flex; flex-direction: column-reverse;';
+                            headerAreaStyle += 'border-top: 1px solid rgba(0,255,255,0.2);';
+                        } else if (orient === 'LEFT') {
+                            layoutStyle = 'display: flex; flex-direction: row; min-height: 200px;';
+                            headerAreaStyle += 'width: 150px; border-right: 1px solid rgba(0,255,255,0.2);';
+                            tabsStyle = 'display: flex; flex-direction: column; flex-wrap: nowrap;';
+                        } else if (orient === 'RIGHT') {
+                            layoutStyle = 'display: flex; flex-direction: row-reverse; min-height: 200px;';
+                            headerAreaStyle += 'width: 150px; border-left: 1px solid rgba(0,255,255,0.2);';
+                            tabsStyle = 'display: flex; flex-direction: column; flex-wrap: nowrap;';
+                        } else { // TOP
+                            headerAreaStyle += 'border-bottom: 1px solid rgba(0,255,255,0.2);';
+                        }
+
+                        const titleHtml = defaultProps.text ? `<div class="tabview-title" style="padding: 8px 10px; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 11px; color: var(--jettra-accent); background: rgba(255,255,255,0.05);">${defaultProps.text}</div>` : '';
+
+                        content = `<div class="tabview-wrapper" style="border: 1px solid rgba(0,255,255,0.2); border-radius: 8px; overflow: hidden; width: 100%; ${layoutStyle}">
+                                    <div style="${headerAreaStyle}" class="tabview-header-area">
+                                        ${titleHtml}
+                                        <div style="${tabsStyle}" class="tab-headers">
+                                            <span style="padding:10px; color:#aaa; font-size:10px; opacity:0.5;">[Tabs]</span>
+                                        </div>
+                                    </div>
+                                    <div class="canvas-container" style="${containerStyle}"></div>
+                                   </div>`;
+                        break;
+                    }
                     case 'Tab': content = '<div class="canvas-container" style="border:1px dashed var(--jettra-accent); min-height:80px; padding:10px; position:relative; background:rgba(0,0,0,0.4); margin-bottom:10px;"><span style="position:absolute; top:-12px; left:10px; background:var(--jettra-accent); color:#000; padding:2px 8px; border-radius:4px; font-size:10px; font-weight:bold;">Tab Title</span></div>'; break;
                     case 'Tree': content = '<div class="canvas-container" style="padding:10px; border:1px solid rgba(255,255,255,0.1); border-radius:4px; background:rgba(0,0,0,0.2); min-height:50px;"></div>'; break;
                     case 'TreeItem': content = '<div class="canvas-container" style="padding-left:15px; border-left:1px dashed rgba(0,255,255,0.2); min-height:30px; margin-top:5px; position:relative;"><span style="position:absolute; left:-10px; top:5px; font-size:10px; color:var(--jettra-accent);">\u25B6</span><span style="display:inline-block; margin-bottom:5px; color:#fff;">Tree Node</span></div>'; break;
@@ -1444,6 +1478,65 @@ public class WebDesignerPage extends DashboardBasePage {
                     if (key === 'title') { const tEl = selectedItem.querySelector('.card-title-mock'); if (tEl) tEl.innerText = value; }
                     if (key === 'subtitle') { const sEl = selectedItem.querySelector('.card-subtitle-mock'); if (sEl) sEl.innerText = value; }
                     if (key === 'content') { const cEl = selectedItem.querySelector('.card-content-mock'); if (cEl) cEl.innerText = value; }
+                }
+
+                if (type === 'TabView') {
+                    const wrapper = selectedItem.querySelector('.tabview-wrapper');
+                    if (wrapper) {
+                        const orient = props.orientation || 'TOP';
+                        let layoutStyle = 'display: flex; flex-direction: column;';
+                        let headerAreaStyle = 'display: flex; background: rgba(0,0,0,0.3); flex-direction: column;';
+                        let tabsStyle = 'display: flex; flex-wrap: wrap;';
+                        
+                        if (orient === 'BOTTOM') {
+                            layoutStyle = 'display: flex; flex-direction: column-reverse;';
+                            headerAreaStyle += 'border-top: 1px solid rgba(0,255,255,0.2);';
+                        } else if (orient === 'LEFT') {
+                            layoutStyle = 'display: flex; flex-direction: row; min-height: 200px;';
+                            headerAreaStyle += 'width: 150px; border-right: 1px solid rgba(0,255,255,0.2);';
+                            tabsStyle = 'display: flex; flex-direction: column; flex-wrap: nowrap;';
+                        } else if (orient === 'RIGHT') {
+                            layoutStyle = 'display: flex; flex-direction: row-reverse; min-height: 200px;';
+                            headerAreaStyle += 'width: 150px; border-left: 1px solid rgba(0,255,255,0.2);';
+                            tabsStyle = 'display: flex; flex-direction: column; flex-wrap: nowrap;';
+                        } else { // TOP
+                            headerAreaStyle += 'border-bottom: 1px solid rgba(0,255,255,0.2);';
+                        }
+                        
+                        wrapper.style.cssText = `border: 1px solid rgba(0,255,255,0.2); border-radius: 8px; overflow: hidden; width: 100%; ${layoutStyle}`;
+                        const headerArea = wrapper.querySelector('.tabview-header-area');
+                        if (headerArea) headerArea.style.cssText = headerAreaStyle;
+                        const headers = wrapper.querySelector('.tab-headers');
+                        if (headers) headers.style.cssText = tabsStyle;
+
+                        // Update title
+                        let titleEl = wrapper.querySelector('.tabview-title');
+                        if (props.text) {
+                            if (!titleEl) {
+                                titleEl = document.createElement('div');
+                                titleEl.className = 'tabview-title';
+                                titleEl.style.cssText = 'padding: 8px 10px; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 11px; color: var(--jettra-accent); background: rgba(255,255,255,0.05);';
+                                if (headerArea) headerArea.prepend(titleEl);
+                            }
+                            titleEl.innerText = props.text;
+                        } else if (titleEl) {
+                            titleEl.remove();
+                        }
+
+                        // Refresh tabs in header
+                        const container = wrapper.querySelector('.canvas-container');
+                        if (container) {
+                            const tabs = container.querySelectorAll(':scope > .canvas-item[data-type="Tab"]');
+                            if (tabs.length > 0) {
+                                headers.innerHTML = Array.from(tabs).map(t => {
+                                    const tp = JSON.parse(t.getAttribute('data-props') || '{}');
+                                    return `<div style="padding: 6px 10px; border: 1px solid rgba(0,255,255,0.15); margin: 3px; border-radius: 4px; font-size: 10px; background: rgba(0,255,255,0.05); color: var(--jettra-accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${tp.text || 'Tab'}</div>`;
+                                }).join('');
+                            } else {
+                                headers.innerHTML = '<span style="padding:10px; color:#aaa; font-size:10px; opacity:0.5;">[Tabs]</span>';
+                            }
+                        }
+                    }
                 }
 
                 if (type === 'CreditCard') {
@@ -2095,6 +2188,15 @@ public class WebDesignerPage extends DashboardBasePage {
                                 out += `        Modal ${v} = new Modal("${mId}")${chainProps()};\\n`;
                                 const kidsM = it.querySelectorAll(':scope > .canvas-container > .canvas-item');
                                 if (kidsM.length > 0) out += walk(kidsM, v);
+                                out += `        ${container}.add(${v});\\n`;
+                                break;
+                            }
+                            case 'TabView': {
+                                out += `        TabView ${v} = new TabView("${props.text || 'TabView'}")${chainProps()}`;
+                                if (props.orientation) out += `.setOrientation(TabView.Orientation.${props.orientation})`;
+                                out += `;\\n`;
+                                const kidsT = it.querySelectorAll(':scope > .tabview-wrapper > .canvas-container > .canvas-item');
+                                if (kidsT.length > 0) out += walk(kidsT, v);
                                 out += `        ${container}.add(${v});\\n`;
                                 break;
                             }
