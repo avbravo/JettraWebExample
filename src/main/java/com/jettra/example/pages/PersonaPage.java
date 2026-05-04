@@ -304,8 +304,9 @@ public class PersonaPage extends DashboardBasePage {
         
         boolean changed = false;
         if ("save".equals(action)) {
+            boolean isNew = id == null || id.isEmpty() || PersonaRepository.findAll().stream().noneMatch(p -> p.getId().equals(id));
             PersonaRepository.save(new PersonaModel(id, nombre, direccion));
-            JettraSyncManager.notifyChange("PersonaModel", SyncType.UPDATE, getLoggedUser(currentExchange));
+            JettraSyncManager.notifyChange("PersonaModel", isNew ? SyncType.CREATE : SyncType.UPDATE, getLoggedUser(currentExchange));
             changed = true;
         } else if ("delete".equals(action)) {
             if (id != null && !id.isEmpty()) {

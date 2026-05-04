@@ -258,8 +258,9 @@ public class DeportePage extends DashboardBasePage {
 
         boolean changed = false;
         if ("save".equals(action)) {
+            boolean isNew = code == null || code.isEmpty() || DeporteRepository.findAll().stream().noneMatch(d -> d.getCode().equals(code));
             DeporteRepository.save(new DeporteModel(code, name));
-            JettraSyncManager.notifyChange("DeporteModel", SyncType.UPDATE, getLoggedUser(currentExchange));
+            JettraSyncManager.notifyChange("DeporteModel", isNew ? SyncType.CREATE : SyncType.UPDATE, getLoggedUser(currentExchange));
             changed = true;
         } else if ("delete".equals(action)) {
             if (code != null && !code.isEmpty()) {

@@ -53,7 +53,7 @@ public class KanbanPage extends DashboardBasePage {
                 case "add": addCard(params, loggedUser); changed = true; syncType = SyncType.CREATE; break;
                 case "edit": editCard(params); changed = true; syncType = SyncType.UPDATE; break;
                 case "remove": removeCard(params); changed = true; syncType = SyncType.DELETE; break;
-                case "move": moveCard(params); changed = true; syncType = SyncType.UPDATE; break;
+                case "move": moveCard(params); changed = true; syncType = SyncType.MOVE; break;
             }
         }
         

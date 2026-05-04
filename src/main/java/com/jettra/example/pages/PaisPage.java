@@ -208,12 +208,13 @@ public class PaisPage extends DashboardBasePage {
         if (action != null) {
             if (action.equals("save")) {
                 paisRepository.save(pais);
+                JettraSyncManager.notifyChange("PaisModel", SyncType.UPDATE, getLoggedUser(currentExchange));
                 changed = true;
             } else if (action.equals("delete")) {
                 paisRepository.delete(pais.getCode());
+                JettraSyncManager.notifyChange("PaisModel", SyncType.DELETE, getLoggedUser(currentExchange));
                 changed = true;
             }
-            JettraSyncManager.notifyChange("PaisModel", SyncType.UPDATE, getLoggedUser(currentExchange));
         }
         
         if (changed) {
