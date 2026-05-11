@@ -4,14 +4,17 @@ import io.jettra.wui.validations.NotNull;
 import io.jettra.wui.validations.Size;
 
 public class PersonaModel {
+    @io.jettra.wui.core.annotations.PropertiesLabel(value = "lbl.id", label = "ID")
     private String id;
     
     @NotNull
     @Size(min = 3, max = 100)
+    @io.jettra.wui.core.annotations.PropertiesLabel(value = "lbl.name", label = "Nombre")
     private String nombre;
     
     @NotNull
     @Size(min = 5, max = 200)
+    @io.jettra.wui.core.annotations.PropertiesLabel(value = "lbl.address", label = "Dirección")
     private String direccion;
 
     public PersonaModel() {}

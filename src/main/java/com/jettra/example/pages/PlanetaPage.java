@@ -9,7 +9,7 @@ import java.util.Properties;
 import io.jettra.wui.complex.Center;
 
 @JettraPageSincronized(SyncType.ALL)
-@CrudView(model = "PlanetaModel")
+@CrudView(model = com.jettra.example.model.PlanetaModel.class, repository = com.jettra.example.repository.PlanetaRepository.class)
 public class PlanetaPage extends DashboardBasePage {
 
     @InjectProperties(name = "messages")
