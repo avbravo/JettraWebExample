@@ -127,6 +127,7 @@ public class WebExampleMain {
         server.addHandler("/qr", QRPage.class);
         server.addHandler("/otpvalidator", OTPValidatorPage.class);
         server.addHandler("/trafficlight", TrafficLightPage.class);
+        server.addHandler("/planeta", PlanetaPage.class);
         server.start();
     }
 }
