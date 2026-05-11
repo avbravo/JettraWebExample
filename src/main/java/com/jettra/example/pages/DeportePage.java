@@ -3,279 +3,126 @@ package com.jettra.example.pages;
 import com.jettra.example.dashboard.DashboardBasePage;
 import com.jettra.example.model.DeporteModel;
 import com.jettra.example.repository.DeporteRepository;
-import io.jettra.wui.complex.Center;
-import io.jettra.wui.complex.Modal;
+import io.jettra.wui.complex.*;
 import io.jettra.wui.components.*;
 import io.jettra.wui.core.annotations.InjectProperties;
-import io.jettra.wui.core.annotations.InjectViewModel;
-import io.jettra.wui.sync.JettraPageSincronized;
-import io.jettra.wui.sync.SyncType;
-import io.jettra.wui.sync.JettraSyncManager;
-import io.jettra.wui.validations.JettraValidations;
+import io.jettra.wui.sync.*;
 import com.jettra.server.JettraServer;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 @JettraPageSincronized(SyncType.ALL)
 public class DeportePage extends DashboardBasePage {
-
-    @InjectViewModel
-    DeporteModel deporte;
-
     @InjectProperties(name = "messages")
     private Properties msg;
-    private String lang = "es";
+    
     private int pageNumber = 1;
-
     private Modal crudModal;
-    private Header modalTitle;
-    private TextBox modalAction;
-    private TextBox modalCode;
-    private TextBox inputDeporte;
-    private Button modalSubmitBtn;
-    private FormGroup groupCode;
-    private FormGroup groupDeporte;
+    private TextBox modalAction, modalId, inputIdVisible, inputDeporte;
+    private FormGroup groupId, groupDeporte;
     private Paragraph deleteMsg;
+    private Button modalSubmitBtn;
 
     public DeportePage() {
-        super("Mantenimiento de Deportes");
+        super("Gestión de Deportes (Optimizado)");
     }
 
     @Override
-    protected void onInit(Map<String, String> params) {
-        String pStr = params.get("page");
-        if (pStr != null) {
-            try {
-                this.pageNumber = Integer.parseInt(pStr);
-            } catch (Exception e) {
-            }
+    protected void onInit(java.util.Map<String, String> params) {
+        try {
+            pageNumber = Integer.parseInt(params.getOrDefault("page", "1"));
+        } catch (Exception e) {
         }
-        String lStr = params.get("lang");
-        if (lStr != null)
-            this.lang = lStr;
-
         super.onInit(params);
     }
 
     @Override
     protected void initCenter(Center center, String username) {
-        Card mainCard = new Card()
-                .setTitle(msg.getProperty("title.deporte"))
-                .setSubtitle(msg.getProperty("subtitle.deporte"))
-                .setWidth("100%");
-
-        Style customStyles = new Style("""
-            #crudModal { color: #fff; }
-            .form-group { margin-bottom: 15px; }
-            .form-group label { display: block; margin-bottom: 5px; color: #8b949e; font-size: 14px; }
-            .modal-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: 20px; }
-            
-            @media (max-width: 600px) {
-                #crudModal { width: 98%; padding: 20px; }
-            }
-            
-            @media (max-width: 480px) {
-                #crudModal { 
-                    width: 100%; 
-                    height: 100%; 
-                    max-width: 100vw; 
-                    max-height: 100vh; 
-                    border-radius: 0;
-                    top: 0 !important;
-                    left: 0 !important;
-                    transform: none !important;
-                    position: fixed;
-                }
-                .modal-actions { grid-template-columns: 1fr; }
-                .modal-actions .j-btn { width: 100%; justify-content: center; }
-            }
-            """);
-        center.add(customStyles);
-
         setupModal();
+        Card card = new Card().setTitle(msg.getProperty("subtitle.deporte")).setWidth("100%");
+        Datatable table = new Datatable();
 
-        Button addBtn = new Button("➕ " + msg.getProperty("btn.add.deporte"))
-                .setId("addDeporteBtn")
-                .setBackgroundColor("#238636")
-                .addClickListener(() -> {
-                    this.deporte.setCode("");
-                    this.deporte.setDeporte("");
-                    showModal(msg.getProperty("modal.add.deporte.title"), "save", false);
-                });
+        Button addBtn = new Button("➕ " + msg.getProperty("btn.add")).setId("btnAdd")
+                .setBackgroundColor("#238636").setStyle("font-size", "12px")
+                .addClickListener(() -> openModal("save", new DeporteModel("", "")));
 
-        // Table
-        io.jettra.wui.complex.Datatable table = new io.jettra.wui.complex.Datatable();
-        // io.jettra.wui.complex.Datatable table = new io.jettra.wui.complex.Datatable()
-        // .addHeaderRow(msg.getProperty("th.code", "Código"),
-        // msg.getProperty("th.name", "Nombre"),
-        // msg.getProperty("th.actions", "Acciones")
-        // );
-        Row headerRow = new Row();
-        headerRow.add(new TD(msg.getProperty("th.code")));
-        headerRow.add(new TD(msg.getProperty("th.deporte")));
-
-        TD actionsTdHeader = new TD();
-        actionsTdHeader.add(addBtn);
-
-        headerRow.add(actionsTdHeader);
-        table.addHeaderRow(headerRow);
+        table.addHeaderRow(new Row(new TD(msg.getProperty("th.code", "Código")), new TD(msg.getProperty("th.deporte")),
+                new TD().add(addBtn)));
 
         List<DeporteModel> all = DeporteRepository.findAll();
-        int pageSize = 10;
-        int totalPages = (int) Math.ceil((double) all.size() / pageSize);
-        if (totalPages == 0)
-            totalPages = 1;
-        int start = (pageNumber - 1) * pageSize;
-        int end = Math.min(start + pageSize, all.size());
+        all.stream().skip((pageNumber - 1) * 10L).limit(10).forEach(d -> {
+            Button editBtn = new Button("✏️").setId("btnEdit-" + d.getCode())
+                    .addClickListener(() -> openModal("save", d));
+            Button delBtn = new Button("🗑️").setId("btnDel-" + d.getCode()).setStyle("color", "red")
+                    .addClickListener(() -> openModal("delete", d));
+            table.addRow(new Row(new TD(d.getCode()).setStyle("font-family", "monospace").setStyle("font-size", "11px"),
+                    new TD(d.getDeporte()), new TD().add(editBtn).add(delBtn)));
+        });
 
-        List<DeporteModel> paginated = (start >= all.size()) ? List.of()
-                : all.subList(Math.max(0, start), Math.max(0, end));
-
-        for (DeporteModel d : paginated) {
-            TD actionsTd = new TD();
-
-            Button editBtn = new Button("✏️")
-                    .setId("editBtn_" + d.getCode())
-
-                    .addClickListener(() -> {
-                        this.deporte.setCode(d.getCode());
-                        this.deporte.setDeporte(d.getDeporte());
-                        showModal(msg.getProperty("modal.edit.deporte.title"), "save", true);
-                    });
-
-            Button deleteBtn = new Button("🗑️")
-                    .setId("deleteBtn_" + d.getCode())
-                    .addClickListener(() -> {
-                        this.deporte.setCode(d.getCode());
-                        this.deporte.setDeporte(d.getDeporte());
-                        showModal(msg.getProperty("modal.delete.deporte.title"), "delete", true);
-                    });
-
-            actionsTd.add(editBtn).add(deleteBtn);
-            table.addRow(new Row(
-                    new TD(d.getCode()),
-                    new TD(d.getDeporte()),
-                    actionsTd));
-        }
-
-        mainCard.add(table);
-
-        // Pager
-        if (totalPages > 1) {
-            Div pager = new Div();
-
-            if (pageNumber > 1) {
-                pager.add(new Link("?lang=" + lang + "&page=" + (pageNumber - 1), "« " + msg.getProperty("pager.prev"))
-                        .addClass("j-btn"));
-            }
-            pager.add(new Span(msg.getProperty("pager.page", "Página") + " " + pageNumber + " / " + totalPages));
-            if (pageNumber < totalPages) {
-                pager.add(new Link("?lang=" + lang + "&page=" + (pageNumber + 1), msg.getProperty("pager.next") + " »")
-                        .addClass("j-btn"));
-            }
-            mainCard.add(pager);
-        }
-
-        center.add(mainCard);
-        center.add(this.crudModal);
+        center.add(new Div().setStyle("padding", "20px").add(card.add(table))).add(crudModal);
     }
 
-    private void showModal(String title, String action, boolean isEdit) {
-        this.crudModal.setDisplay("flex");
-        this.modalTitle.setContent(title);
-        this.modalAction.setValue(action);
-        this.modalCode.setValue(this.deporte.getCode());
-        this.inputDeporte.setValue(this.deporte.getDeporte());
-
-        this.modalCode.setReadonly(isEdit);
-
-        if ("delete".equals(action)) {
-            this.groupCode.setDisplay("none");
-            this.groupDeporte.setDisplay("none");
-            this.deleteMsg.setDisplay("block");
-            this.modalSubmitBtn.setContent(msg.getProperty("btn.confirm.delete"))
-                               .setBackgroundColor("#da3633");
-        } else {
-            this.groupCode.setDisplay("block");
-            this.groupDeporte.setDisplay("block");
-            this.deleteMsg.setDisplay("none");
-            this.modalSubmitBtn.setContent(msg.getProperty("btn.save"))
-                               .setBackgroundColor("#238636");
-        }
+    private void openModal(String action, DeporteModel d) {
+        crudModal.setDisplay("block");
+        modalAction.setValue(action);
+        modalId.setValue(d.getCode());
+        inputIdVisible.setValue(d.getCode());
+        inputDeporte.setValue(d.getDeporte());
+        boolean isDel = "delete".equals(action);
+        boolean isNew = (d.getCode() == null || d.getCode().isEmpty());
+        
+        inputIdVisible.setReadonly(!isNew);
+        inputIdVisible.setStyle("opacity", isNew ? "1" : "0.7");
+        
+        groupId.setStyle("display", "block");
+        groupDeporte.setStyle("display", isDel ? "none" : "block");
+        deleteMsg.setStyle("display", isDel ? "block" : "none");
+        modalSubmitBtn.setContent(isDel ? msg.getProperty("btn.confirm.delete") : msg.getProperty("btn.save"));
+        modalSubmitBtn.setBackgroundColor(isDel ? "#da3633" : "#238636");
     }
 
     private void setupModal() {
-        this.crudModal = new Modal("crudModal")
-                .setPadding("35px")
-                .setMaxWidth("650px")
-                .setZIndex("9999");
-
-        this.modalTitle = new Header(3, "Operación");
-
+        crudModal = new Modal("crudModal").setMaxWidth("500px").setZIndex("9999");
         Form form = new Form("deporteForm", JettraServer.resolvePath("/deporte"));
-        this.modalAction = new TextBox("hidden", "action");
+        modalAction = new TextBox("hidden", "action");
+        modalId = new TextBox("hidden", "deporteId");
+        form.add(modalAction).add(modalId);
 
-        this.groupCode = new FormGroup();
-        groupCode.add(new Label("code", msg.getProperty("lbl.code")));
-        this.modalCode = new TextBox("text", "code").setId("deporteCode");
-        JettraValidations.apply(this.modalCode, DeporteModel.class, "code");
-        groupCode.add(this.modalCode);
+        groupId = new FormGroup();
+        groupId.add(new Label("idV", msg.getProperty("lbl.code", "Código")))
+                .add(inputIdVisible = new TextBox("text", "idV"));
+        form.add(groupId);
 
-        this.groupDeporte = new FormGroup();
-        groupDeporte.add(new Label("deporte", msg.getProperty("lbl.deporte")));
-        this.inputDeporte = new TextBox("text", "deporte").setId("deporteName");
-        JettraValidations.apply(this.inputDeporte, DeporteModel.class, "deporte");
-        groupDeporte.add(this.inputDeporte);
+        form.add(groupDeporte = new FormGroup()).add(new Label("d", msg.getProperty("lbl.deporte")))
+                .add(inputDeporte = new TextBox("text", "deporte"));
 
-        this.deleteMsg = new Paragraph(msg.getProperty("msg.confirm.delete.deporte"));
-        this.deleteMsg.setColor("#f85149").setDisplay("none");
+        deleteMsg = new Paragraph(msg.getProperty("msg.confirm.delete")).setStyle("color", "#f85149")
+                .setStyle("display", "none");
+        form.add(deleteMsg);
 
-        Div actions = new Div().addClass("modal-actions");
-
-        Button cancelBtn = new Button(msg.getProperty("btn.cancel"))
-                .setType("button")
-                .setBackgroundColor("#30363d")
-                .setOnclick("document.getElementById('crudModal').style.display='none'; return false;");
-
-        this.modalSubmitBtn = new Button(msg.getProperty("btn.save"))
-                .setType("submit")
-                .setBackgroundColor("#238636");
-
-        actions.add(cancelBtn).add(this.modalSubmitBtn);
-        form.add(this.modalAction).add(groupCode).add(groupDeporte).add(this.deleteMsg).add(actions);
-
-        this.crudModal.add(this.modalTitle).add(form);
+        Div actions = new Div().setStyle("display", "flex").setStyle("gap", "10px").setStyle("margin-top", "20px");
+        actions.add(new Button(msg.getProperty("btn.cancel")).setType("button")
+                .setOnclick("document.getElementById('crudModal').style.display='none'; return false;"));
+        actions.add(modalSubmitBtn = new Button(msg.getProperty("btn.save")).setType("submit")
+                .setBackgroundColor("#238636"));
+        crudModal.add(new Header(3, "Operación")).add(form.add(actions));
     }
 
     @Override
-    protected void onPost(Map<String, String> params) {
-        String action = params.get("action");
-        String code = params.get("code");
-        String name = params.get("deporte");
-
-        boolean changed = false;
+    protected void onPost(java.util.Map<String, String> params) {
+        String action = params.get("action"), id = params.get("deporteId");
+        String code = (id == null || id.isEmpty()) ? params.get("idV") : id;
+        
         if ("save".equals(action)) {
-            boolean isNew = code == null || code.isEmpty() || DeporteRepository.findAll().stream().noneMatch(d -> d.getCode().equals(code));
-            DeporteRepository.save(new DeporteModel(code, name));
-            JettraSyncManager.notifyChange("DeporteModel", isNew ? SyncType.CREATE : SyncType.UPDATE, getLoggedUser(currentExchange));
-            changed = true;
+            DeporteRepository.save(new DeporteModel(code, params.get("deporte")));
+            JettraSyncManager.notifyChange("DeporteModel",
+                    (id == null || id.isEmpty()) ? SyncType.CREATE : SyncType.UPDATE, "user");
         } else if ("delete".equals(action)) {
-            if (code != null && !code.isEmpty()) {
-                DeporteRepository.delete(code);
-                JettraSyncManager.notifyChange("DeporteModel", SyncType.DELETE, getLoggedUser(currentExchange));
-                changed = true;
-            }
+            DeporteRepository.delete(id);
+            JettraSyncManager.notifyChange("DeporteModel", SyncType.DELETE, "user");
         }
-
-        if (changed) {
-            try {
-                redirect(currentExchange, JettraServer.resolvePath("/deporte?lang=" + lang + "&page=" + pageNumber));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        try {
+            redirect(currentExchange, JettraServer.resolvePath("/deporte?page=" + pageNumber));
+        } catch (Exception e) {
         }
     }
 }

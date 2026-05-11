@@ -3,226 +3,136 @@ package com.jettra.example.pages;
 import com.jettra.example.dashboard.DashboardBasePage;
 import com.jettra.example.model.PaisModel;
 import com.jettra.example.repository.PaisRepository;
+import io.jettra.wui.complex.*;
 import io.jettra.wui.components.*;
-import io.jettra.wui.validations.JettraValidations;
-import io.jettra.wui.complex.Center;
-import io.jettra.wui.core.annotations.InjectViewModel;
-import io.jettra.wui.sync.JettraSyncManager;
-import io.jettra.wui.sync.JettraPageSincronized;
-import io.jettra.wui.sync.SyncType;
 import io.jettra.wui.core.annotations.InjectProperties;
+import io.jettra.wui.sync.*;
 import com.jettra.server.JettraServer;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 @JettraPageSincronized(SyncType.ALL)
 public class PaisPage extends DashboardBasePage {
-
-    @InjectViewModel
-    PaisModel pais;
-
-    @io.jettra.wui.core.annotations.Inject  
-    private PaisRepository paisRepository;
-
     @InjectProperties(name = "messages")
     private Properties msg;
+    
+    @io.jettra.wui.core.annotations.Inject
+    private PaisRepository paisRepository;
 
-    private String lang = "es";
-
-    private Div crudModal;
-    private Header modalTitle;
-    private TextBox modalAction;
+    private int pageNumber = 1;
+    private Modal crudModal;
+    private TextBox modalAction, modalCode, inputCode, inputNombre;
+    private FormGroup groupCode, groupNombre;
+    private Paragraph deleteMsg;
     private Button modalSubmitBtn;
 
     public PaisPage() {
-        super("Mantenimiento de Países (Pure MVC)");
+        super("Gestión de Países (Optimizado)");
     }
 
     @Override
-    protected void onInit(Map<String, String> params) {
-        String lStr = params.get("lang");
-        if (lStr != null) this.lang = lStr;
+    protected void onInit(java.util.Map<String, String> params) {
+        try {
+            pageNumber = Integer.parseInt(params.getOrDefault("page", "1"));
+        } catch (Exception e) {
+        }
         super.onInit(params);
     }
 
     @Override
     protected void initCenter(Center center, String username) {
-        Style customStyles = new Style("""
-            .crud-table { width: 100%; border-collapse: collapse; margin-top: 20px; color: #fff; }
-            .crud-table th, .crud-table td { padding: 12px; border: 1px solid rgba(0,255,255,0.3); text-align: left; }
-            .crud-table th { background: rgba(0,255,255,0.1); color: #0ff; }
-            
-            .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); justify-content: center; align-items: center;}
-            .modal-content { background-color: #0d1117; padding: 30px; border: 2px solid #0ff; width: 450px; border-radius: 12px; box-shadow: 0 0 50px rgba(0,255,255,0.4); color: #fff;}
-            .form-group { margin-bottom: 20px; }
-            .form-group label { display: block; margin-bottom: 8px; color: #0ff; }
-            .modal-actions { display: flex; justify-content: flex-end; gap: 15px; margin-top: 25px; }
-            """);
+        setupModal();
+        Card card = new Card().setTitle(msg.getProperty("subtitle.pais")).setWidth("100%");
+        Datatable table = new Datatable();
 
-        center.add(customStyles);
-        
-        Div mainContent = new Div();
-        mainContent.setStyle("padding", "20px");
+        Button addBtn = new Button("➕ " + msg.getProperty("btn.add")).setId("btnAdd")
+                .setBackgroundColor("#238636").setStyle("font-size", "12px")
+                .addClickListener(() -> openModal("save", new PaisModel("", "")));
 
-        Header title = new Header(2, msg.getProperty("subtitle.pais"))
-            .setStyle("color", "var(--jettra-accent)")
-            .setStyle("margin-bottom", "20px");
-        mainContent.add(title);
-
-        setupModal(); // Initialize components before using them in listeners
-
-        Button addBtn = new Button("➕ " + msg.getProperty("btn.add.pais", "Añadir País"))
-            .setId("addBtn")
-            .addClass("j-btn")
-            .setStyle("background-color", "#0f5132")
-            .addClickListener(() -> {
-                this.pais.setCode("");
-                this.pais.setName("");
-                showModal(msg.getProperty("modal.add.pais.title", "Nuevo País"), "save");
-            });
-        mainContent.add(addBtn);
-
-        // Table
-        io.jettra.wui.complex.Datatable table = new io.jettra.wui.complex.Datatable()
-            .addHeaderRow(msg.getProperty("th.code", "Código"),
-                msg.getProperty("th.name", "Nombre"),
-                msg.getProperty("th.actions", "Acciones")
-            );
+        table.addHeaderRow(new Row(new TD(msg.getProperty("th.code", "Código")), new TD(msg.getProperty("th.name")),
+                new TD().add(addBtn)));
 
         List<PaisModel> all = paisRepository.findAll();
-        for (PaisModel p : all) {
-            io.jettra.wui.components.TD actionsTd = new io.jettra.wui.components.TD()
-                .setStyle("display", "flex")
-                .setStyle("gap", "10px");
-            
-            Button editBtn = new Button("✏️")
-                .addClass("j-btn")
-                .setId("edit-" + p.getCode())
-                .addClickListener(() -> {
-                    this.pais.setCode(p.getCode());
-                    this.pais.setName(p.getName());
-                    showModal(msg.getProperty("modal.edit.pais.title", "Editar País"), "save");
-                });
-            
-            Button deleteBtn = new Button("🗑️")
-                .addClass("j-btn")
-                .setId("del-" + p.getCode())
-                .setStyle("color", "#ff5555")
-                .setStyle("border-color", "#ff5555")
-                .setStyle("background", "rgba(255,0,0,0.1)")
-                .addClickListener(() -> {
-                    this.pais.setCode(p.getCode());
-                    this.pais.setName(p.getName());
-                    showModal(msg.getProperty("modal.delete.pais.title", "¿Eliminar País?"), "delete");
-                });
-            
-            actionsTd.add(editBtn).add(deleteBtn);
-            table.addRow(new io.jettra.wui.components.Row(
-                new io.jettra.wui.components.TD(p.getCode()),
-                new io.jettra.wui.components.TD(p.getName()),
-                actionsTd
-            ));
-        }
-        mainContent.add(table);
-        center.add(mainContent);
+        all.stream().skip((pageNumber - 1) * 10L).limit(10).forEach(p -> {
+            Button editBtn = new Button("✏️").setId("btnEdit-" + p.getCode())
+                    .addClickListener(() -> openModal("save", p));
+            Button delBtn = new Button("🗑️").setId("btnDel-" + p.getCode()).setStyle("color", "red")
+                    .addClickListener(() -> openModal("delete", p));
+            table.addRow(new Row(new TD(p.getCode()).setStyle("font-family", "monospace").setStyle("font-size", "11px"),
+                    new TD(p.getName()), new TD().add(editBtn).add(delBtn)));
+        });
+
+        center.add(new Div().setStyle("padding", "20px").add(card.add(table))).add(crudModal);
     }
 
-    private void showModal(String title, String action) {
-        this.crudModal.setStyle("display", "flex");
-        this.modalTitle.setContent(title);
-        this.modalAction.setProperty("value", action);
+    private void openModal(String action, PaisModel p) {
+        crudModal.setDisplay("block");
+        modalAction.setValue(action);
+        modalCode.setValue(p.getCode());
+        inputCode.setValue(p.getCode());
+        inputNombre.setValue(p.getName());
+        boolean isDel = "delete".equals(action);
+        boolean isNew = (p.getCode() == null || p.getCode().isEmpty());
         
-        if ("delete".equals(action)) {
-            this.modalSubmitBtn.setContent(msg.getProperty("btn.confirm", "¡Confirmar!"));
-            this.modalSubmitBtn.setStyle("background-color", "rgba(255,0,0,0.6)");
-        } else {
-            this.modalSubmitBtn.setContent(msg.getProperty("btn.save", "Guardar"));
-            this.modalSubmitBtn.setStyle("background-color", "");
-        }
+        // If it's a new country, the code field should be editable.
+        // If it's an existing country, the code field is readonly (it's the PK).
+        inputCode.setReadonly(!isNew);
+        inputCode.setStyle("opacity", isNew ? "1" : "0.7");
+        
+        groupCode.setStyle("display", "block"); // Always show code for Pais
+        groupNombre.setStyle("display", isDel ? "none" : "block");
+        deleteMsg.setStyle("display", isDel ? "block" : "none");
+        modalSubmitBtn.setContent(isDel ? msg.getProperty("btn.confirm.delete") : msg.getProperty("btn.save"));
+        modalSubmitBtn.setBackgroundColor(isDel ? "#da3633" : "#238636");
     }
 
     private void setupModal() {
-        this.crudModal = new Div();
-        this.crudModal.setId("crudModal").addClass("modal");
-
-        Div modalBody = new Div();
-        modalBody.addClass("modal-content");
-        
-        this.modalTitle = new Header(3, msg.getProperty("modal.operation", "Operación"));
-        this.modalTitle.setId("modalTitle");
-
+        crudModal = new Modal("crudModal").setMaxWidth("500px").setZIndex("9999");
         Form form = new Form("paisForm", JettraServer.resolvePath("/pais"));
-        this.modalAction = new TextBox("hidden", "modalAction");
-        this.modalAction.setId("modalAction");
-        
-        FormGroup g1 = new FormGroup()
-            .add(new Label("code", msg.getProperty("th.code", "Código")));
-        TextBox inputCode = new TextBox("text", "code")
-            .setId("paisCode")
-            .addClass("j-input");
-        JettraValidations.apply(inputCode, PaisModel.class, "code");
-        g1.add(inputCode);
+        modalAction = new TextBox("hidden", "action");
+        modalCode = new TextBox("hidden", "paisCode");
+        form.add(modalAction).add(modalCode);
 
-        FormGroup g2 = new FormGroup()
-            .add(new Label("name", msg.getProperty("th.name", "Nombre")));
-        TextBox inputName = new TextBox("text", "name")
-            .setId("paisName")
-            .addClass("j-input");
-        JettraValidations.apply(inputName, PaisModel.class, "name");
-        g2.add(inputName);
+        groupCode = new FormGroup();
+        groupCode.add(new Label("code", msg.getProperty("lbl.code", "Código")))
+                .add(inputCode = new TextBox("text", "code"));
+        form.add(groupCode);
 
-        Div groupActions = new Div()
-            .addClass("modal-actions");
-        
-        Button cancelBtn = new Button(msg.getProperty("btn.close", "CERRAR"))
-            .setProperty("type", "button")
-            .addClass("j-btn")
-            .setStyle("background", "#555")
-            .setStyle("border", "none")
-            .setProperty("onclick", "document.getElementById('crudModal').style.display='none'; return false;");
+        form.add(groupNombre = new FormGroup()).add(new Label("n", msg.getProperty("lbl.name")))
+                .add(inputNombre = new TextBox("text", "nombre"));
 
-        this.modalSubmitBtn = new Button(msg.getProperty("btn.save", "Guardar"))
-            .setId("modalSubmitBtn")
-            .addClass("j-btn")
-            .setProperty("type", "submit");
+        deleteMsg = new Paragraph(msg.getProperty("msg.confirm.delete")).setStyle("color", "#f85149")
+                .setStyle("display", "none");
+        form.add(deleteMsg);
 
-        groupActions.add(cancelBtn).add(this.modalSubmitBtn);
-        form.add(this.modalAction).add(g1).add(g2).add(groupActions);
-        modalBody.add(this.modalTitle).add(form);
-        this.crudModal.add(modalBody);
-        this.add(this.crudModal);
+        Div actions = new Div().setStyle("display", "flex").setStyle("gap", "10px").setStyle("margin-top", "20px");
+        actions.add(new Button(msg.getProperty("btn.cancel")).setType("button")
+                .setOnclick("document.getElementById('crudModal').style.display='none'; return false;"));
+        actions.add(modalSubmitBtn = new Button(msg.getProperty("btn.save")).setType("submit")
+                .setBackgroundColor("#238636"));
+        crudModal.add(new Header(3, "Operación")).add(form.add(actions));
     }
 
     @Override
-    protected void onPost(Map<String, String> params) {
-        // Logging for diagnostics
-        String action = params.get("modalAction");
-        String code = params.get("code");
-        String name = params.get("name");
+    protected void onPost(java.util.Map<String, String> params) {
+        String action = params.get("action");
+        String hiddenCode = params.get("paisCode");
+        String inputCodeValue = params.get("code");
+        String name = params.get("nombre");
         
-        System.out.println("[PaisPage] POST Action: " + action + " | Code: " + code + " | Name: " + name);
-        
-        boolean changed = false;
-        if (action != null) {
-            if (action.equals("save")) {
-                paisRepository.save(pais);
-                JettraSyncManager.notifyChange("PaisModel", SyncType.UPDATE, getLoggedUser(currentExchange));
-                changed = true;
-            } else if (action.equals("delete")) {
-                paisRepository.delete(pais.getCode());
-                JettraSyncManager.notifyChange("PaisModel", SyncType.DELETE, getLoggedUser(currentExchange));
-                changed = true;
-            }
+        // The effective code is either the hidden one (edit/delete) or the input one (new)
+        String finalCode = (hiddenCode == null || hiddenCode.isEmpty()) ? inputCodeValue : hiddenCode;
+
+        if ("save".equals(action)) {
+            paisRepository.save(new PaisModel(finalCode, name));
+            JettraSyncManager.notifyChange("PaisModel",
+                    (hiddenCode == null || hiddenCode.isEmpty()) ? SyncType.CREATE : SyncType.UPDATE, "user");
+        } else if ("delete".equals(action)) {
+            paisRepository.delete(finalCode);
+            JettraSyncManager.notifyChange("PaisModel", SyncType.DELETE, "user");
         }
-        
-        if (changed) {
-            try {
-                redirect(currentExchange, JettraServer.resolvePath("/pais?lang=" + lang));
-            } catch (IOException e) { 
-                System.err.println("Error during redirect: " + e.getMessage());
-            }
+        try {
+            redirect(currentExchange, JettraServer.resolvePath("/pais?page=" + pageNumber));
+        } catch (Exception e) {
         }
     }
 }
