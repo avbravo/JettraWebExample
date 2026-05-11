@@ -19,7 +19,7 @@ public class PaisPage extends DashboardBasePage {
     private PaisRepository paisRepository;
 
     private int pageNumber = 1;
-    private Modal crudModal;
+    private Modal crudModal, reportModal;
     private TextBox modalAction, modalCode, inputCode, inputNombre;
     private FormGroup groupCode, groupNombre;
     private Paragraph deleteMsg;
@@ -50,7 +50,7 @@ public class PaisPage extends DashboardBasePage {
 
         Button reportBtn = new Button("📄 " + msg.getProperty("btn.report", "Reporte")).setId("btnReport")
                 .setBackgroundColor("#007bff").setStyle("font-size", "12px").setStyle("margin-left", "10px")
-                .setOnclick("location.href='?action=report'");
+                .setOnclick("document.getElementById('reportModal').style.display='flex'");
 
         table.addHeaderRow(new Row(new TD(msg.getProperty("th.code", "Código")), new TD(msg.getProperty("th.name")),
                 new TD().add(addBtn).add(reportBtn)));
@@ -65,17 +65,20 @@ public class PaisPage extends DashboardBasePage {
                     new TD(p.getName()), new TD().add(editBtn).add(delBtn)));
         });
 
-        center.add(new Div().setStyle("padding", "20px").add(card.add(table))).add(crudModal);
+        setupReportModal();
+        center.add(new Div().setStyle("padding", "20px").add(card.add(table))).add(crudModal).add(reportModal);
     }
 
     @Override
     protected void onGet(java.util.Map<String, String> params) {
         if ("report".equals(params.get("action"))) {
-            imprimirReporte();
+            String format = params.get("format");
+            if (format == null) format = "pdf";
+            imprimirReporte(format);
         }
     }
 
-    private void imprimirReporte() {
+    private void imprimirReporte(String format) {
         try {
             List<PaisModel> data = paisRepository.findAll();
             com.jettra.report.Report report = new com.jettra.report.Report("Reporte de Países");
@@ -91,13 +94,23 @@ public class PaisPage extends DashboardBasePage {
             report.getDetail().addElement(table);
 
             // Export and Send
-            String fileName = "reporte_paises_" + System.currentTimeMillis() + ".pdf";
-            report.exportToPdf(fileName);
+            String fileName = "reporte_paises_" + System.currentTimeMillis() + "." + format;
+            
+            if ("pdf".equals(format)) report.exportToPdf(fileName);
+            else if ("excel".equals(format)) report.exportToExcel(fileName);
+            else if ("csv".equals(format)) report.exportToCsv(fileName);
+            else report.exportToPdf(fileName); // default
 
             java.io.File file = new java.io.File(fileName);
             if (file.exists()) {
                 byte[] bytes = java.nio.file.Files.readAllBytes(file.toPath());
-                currentExchange.getResponseHeaders().set("Content-Type", "application/pdf");
+                
+                String contentType = "application/octet-stream";
+                if ("pdf".equals(format)) contentType = "application/pdf";
+                else if ("excel".equals(format)) contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                else if ("csv".equals(format)) contentType = "text/csv";
+                
+                currentExchange.getResponseHeaders().set("Content-Type", contentType);
                 currentExchange.getResponseHeaders().set("Content-Disposition", "attachment; filename=" + file.getName());
                 currentExchange.sendResponseHeaders(200, bytes.length);
                 currentExchange.getResponseBody().write(bytes);
@@ -128,6 +141,39 @@ public class PaisPage extends DashboardBasePage {
         deleteMsg.setStyle("display", isDel ? "block" : "none");
         modalSubmitBtn.setContent(isDel ? msg.getProperty("btn.confirm.delete") : msg.getProperty("btn.save"));
         modalSubmitBtn.setBackgroundColor(isDel ? "#da3633" : "#238636");
+    }
+
+    private void setupReportModal() {
+        reportModal = new Modal("reportModal").setMaxWidth("500px").setZIndex("9999");
+        reportModal.setStyle("display", "none");
+
+        Header header = new Header(3, msg.getProperty("lbl.report_viewer", "Visor de Reporte"));
+        Paragraph desc = new Paragraph(msg.getProperty("lbl.report_desc", "Seleccione el formato de exportación o acción deseada."));
+
+        Div actions = new Div().setStyle("display", "flex").setStyle("flex-wrap", "wrap").setStyle("gap", "10px").setStyle("margin-top", "20px");
+
+        actions.add(new Button("📄 PDF")
+            .setBackgroundColor("#da3633")
+            .setOnclick("location.href='?action=report&format=pdf'; document.getElementById('reportModal').style.display='none';"));
+        
+        actions.add(new Button("📊 Excel")
+            .setBackgroundColor("#238636")
+            .setOnclick("location.href='?action=report&format=excel'; document.getElementById('reportModal').style.display='none';"));
+        
+        actions.add(new Button("📝 CSV")
+            .setBackgroundColor("#8957e5")
+            .setOnclick("location.href='?action=report&format=csv'; document.getElementById('reportModal').style.display='none';"));
+            
+        actions.add(new Button("🖨️ Imprimir")
+            .setBackgroundColor("#007bff")
+            .setOnclick("location.href='?action=report&format=pdf&print=true'; document.getElementById('reportModal').style.display='none';"));
+
+        Button cancelBtn = new Button(msg.getProperty("btn.close", "Cerrar"))
+                .setBackgroundColor("#30363d")
+                .setOnclick("document.getElementById('reportModal').style.display='none';");
+        actions.add(cancelBtn);
+
+        reportModal.add(header).add(desc).add(actions);
     }
 
     private void setupModal() {
