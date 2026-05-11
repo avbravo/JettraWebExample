@@ -48,8 +48,12 @@ public class PaisPage extends DashboardBasePage {
                 .setBackgroundColor("#238636").setStyle("font-size", "12px")
                 .addClickListener(() -> openModal("save", new PaisModel("", "")));
 
+        Button reportBtn = new Button("📄 " + msg.getProperty("btn.report", "Reporte")).setId("btnReport")
+                .setBackgroundColor("#007bff").setStyle("font-size", "12px").setStyle("margin-left", "10px")
+                .setOnclick("location.href='?action=report'");
+
         table.addHeaderRow(new Row(new TD(msg.getProperty("th.code", "Código")), new TD(msg.getProperty("th.name")),
-                new TD().add(addBtn)));
+                new TD().add(addBtn).add(reportBtn)));
 
         List<PaisModel> all = paisRepository.findAll();
         all.stream().skip((pageNumber - 1) * 10L).limit(10).forEach(p -> {
@@ -62,6 +66,47 @@ public class PaisPage extends DashboardBasePage {
         });
 
         center.add(new Div().setStyle("padding", "20px").add(card.add(table))).add(crudModal);
+    }
+
+    @Override
+    protected void onGet(java.util.Map<String, String> params) {
+        if ("report".equals(params.get("action"))) {
+            imprimirReporte();
+        }
+    }
+
+    private void imprimirReporte() {
+        try {
+            List<PaisModel> data = paisRepository.findAll();
+            com.jettra.report.Report report = new com.jettra.report.Report("Reporte de Países");
+            report.setData(data);
+
+            // Header
+            report.getHeader().addElement(new com.jettra.report.Report.TextElement("LISTADO DE PAÍSES"));
+
+            // Table
+            com.jettra.report.Report.Table table = new com.jettra.report.Report.Table();
+            table.addColumn(new com.jettra.report.Report.Column("CÓDIGO", "code", 100));
+            table.addColumn(new com.jettra.report.Report.Column("NOMBRE", "name", 300));
+            report.getDetail().addElement(table);
+
+            // Export and Send
+            String fileName = "reporte_paises_" + System.currentTimeMillis() + ".pdf";
+            report.exportToPdf(fileName);
+
+            java.io.File file = new java.io.File(fileName);
+            if (file.exists()) {
+                byte[] bytes = java.nio.file.Files.readAllBytes(file.toPath());
+                currentExchange.getResponseHeaders().set("Content-Type", "application/pdf");
+                currentExchange.getResponseHeaders().set("Content-Disposition", "attachment; filename=" + file.getName());
+                currentExchange.sendResponseHeaders(200, bytes.length);
+                currentExchange.getResponseBody().write(bytes);
+                currentExchange.getResponseBody().close();
+                file.delete();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void openModal(String action, PaisModel p) {

@@ -44,8 +44,12 @@ public class PersonaPage extends DashboardBasePage {
                 .setBackgroundColor("#238636").setStyle("font-size", "12px")
                 .addClickListener(() -> openModal("save", new PersonaModel("", "", "")));
 
+        Button reportBtn = new Button("📄 " + msg.getProperty("btn.report", "Reporte")).setId("btnReport")
+                .setBackgroundColor("#007bff").setStyle("font-size", "12px").setStyle("margin-left", "10px")
+                .setOnclick("location.href='?action=report'");
+
         table.addHeaderRow(new Row(new TD(msg.getProperty("th.id", "ID")), new TD(msg.getProperty("th.name")),
-                new TD(msg.getProperty("th.address")), new TD().add(addBtn)));
+                new TD(msg.getProperty("th.address")), new TD().add(addBtn).add(reportBtn)));
 
         List<PersonaModel> all = PersonaRepository.findAll();
         all.stream().skip((pageNumber - 1) * 10L).limit(10).forEach(p -> {
@@ -58,6 +62,45 @@ public class PersonaPage extends DashboardBasePage {
         });
 
         center.add(new Div().setStyle("padding", "20px").add(card.add(table))).add(crudModal);
+    }
+
+    @Override
+    protected void onGet(java.util.Map<String, String> params) {
+        if ("report".equals(params.get("action"))) {
+            imprimirReporte();
+        }
+    }
+
+    private void imprimirReporte() {
+        try {
+            List<PersonaModel> data = PersonaRepository.findAll();
+            com.jettra.report.Report report = new com.jettra.report.Report("Reporte de Personas");
+            report.setData(data);
+
+            report.getHeader().addElement(new com.jettra.report.Report.TextElement("LISTADO DE PERSONAS"));
+
+            com.jettra.report.Report.Table table = new com.jettra.report.Report.Table();
+            table.addColumn(new com.jettra.report.Report.Column("ID", "id", 100));
+            table.addColumn(new com.jettra.report.Report.Column("NOMBRE", "nombre", 200));
+            table.addColumn(new com.jettra.report.Report.Column("DIRECCIÓN", "direccion", 300));
+            report.getDetail().addElement(table);
+
+            String fileName = "reporte_personas_" + System.currentTimeMillis() + ".pdf";
+            report.exportToPdf(fileName);
+
+            java.io.File file = new java.io.File(fileName);
+            if (file.exists()) {
+                byte[] bytes = java.nio.file.Files.readAllBytes(file.toPath());
+                currentExchange.getResponseHeaders().set("Content-Type", "application/pdf");
+                currentExchange.getResponseHeaders().set("Content-Disposition", "attachment; filename=" + file.getName());
+                currentExchange.sendResponseHeaders(200, bytes.length);
+                currentExchange.getResponseBody().write(bytes);
+                currentExchange.getResponseBody().close();
+                file.delete();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void openModal(String action, PersonaModel p) {
