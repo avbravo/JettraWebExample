@@ -45,9 +45,30 @@ public class DeportePage extends DashboardBasePage {
                 .setBackgroundColor("#238636").setStyle("font-size", "12px")
                 .addClickListener(() -> openModal("save", new DeporteModel("", "")));
 
+        com.jettra.report.Report reportConfig = new com.jettra.report.Report("Reporte de Deportes");
+        reportConfig.setData(DeporteRepository.findAll());
+        reportConfig.getHeader().addElement(new com.jettra.report.Report.TextElement("LISTADO DE DEPORTES"));
+        
+        com.jettra.report.Report.Table rtable = new com.jettra.report.Report.Table();
+        rtable.addColumn(new com.jettra.report.Report.Column("CÓDIGO", "code", 100));
+        rtable.addColumn(new com.jettra.report.Report.Column("DEPORTE", "deporte", 300));
+        reportConfig.getDetail().addElement(rtable);
+
+        reportConfig.getViewerOptions()
+            .setShowViewer(true)
+            .setAllowPrint(true)
+            .setAllowPdf(true)
+            .setAllowExcel(false)
+            .setAllowCsv(true);
+
         Button reportBtn = new Button("📄 " + msg.getProperty("btn.report", "Reporte")).setId("btnReport")
-                .setBackgroundColor("#007bff").setStyle("font-size", "12px").setStyle("margin-left", "10px")
-                .setOnclick("location.href='?action=report'");
+                .setBackgroundColor("#007bff").setStyle("font-size", "12px").setStyle("margin-left", "10px");
+                
+        if (reportConfig.getViewerOptions().isShowViewer()) {
+            reportBtn.setOnclick("document.getElementById('reportModal_deporte').style.display='flex'");
+        } else {
+            reportBtn.setOnclick("location.href='?action=report&format=pdf'");
+        }
 
         table.addHeaderRow(new Row(new TD(msg.getProperty("th.code", "Código")), new TD(msg.getProperty("th.deporte")),
                 new TD().add(addBtn).add(reportBtn)));
@@ -62,17 +83,19 @@ public class DeportePage extends DashboardBasePage {
                     new TD(d.getDeporte()), new TD().add(editBtn).add(delBtn)));
         });
 
-        center.add(new Div().setStyle("padding", "20px").add(card.add(table))).add(crudModal);
+        center.add(new Div().setStyle("padding", "20px").add(card.add(table))).add(crudModal).add(reportConfig.createViewer("deporte"));
     }
 
     @Override
     protected void onGet(java.util.Map<String, String> params) {
         if ("report".equals(params.get("action"))) {
-            imprimirReporte();
+            String format = params.get("format");
+            if (format == null) format = "pdf";
+            imprimirReporte(format);
         }
     }
 
-    private void imprimirReporte() {
+    private void imprimirReporte(String format) {
         try {
             List<DeporteModel> data = DeporteRepository.findAll();
             com.jettra.report.Report report = new com.jettra.report.Report("Reporte de Deportes");
@@ -85,13 +108,23 @@ public class DeportePage extends DashboardBasePage {
             table.addColumn(new com.jettra.report.Report.Column("DEPORTE", "deporte", 300));
             report.getDetail().addElement(table);
 
-            String fileName = "reporte_deportes_" + System.currentTimeMillis() + ".pdf";
-            report.exportToPdf(fileName);
+            String fileName = "reporte_deportes_" + System.currentTimeMillis() + "." + format;
+            
+            if ("pdf".equals(format)) report.exportToPdf(fileName);
+            else if ("excel".equals(format)) report.exportToExcel(fileName);
+            else if ("csv".equals(format)) report.exportToCsv(fileName);
+            else report.exportToPdf(fileName);
 
             java.io.File file = new java.io.File(fileName);
             if (file.exists()) {
                 byte[] bytes = java.nio.file.Files.readAllBytes(file.toPath());
-                currentExchange.getResponseHeaders().set("Content-Type", "application/pdf");
+                
+                String contentType = "application/octet-stream";
+                if ("pdf".equals(format)) contentType = "application/pdf";
+                else if ("excel".equals(format)) contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                else if ("csv".equals(format)) contentType = "text/csv";
+                
+                currentExchange.getResponseHeaders().set("Content-Type", contentType);
                 currentExchange.getResponseHeaders().set("Content-Disposition", "attachment; filename=" + file.getName());
                 currentExchange.sendResponseHeaders(200, bytes.length);
                 currentExchange.getResponseBody().write(bytes);

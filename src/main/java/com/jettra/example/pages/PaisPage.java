@@ -19,7 +19,7 @@ public class PaisPage extends DashboardBasePage {
     private PaisRepository paisRepository;
 
     private int pageNumber = 1;
-    private Modal crudModal, reportModal;
+    private Modal crudModal;
     private TextBox modalAction, modalCode, inputCode, inputNombre;
     private FormGroup groupCode, groupNombre;
     private Paragraph deleteMsg;
@@ -48,9 +48,30 @@ public class PaisPage extends DashboardBasePage {
                 .setBackgroundColor("#238636").setStyle("font-size", "12px")
                 .addClickListener(() -> openModal("save", new PaisModel("", "")));
 
+        com.jettra.report.Report reportConfig = new com.jettra.report.Report("Reporte de Países");
+        reportConfig.setData(paisRepository.findAll());
+        reportConfig.getHeader().addElement(new com.jettra.report.Report.TextElement("LISTADO DE PAÍSES"));
+        
+        com.jettra.report.Report.Table rtable = new com.jettra.report.Report.Table();
+        rtable.addColumn(new com.jettra.report.Report.Column("CÓDIGO", "code", 100));
+        rtable.addColumn(new com.jettra.report.Report.Column("NOMBRE", "name", 300));
+        reportConfig.getDetail().addElement(rtable);
+
+        reportConfig.getViewerOptions()
+            .setShowViewer(true)
+            .setAllowPrint(true)
+            .setAllowPdf(true)
+            .setAllowExcel(false)
+            .setAllowCsv(true);
+
         Button reportBtn = new Button("📄 " + msg.getProperty("btn.report", "Reporte")).setId("btnReport")
-                .setBackgroundColor("#007bff").setStyle("font-size", "12px").setStyle("margin-left", "10px")
-                .setOnclick("document.getElementById('reportModal').style.display='flex'");
+                .setBackgroundColor("#007bff").setStyle("font-size", "12px").setStyle("margin-left", "10px");
+                
+        if (reportConfig.getViewerOptions().isShowViewer()) {
+            reportBtn.setOnclick("document.getElementById('reportModal_pais').style.display='flex'");
+        } else {
+            reportBtn.setOnclick("location.href='?action=report&format=pdf'");
+        }
 
         table.addHeaderRow(new Row(new TD(msg.getProperty("th.code", "Código")), new TD(msg.getProperty("th.name")),
                 new TD().add(addBtn).add(reportBtn)));
@@ -65,8 +86,7 @@ public class PaisPage extends DashboardBasePage {
                     new TD(p.getName()), new TD().add(editBtn).add(delBtn)));
         });
 
-        setupReportModal();
-        center.add(new Div().setStyle("padding", "20px").add(card.add(table))).add(crudModal).add(reportModal);
+        center.add(new Div().setStyle("padding", "20px").add(card.add(table))).add(crudModal).add(reportConfig.createViewer("pais"));
     }
 
     @Override
@@ -143,38 +163,6 @@ public class PaisPage extends DashboardBasePage {
         modalSubmitBtn.setBackgroundColor(isDel ? "#da3633" : "#238636");
     }
 
-    private void setupReportModal() {
-        reportModal = new Modal("reportModal").setMaxWidth("500px").setZIndex("9999");
-        reportModal.setStyle("display", "none");
-
-        Header header = new Header(3, msg.getProperty("lbl.report_viewer", "Visor de Reporte"));
-        Paragraph desc = new Paragraph(msg.getProperty("lbl.report_desc", "Seleccione el formato de exportación o acción deseada."));
-
-        Div actions = new Div().setStyle("display", "flex").setStyle("flex-wrap", "wrap").setStyle("gap", "10px").setStyle("margin-top", "20px");
-
-        actions.add(new Button("📄 PDF")
-            .setBackgroundColor("#da3633")
-            .setOnclick("location.href='?action=report&format=pdf'; document.getElementById('reportModal').style.display='none';"));
-        
-        actions.add(new Button("📊 Excel")
-            .setBackgroundColor("#238636")
-            .setOnclick("location.href='?action=report&format=excel'; document.getElementById('reportModal').style.display='none';"));
-        
-        actions.add(new Button("📝 CSV")
-            .setBackgroundColor("#8957e5")
-            .setOnclick("location.href='?action=report&format=csv'; document.getElementById('reportModal').style.display='none';"));
-            
-        actions.add(new Button("🖨️ Imprimir")
-            .setBackgroundColor("#007bff")
-            .setOnclick("location.href='?action=report&format=pdf&print=true'; document.getElementById('reportModal').style.display='none';"));
-
-        Button cancelBtn = new Button(msg.getProperty("btn.close", "Cerrar"))
-                .setBackgroundColor("#30363d")
-                .setOnclick("document.getElementById('reportModal').style.display='none';");
-        actions.add(cancelBtn);
-
-        reportModal.add(header).add(desc).add(actions);
-    }
 
     private void setupModal() {
         crudModal = new Modal("crudModal").setMaxWidth("500px").setZIndex("9999");
