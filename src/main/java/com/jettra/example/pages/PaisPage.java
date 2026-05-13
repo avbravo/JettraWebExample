@@ -61,7 +61,8 @@ public class PaisPage extends DashboardBasePage {
             .setShowViewer(true)
             .setAllowPrint(true)
             .setAllowPdf(true)
-            .setAllowExcel(false)
+            .setAllowExcel(true)
+            .setAllowWord(true)
             .setAllowCsv(true);
 
         Button reportBtn = new Button("📄 " + msg.getProperty("btn.report", "Reporte")).setId("btnReport")
@@ -118,6 +119,7 @@ public class PaisPage extends DashboardBasePage {
             
             if ("pdf".equals(format)) report.exportToPdf(fileName);
             else if ("excel".equals(format)) report.exportToExcel(fileName);
+            else if ("word".equals(format)) report.exportToWord(fileName);
             else if ("csv".equals(format)) report.exportToCsv(fileName);
             else report.exportToPdf(fileName); // default
 
@@ -128,6 +130,7 @@ public class PaisPage extends DashboardBasePage {
                 String contentType = "application/octet-stream";
                 if ("pdf".equals(format)) contentType = "application/pdf";
                 else if ("excel".equals(format)) contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                else if ("word".equals(format)) contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
                 else if ("csv".equals(format)) contentType = "text/csv";
                 
                 currentExchange.getResponseHeaders().set("Content-Type", contentType);
