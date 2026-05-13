@@ -10,7 +10,10 @@ import io.jettra.wui.complex.Center;
 
 @JettraPageSincronized(SyncType.ALL)
 @CrudView(model = com.jettra.example.model.PlanetaModel.class, repository = com.jettra.example.repository.PlanetaRepository.class,
-       report = true)
+       report = true,
+       reportOrientation = "LANDSCAPE",
+       reportTitle = "INFORME GLOBAL DE PLANETAS",
+       reportHeaderColor = "#007BFF")
 public class PlanetaPage extends DashboardBasePage {
 
     @InjectProperties(name = "messages")
