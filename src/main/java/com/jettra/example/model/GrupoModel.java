@@ -1,7 +1,7 @@
-
 package com.jettra.example.model;
 
 import io.jettra.wui.core.annotations.JettraViewModel;
+import io.jettra.wui.core.annotations.PropertiesLabel;
 import io.jettra.wui.validations.NotNull;
 import io.jettra.wui.validations.Size;
 
@@ -9,10 +9,12 @@ import io.jettra.wui.validations.Size;
 public class GrupoModel {
     @NotNull
     @Size(min = 2, max = 5)
+    @PropertiesLabel(value = "lbl.id", label = "ID")
     private String id;
     
     @NotNull
     @Size(min = 3, max = 100)
+    @PropertiesLabel(value = "lbl.name", label = "Nombre Grupo")
     private String name;
 
     public GrupoModel() {}
@@ -38,5 +40,8 @@ public class GrupoModel {
         this.name = name;
     }
 
-   
+    @Override
+    public String toString() {
+        return name;
+    }
 }

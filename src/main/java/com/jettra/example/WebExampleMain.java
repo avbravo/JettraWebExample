@@ -128,6 +128,8 @@ public class WebExampleMain {
         server.addHandler("/otpvalidator", OTPValidatorPage.class);
         server.addHandler("/trafficlight", TrafficLightPage.class);
         server.addHandler("/planeta", PlanetaPage.class);
+        server.addHandler("/grupo", GrupoPage.class);
+        server.addHandler("/subgrupo", SubGrupoPage.class);
         server.start();
     }
 }
