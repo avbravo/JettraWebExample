@@ -31,6 +31,18 @@ public class GrupoPage extends DashboardBasePage {
     }
 
     @Override
+    protected void onGet(Map<String, String> params) {
+        if ("report".equals(params.get("action"))) {
+            String format = params.get("format");
+            if (format == null) format = "pdf";
+            boolean print = "true".equals(params.get("print"));
+            
+            // Invoke report generation
+            io.jettra.wui.mvc.JettraMVC.generateReport(this, GrupoModel.class, GrupoRepository.class, format, print);
+        }
+    }
+
+    @Override
     protected void onPost(Map<String, String> params) {
         String action = params.get("action");
         String id = params.get("id"); // CrudView uses the field name for the ID in the form

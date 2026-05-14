@@ -29,7 +29,7 @@ public class SubGrupoModel {
     
     @ViewSelectMany(label = "deporte", source = "DeporteRepository", method = "findAll")
     @PropertiesLabel(value = "lbl.deportes", label = "Deportes")
-    @TableColumnField(field = "name")
+    @TableColumnField(field = "deporte")
     private List<DeporteModel> deportesModel;
     
 
