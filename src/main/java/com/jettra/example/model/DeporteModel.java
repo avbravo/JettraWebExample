@@ -48,6 +48,11 @@ public class DeporteModel {
     public void setDeporte(String deporte) {
         this.deporte = deporte;
     }
+
+    @Override
+    public String toString() {
+        return "DeporteModel{" + "code=" + code + ", deporte=" + deporte + '}';
+    }
     
     
     

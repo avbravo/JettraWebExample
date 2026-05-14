@@ -7,6 +7,7 @@ import io.jettra.wui.core.annotations.ViewSelectMany;
 import io.jettra.wui.core.annotations.ViewSelectOne;
 import io.jettra.wui.validations.NotNull;
 import io.jettra.wui.validations.Size;
+import java.util.List;
 
 @JettraViewModel
 public class SubGrupoModel {
@@ -27,7 +28,7 @@ public class SubGrupoModel {
     
     @ViewSelectMany(label = "deporte", source = "DeporteRepository", method = "findAll")
     @PropertiesLabel(value = "lbl.deportes", label = "Deportes")
-    private String deportes;
+    private List<DeporteModel> deportesModel;
     
 
     public SubGrupoModel() {}
@@ -38,12 +39,14 @@ public class SubGrupoModel {
         this.grupoModel = grupoModel;
     }
 
-    public SubGrupoModel(String id, String name, GrupoModel grupoModel, String deportes) {
+    public SubGrupoModel(String id, String name, GrupoModel grupoModel, List<DeporteModel> deportesModel) {
         this.id = id;
         this.name = name;
         this.grupoModel = grupoModel;
-        this.deportes = deportes;
+        this.deportesModel = deportesModel;
     }
+
+   
 
     public String getId() {
         return id;
@@ -69,16 +72,20 @@ public class SubGrupoModel {
         this.grupoModel = grupoModel;
     }
 
-    public String getDeportes() {
-        return deportes;
+    public List<DeporteModel> getDeportesModel() {
+        return deportesModel;
     }
 
-    public void setDeportes(String deportes) {
-        this.deportes = deportes;
+    public void setDeportesModel(List<DeporteModel> deportesModel) {
+        this.deportesModel = deportesModel;
     }
 
     @Override
     public String toString() {
-        return "SubGrupoModel{" + "id=" + id + ", name=" + name + ", grupoModel=" + (grupoModel != null ? grupoModel.getName() : "null") + ", deportes=" + deportes + '}';
+        return "SubGrupoModel{" + "id=" + id + ", name=" + name + ", grupoModel=" + grupoModel + ", deportesModel=" + deportesModel + '}';
     }
+
+    
+  
+
 }

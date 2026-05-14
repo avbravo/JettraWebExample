@@ -1,5 +1,6 @@
 package com.jettra.example.repository;
 
+import com.jettra.example.model.DeporteModel;
 import com.jettra.example.model.SubGrupoModel;
 import com.jettra.example.model.GrupoModel;
 import java.util.ArrayList;
@@ -10,9 +11,9 @@ public class SubGrupoRepository {
 
     static {
         List<GrupoModel> grupos = GrupoRepository.findAll();
-        subgrupos.add(new SubGrupoModel("SG1", "Java Backend", grupos.get(0), "FUT,TEN"));
-        subgrupos.add(new SubGrupoModel("SG2", "Vue Frontend", grupos.get(0), "NAT"));
-        subgrupos.add(new SubGrupoModel("SG3", "Help Desk", grupos.get(1), "FUT"));
+        subgrupos.add(new SubGrupoModel("SG1", "Java Backend", grupos.get(0), List.of(new DeporteModel("FUT", "Fútbol"))));
+        subgrupos.add(new SubGrupoModel("SG2", "Vue Frontend", grupos.get(0),  List.of(new DeporteModel("TEN", "Tenis"))));
+        subgrupos.add(new SubGrupoModel("SG3", "Help Desk", grupos.get(1), List.of(new DeporteModel("NAT", "Natación"))));
     }
 
     public static List<SubGrupoModel> findAll() {
@@ -28,7 +29,7 @@ public class SubGrupoRepository {
         if (existing != null) {
             existing.setName(subgrupo.getName());
             existing.setGrupoModel(subgrupo.getGrupoModel());
-            existing.setDeportes(subgrupo.getDeportes());
+            existing.setDeportesModel(subgrupo.getDeportesModel());
         } else {
             subgrupos.add(subgrupo);
         }
