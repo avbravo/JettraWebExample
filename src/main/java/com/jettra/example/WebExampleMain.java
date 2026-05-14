@@ -1,5 +1,11 @@
 package com.jettra.example;
 
+import com.jettra.example.pages.crud.PaisPage;
+import com.jettra.example.pages.crud.DeportePage;
+import com.jettra.example.pages.crud.PersonaPage;
+import com.jettra.example.pages.cruview.SubGrupoPage;
+import com.jettra.example.pages.cruview.PlanetaPage;
+import com.jettra.example.pages.cruview.GrupoPage;
 import com.jettra.server.JettraServer;
 import com.jettra.server.config.JettraConfigProperty;
 import com.jettra.server.config.ConfigInjector;

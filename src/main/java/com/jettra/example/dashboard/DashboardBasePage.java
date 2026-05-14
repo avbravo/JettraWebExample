@@ -29,9 +29,9 @@ public abstract class DashboardBasePage extends JettraDashboardPage {
         // --- Administration ---
         if ("admin".equals(username) || "demo".equals(username) || "avbravo".equals(username)) {
             addCategory(es ? "Administración" : "Administration", new String[]{}, "");
-            appendMenuItem("Persona CRUD", "/persona", "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'></path><circle cx='9' cy='7' r='4'></circle></svg>");
-            appendMenuItem("Pais CRUD (MVC)", "/pais", "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'></circle><line x1='2' y1='12' x2='22' y2='12'></line></svg>");
-            appendMenuItem("Deporte CRUD", "/deporte", "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'></circle><line x1='2' y1='12' x2='22' y2='12'></line></svg>");
+//            appendMenuItem("Persona CRUD", "/persona", "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'></path><circle cx='9' cy='7' r='4'></circle></svg>");
+//            appendMenuItem("Pais CRUD (MVC)", "/pais", "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'></circle><line x1='2' y1='12' x2='22' y2='12'></line></svg>");
+//            appendMenuItem("Deporte CRUD", "/deporte", "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'></circle><line x1='2' y1='12' x2='22' y2='12'></line></svg>");
 //            appendMenuItem("Grupo CRUD", "/grupo", "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'></path><circle cx='9' cy='7' r='4'></circle></svg>");
 //            appendMenuItem("SubGrupo CRUD", "/subgrupo", "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'></path><circle cx='9' cy='7' r='4'></circle></svg>");
 //            appendMenuItem("Planeta CRUD (@CrudView)", "/planeta", "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'></circle><line x1='2' y1='12' x2='22' y2='12'></line></svg>");
@@ -40,6 +40,7 @@ public abstract class DashboardBasePage extends JettraDashboardPage {
         }
 
         // --- Categories and Components ---
+         addCategory(es ? "Crud" : "Crud", new String[]{"Persona", "Pais", "Deporte"}, compIcon);
         addCategory(es ? "@CrudView" : "@CrudView", new String[]{"Grupo", "SubGrupo", "Planeta"}, compIcon);
         addCategory(es ? "Tipografía" : "Typography", new String[]{"Header", "Paragraph", "Span", "Label", "Separator", "Icon", "Typography"}, compIcon);
         addCategory(es ? "Formularios" : "Forms", new String[]{"Button", "Catcha", "CheckBox", "CheckBoxGroup", "CreditCard", "Form", "FormGroup", "Forms", "OTPValidator", "RadioButton", "RadioGroupButton", "ScheduleControl", "SelectOne", "SelectMany", "SelectOneIcon", "Spinner", "TextBox", "TextArea", "ToggleSwitch"}, compIcon);

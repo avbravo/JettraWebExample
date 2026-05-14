@@ -1,4 +1,4 @@
-package com.jettra.example.pages;
+package com.jettra.example.pages.cruview;
 
 import com.jettra.example.dashboard.DashboardBasePage;
 import com.jettra.example.model.DeporteModel;
