@@ -3,6 +3,7 @@ package com.jettra.example.model;
 
 import io.jettra.wui.core.annotations.JettraViewModel;
 import io.jettra.wui.core.annotations.PropertiesLabel;
+import io.jettra.wui.core.annotations.TableColumnField;
 import io.jettra.wui.core.annotations.ViewSelectMany;
 import io.jettra.wui.core.annotations.ViewSelectOne;
 import io.jettra.wui.validations.NotNull;
@@ -28,6 +29,7 @@ public class SubGrupoModel {
     
     @ViewSelectMany(label = "deporte", source = "DeporteRepository", method = "findAll")
     @PropertiesLabel(value = "lbl.deportes", label = "Deportes")
+    @TableColumnField(field = "name")
     private List<DeporteModel> deportesModel;
     
 

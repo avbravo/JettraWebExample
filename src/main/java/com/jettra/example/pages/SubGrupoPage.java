@@ -37,6 +37,18 @@ public class SubGrupoPage extends DashboardBasePage {
     }
 
     @Override
+    protected void onGet(Map<String, String> params) {
+        if ("report".equals(params.get("action"))) {
+            String format = params.get("format");
+            if (format == null) format = "pdf";
+            boolean print = "true".equals(params.get("print"));
+            
+            // Invoke report generation
+            io.jettra.wui.mvc.JettraMVC.generateReport(this, SubGrupoModel.class, SubGrupoRepository.class, format, print);
+        }
+    }
+
+    @Override
     protected void onPost(Map<String, String> params) {
         String action = params.get("action");
         String id = params.get("id");
