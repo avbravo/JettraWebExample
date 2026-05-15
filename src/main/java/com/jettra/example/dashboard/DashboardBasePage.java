@@ -4,8 +4,8 @@ import io.jettra.wui.complex.Left;
 import io.jettra.wui.core.JettraDashboardPage;
 
 /**
- * Simplified DashboardBasePage leveraging JettraWUI integration.
- * Most logic was moved to JettraDashboardPage in io.jettra.wui.core.
+ * Simplified DashboardBasePage leveraging JettraWUI integration. Most logic was
+ * moved to JettraDashboardPage in io.jettra.wui.core.
  */
 public abstract class DashboardBasePage extends JettraDashboardPage {
 
@@ -16,12 +16,12 @@ public abstract class DashboardBasePage extends JettraDashboardPage {
     @Override
     protected void setupLeft(Left left, String username) {
         initMenuBuilder();
-        
+
         String compIcon = "<svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' style='opacity:0.7;'><path d='M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z'></path></svg>";
-        
+
         String lang = com.jettra.server.config.JettraConfig.getProperty("app.language");
         boolean es = "es".equals(lang != null ? lang.trim() : "en");
-        
+
         // --- Navigation ---
         addCategory(es ? "Navegación" : "Navigation", new String[]{}, ""); // Empty to hold custom elements
         appendMenuItem(es ? "Panel Principal" : "Main Dashboard", "/dashboard", "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='4 17 10 11 4 5'></polyline><line x1='12' y1='19' x2='20' y2='19'></line></svg>");
@@ -40,7 +40,8 @@ public abstract class DashboardBasePage extends JettraDashboardPage {
         }
 
         // --- Categories and Components ---
-         addCategory(es ? "Crud" : "Crud", new String[]{"Persona", "Pais", "Deporte"}, compIcon);
+        addCategory(es ? "@Rules" : "@Rules", new String[]{"Reglas", "ReglasViewCrud"}, compIcon);
+        addCategory(es ? "Crud" : "Crud", new String[]{"Persona", "Pais", "Deporte"}, compIcon);
         addCategory(es ? "@CrudView" : "@CrudView", new String[]{"Grupo", "SubGrupo", "Planeta"}, compIcon);
         addCategory(es ? "Tipografía" : "Typography", new String[]{"Header", "Paragraph", "Span", "Label", "Separator", "Icon", "Typography"}, compIcon);
         addCategory(es ? "Formularios" : "Forms", new String[]{"Button", "Catcha", "CheckBox", "CheckBoxGroup", "CreditCard", "Form", "FormGroup", "Forms", "OTPValidator", "RadioButton", "RadioGroupButton", "ScheduleControl", "SelectOne", "SelectMany", "SelectOneIcon", "Spinner", "TextBox", "TextArea", "ToggleSwitch"}, compIcon);

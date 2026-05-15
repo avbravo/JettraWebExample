@@ -6,6 +6,8 @@ import com.jettra.example.pages.crud.PersonaPage;
 import com.jettra.example.pages.cruview.SubGrupoPage;
 import com.jettra.example.pages.cruview.PlanetaPage;
 import com.jettra.example.pages.cruview.GrupoPage;
+import com.jettra.example.pages.cruview.ReglasViewCrudPage;
+import com.jettra.example.pages.crud.ReglasPage;
 import com.jettra.server.JettraServer;
 import com.jettra.server.config.JettraConfigProperty;
 import com.jettra.server.config.ConfigInjector;
@@ -20,7 +22,6 @@ public class WebExampleMain {
     private String port;
     @JettraConfigProperty(name = "server.contextpath")
     private String contextpath;
-   
 
     public void initUI() {
         ConfigInjector.inject(this);
@@ -33,7 +34,7 @@ public class WebExampleMain {
 
         // Configurar la ruta de redirección en ErrorPage, usando contextpath (y el puerto implícitamente por el host)
         io.jettra.wui.complex.ErrorPage.path = "http://localhost:" + app.port + app.contextpath;
-        
+
         System.out.println("Levantando servidor de enrutamiento JettraServer empotrado...");
         JettraServer server = new JettraServer();
         server.setErrorPage("/error");
@@ -47,7 +48,6 @@ public class WebExampleMain {
         // Not Found"
         // o "No context found" al intentar cargar la vista o manejar peticiones de
         // Formularios.
-
         // Register pages as classes to ensure a fresh, isolated instance per request
         server.addHandler("/error", io.jettra.wui.complex.ErrorPage.class);
         server.addHandler("/", LoginPage.class);
@@ -136,6 +136,10 @@ public class WebExampleMain {
         server.addHandler("/planeta", PlanetaPage.class);
         server.addHandler("/grupo", GrupoPage.class);
         server.addHandler("/subgrupo", SubGrupoPage.class);
+        server.addHandler("/reglas", ReglasPage.class);
+        server.addHandler("/reglasview", ReglasViewCrudPage.class);
+        server.addHandler("/reglaspage", ReglasPage.class);
+        server.addHandler("/reglasviewcrudpage", ReglasViewCrudPage.class);
         server.start();
     }
 }
