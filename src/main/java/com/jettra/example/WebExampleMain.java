@@ -80,6 +80,7 @@ public class WebExampleMain {
         server.addHandler("/loading", LoadingPage.class);
         server.addHandler("/datepicker", DatePickerPage.class);
         server.addHandler("/datatable", DataTablePage.class);
+        server.addHandler("/datatableeditable", DatatableEditablePage.class);
         server.addHandler("/label", LabelPage.class);
         server.addHandler("/link", LinkPage.class);
         server.addHandler("/organigram", OrganigramPage.class);
