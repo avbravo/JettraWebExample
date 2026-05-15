@@ -125,7 +125,8 @@ public class DatatableEditablePage extends DashboardBasePage {
         table.addHeaderRow("Artículo", "Categoría", "Precio Unit. ($)", "Cantidad", "Fecha de Entrega", "Total por Fila ($)");
 
         String[] articles = {"Laptop XYZ", "Monitor 4K", "Teclado Mecánico"};
-        double[] prices = {999.99, 299.50, 85.00};
+        String[] categories = {"electronic", "accessory", "office"};
+        double[] prices = {10000.0, 456.0, 231.0};
         
         for (int i = 0; i < articles.length; i++) {
             Row row = new Row();
@@ -140,7 +141,9 @@ public class DatatableEditablePage extends DashboardBasePage {
             catBox.addOption("electronic", "Electrónica");
             catBox.addOption("accessory", "Accesorios");
             catBox.addOption("office", "Oficina");
+            catBox.setProperty("value", categories[i]);
             catBox.setStyle("width", "120px").setStyle("padding", "5px").setStyle("border-radius", "4px").setStyle("border", "1px solid var(--jettra-border)").setStyle("background", "var(--jettra-bg)");
+            catBox.setProperty("onchange", "updateCategory(" + i + ")");
             row.add(new TD().add(catBox));
 
             // Editable Price Column (TextBox)
@@ -187,6 +190,19 @@ public class DatatableEditablePage extends DashboardBasePage {
 
         // Javascript for dynamic interactions
         String scriptContent = "<script>\n" +
+            "function updateCategory(index) {\n" +
+            "    const catEl = document.getElementById('cat_' + index);\n" +
+            "    const priceEl = document.getElementById('price_' + index);\n" +
+            "    if (catEl && priceEl) {\n" +
+            "        const cat = catEl.value;\n" +
+            "        let newPrice = 0;\n" +
+            "        if (cat === 'electronic') newPrice = 10000.00;\n" +
+            "        else if (cat === 'accessory') newPrice = 456.00;\n" +
+            "        else if (cat === 'office') newPrice = 231.00;\n" +
+            "        priceEl.value = newPrice.toFixed(2);\n" +
+            "        updateRow(index);\n" +
+            "    }\n" +
+            "}\n" +
             "function updateRow(index) {\n" +
             "    const priceEl = document.getElementById('price_' + index);\n" +
             "    const qtyEl = document.getElementById('qty_' + index);\n" +

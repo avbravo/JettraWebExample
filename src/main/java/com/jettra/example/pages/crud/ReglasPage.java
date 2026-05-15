@@ -34,13 +34,17 @@ public class ReglasPage extends DashboardBasePage {
         Button addBtn = new Button("➕ " + msg.getProperty("btn.add", "Añadir")).setId("btnAdd")
                 .setBackgroundColor("#238636").setStyle("font-size", "12px")
                 .addClickListener(() -> openModal("save", new ReglasModel("", 0.0, 0.0, 0.0)));
+                
+        Button printBtn = new Button("🖨️ Imprimir").setId("btnPrint")
+                .setBackgroundColor("#007bff").setStyle("font-size", "12px")
+                .setOnclick("location.href='?action=report&format=pdf';");
 
         table.addHeaderRow(new Row(
             new TD("ID"), 
             new TD("Saldo"), 
             new TD("Descuento"), 
             new TD("Saldo Neto"),
-            new TD().add(addBtn)
+            new TD().add(addBtn).add(printBtn)
         ));
 
         List<ReglasModel> all = ReglasRepository.findAll();
@@ -67,6 +71,18 @@ public class ReglasPage extends DashboardBasePage {
                     "  const neto = saldo - descuento;\n" +
                     "  const target = document.getElementById('inputSaldoNeto');\n" +
                     "  if(target) target.value = neto.toFixed(2);\n" +
+                    "}\n" +
+                    "function validateForm(e) {\n" +
+                    "  const actionEl = document.getElementById('modalAction');\n" +
+                    "  if(actionEl && actionEl.value === 'delete') return true;\n" +
+                    "  const saldo = parseFloat(document.getElementById('inputSaldo').value) || 0;\n" +
+                    "  const descuento = parseFloat(document.getElementById('inputDescuento').value) || 0;\n" +
+                    "  if(descuento > saldo) {\n" +
+                    "    alert('Error: El descuento no puede ser mayor al saldo');\n" +
+                    "    if(e) e.preventDefault();\n" +
+                    "    return false;\n" +
+                    "  }\n" +
+                    "  return true;\n" +
                     "}\n" +
                     "// We need to wait for the DOM to be ready or ensure elements exist\n" +
                     "setTimeout(() => {\n" +
@@ -101,8 +117,8 @@ public class ReglasPage extends DashboardBasePage {
 
     private void setupModal() {
         crudModal = new Modal("crudModal").setMaxWidth("500px").setZIndex("9999");
-        Form form = new Form("reglasForm", JettraServer.resolvePath("/reglas"));
-        modalAction = new TextBox("hidden", "action");
+        Form form = new Form("reglasForm", JettraServer.resolvePath("/reglas")).setProperty("onsubmit", "return validateForm(event)");
+        modalAction = new TextBox("hidden", "action").setId("modalAction");
         modalId = new TextBox("hidden", "reglasId");
         form.add(modalAction).add(modalId);
 
@@ -112,7 +128,7 @@ public class ReglasPage extends DashboardBasePage {
         form.add(groupSaldoNeto = new FormGroup()).add(new Label("sn", "Saldo Neto")).add(inputSaldoNeto = new TextBox("text", "saldoNeto").setId("inputSaldoNeto"));
         
         // Saldo Neto is always readonly because it's computed
-        inputSaldoNeto.setReadonly(true).setStyle("background-color", "#f0f0f0").setStyle("cursor", "not-allowed");
+        inputSaldoNeto.setReadonly(true).setStyle("background-color", "var(--jettra-bg-muted)").setStyle("cursor", "not-allowed").setStyle("color", "var(--jettra-text-muted)");
 
         deleteMsg = new Paragraph("¿Está seguro de eliminar este registro?").setStyle("color", "#f85149").setStyle("display", "none");
         form.add(deleteMsg);
@@ -121,6 +137,13 @@ public class ReglasPage extends DashboardBasePage {
         actions.add(new Button("Cancelar").setType("button").setOnclick("document.getElementById('crudModal').style.display='none'; return false;"));
         actions.add(modalSubmitBtn = new Button("Guardar").setType("submit").setBackgroundColor("#238636"));
         crudModal.add(new Header(3, "Operación")).add(form.add(actions));
+    }
+
+    @Override
+    protected void onGet(java.util.Map<String, String> params) {
+        if ("report".equals(params.get("action"))) {
+            io.jettra.wui.mvc.JettraMVC.generateReport(this, ReglasModel.class, ReglasRepository.class, "pdf", false);
+        }
     }
 
     @Override
@@ -134,7 +157,29 @@ public class ReglasPage extends DashboardBasePage {
                 Double saldo = Double.parseDouble(params.get("saldo"));
                 Double descuento = Double.parseDouble(params.get("descuento"));
                 Double neto = Double.parseDouble(params.get("saldoNeto"));
-                ReglasRepository.save(new ReglasModel(idValue, saldo, descuento, neto));
+                ReglasModel model = new ReglasModel(idValue, saldo, descuento, neto);
+                
+                // Backend @Rules validation
+                java.util.List<io.jettra.rules.core.RuleResult> results = io.jettra.rules.core.JettraRulesEngine.validate(model);
+                boolean valid = true;
+                StringBuilder errors = new StringBuilder();
+                for (io.jettra.rules.core.RuleResult res : results) {
+                    if (!res.isValid()) {
+                        valid = false;
+                        errors.append(res.getMessage()).append("\\n");
+                    }
+                }
+                
+                if (!valid) {
+                    String jsError = "<script>alert('Error de validación:\\n" + errors.toString() + "'); history.back();</script>";
+                    currentExchange.getResponseHeaders().set("Content-Type", "text/html; charset=UTF-8");
+                    currentExchange.sendResponseHeaders(200, jsError.getBytes().length);
+                    currentExchange.getResponseBody().write(jsError.getBytes());
+                    currentExchange.getResponseBody().close();
+                    return;
+                }
+                
+                ReglasRepository.save(model);
             } catch (Exception e) {
                 e.printStackTrace();
             }
