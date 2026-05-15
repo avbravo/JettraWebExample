@@ -43,15 +43,18 @@ public abstract class DashboardBasePage extends JettraDashboardPage {
         addCategory(es ? "@Rules" : "@Rules", new String[]{"Reglas", "ReglasViewCrud"}, compIcon);
         addCategory(es ? "Crud" : "Crud", new String[]{"Persona", "Pais", "Deporte"}, compIcon);
         addCategory(es ? "@CrudView" : "@CrudView", new String[]{"Grupo", "SubGrupo", "Planeta"}, compIcon);
+        addCategory(es ? "DataTable" : "DataTable", new String[]{"DataTable", "DatatableEditable"}, compIcon);
         addCategory(es ? "Tipografía" : "Typography", new String[]{"Header", "Paragraph", "Span", "Label", "Separator", "Icon", "Typography"}, compIcon);
-        addCategory(es ? "Formularios" : "Forms", new String[]{"Button", "Catcha", "CheckBox", "CheckBoxGroup", "CreditCard", "Form", "FormGroup", "Forms", "OTPValidator", "RadioButton", "RadioGroupButton", "ScheduleControl", "SelectOne", "SelectMany", "SelectOneIcon", "Spinner", "TextBox", "TextArea", "ToggleSwitch"}, compIcon);
-        addCategory(es ? "Fecha y Tiempo" : "Date", new String[]{"Calendar", "DatePicker", "Organigram", "Schedule", "Time", "Timeline"}, compIcon);
+        addCategory(es ? "Formularios" : "Forms", new String[]{"Button", "Catcha", "CheckBox", "CheckBoxGroup", "CreditCard", "Form", "FormGroup", "Forms", "OTPValidator", "RadioButton", "RadioGroupButton", "ScheduleControl", "Spinner", "TextBox", "TextArea", "ToggleSwitch", "Tree"}, compIcon);
+        addCategory(es ? "Select" : "Select", new String[]{"SelectOne", "SelectMany", "SelectOneIcon"}, compIcon);
+
+        addCategory(es ? "Fecha y Tiempo" : "Date", new String[]{"Calendar", "DatePicker", "Organigram", "Schedule", "Time", "Timeline", "Clock"}, compIcon);
         addCategory(es ? "Navegación" : "Navigation", new String[]{"Link", "Menu", "MenuBar", "Navigation"}, compIcon);
         addCategory(es ? "Retroalimentación" : "Feedback", new String[]{"Alert", "Modal", "Notification", "SessionTimeout", "Feedback", "TrafficLight"}, compIcon);
-        addCategory(es ? "Diseño de Página" : "Layout", new String[]{"Avatar", "AvatarGroup", "Board", "Card", "Carousel", "Clock", "Div", "Divide", "Draw", "FileUpload", "FolderSelector", "Grid", "Icon", "Image", "LayoutDisplay", "Loading", "LoginAdvanced", "Map", "Panel", "ProgressBar", "Spinner", "DataTable", "DatatableEditable", "TabView", "Tree"}, compIcon);
+        addCategory(es ? "Diseño de Página" : "Layout", new String[]{"Avatar", "AvatarGroup", "Board", "Card", "Carousel", "Div", "Divide", "Draw", "FileUpload", "FolderSelector", "Grid", "Icon", "Image", "LayoutDisplay", "Loading", "LoginAdvanced", "Panel", "ProgressBar", "TabView"}, compIcon);
         addCategory(es ? "Multimedia" : "Media", new String[]{"BarCode", "Downloader", "PDFViewer", "QR", "ViewMedia"}, compIcon);
-        addCategory("Charts", new String[]{"ChartsBar", "ChartsDoughnut", "ChartsLine", "ChartsPie", "ChartsRadar"}, compIcon);
-
+        addCategory(es ? "Charts" : "Charts", new String[]{"ChartsBar", "ChartsDoughnut", "ChartsLine", "ChartsPie", "ChartsRadar"}, compIcon);
+        addCategory(es ? "Maps" : "Maps", new String[]{ "Map"}, compIcon);
         menuHtmlBuilder.append("<div style='margin-top:20px;'></div>");
         appendMenuItem(es ? "Cerrar Sesión" : "Logout", "/logout", "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'></path><polyline points='16 17 21 12 16 7'></polyline></svg>");
 
