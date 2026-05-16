@@ -8,6 +8,8 @@ import io.jettra.wui.components.*;
 import io.jettra.wui.core.annotations.InjectProperties;
 import io.jettra.wui.sync.*;
 import com.jettra.server.JettraServer;
+import com.jettra.report.Report;
+import com.jettra.report.ReportViewer;
 import java.util.*;
 
 @JettraPageSincronized(SyncType.ALL)
@@ -20,6 +22,7 @@ public class ReglasPage extends DashboardBasePage {
     private FormGroup groupId, groupSaldo, groupDescuento, groupSaldoNeto;
     private Paragraph deleteMsg;
     private Button modalSubmitBtn;
+    private ReportViewer reportViewer;
 
     public ReglasPage() {
         super("Gestión Manual de Reglas y Cómputos");
@@ -37,7 +40,7 @@ public class ReglasPage extends DashboardBasePage {
                 
         Button printBtn = new Button("🖨️ Imprimir").setId("btnPrint")
                 .setBackgroundColor("#007bff").setStyle("font-size", "12px")
-                .setOnclick("location.href='?action=report&format=pdf';");
+                .setOnclick("document.getElementById('reportModal_reglas_list').style.display='flex';");
 
         table.addHeaderRow(new Row(
             new TD("ID"), 
@@ -62,15 +65,44 @@ public class ReglasPage extends DashboardBasePage {
             ));
         });
 
-        center.add(new Div().setStyle("padding", "20px").add(card.add(table))).add(crudModal);
+        setupReportViewer();
+        center.add(new Div().setStyle("padding", "20px").add(card.add(table))).add(crudModal).add(reportViewer);
         
         // Manual JS for @Compute simulation
-        String js = "function updateSaldoNeto() {\n" +
+        String js = "function showToast(msg, type) {\n" +
+                    "  let toast = document.getElementById('j-toast-reglas');\n" +
+                    "  if(!toast) {\n" +
+                    "    toast = document.createElement('div');\n" +
+                    "    toast.id = 'j-toast-reglas';\n" +
+                    "    toast.style = 'position:fixed;top:20px;right:20px;z-index:99999;padding:12px 20px;border-radius:8px;color:white;font-weight:bold;transition:all 0.3s;display:none;';\n" +
+                    "    document.body.appendChild(toast);\n" +
+                    "  }\n" +
+                    "  toast.innerText = msg;\n" +
+                    "  toast.style.backgroundColor = type === 'error' ? 'rgba(239, 68, 68, 0.9)' : 'rgba(16, 185, 129, 0.9)';\n" +
+                    "  toast.style.display = 'block';\n" +
+                    "  toast.style.opacity = '1';\n" +
+                    "  setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.style.display='none', 300); }, 3000);\n" +
+                    "}\n" +
+                    "function updateSaldoNeto() {\n" +
                     "  const saldo = parseFloat(document.getElementById('inputSaldo').value) || 0;\n" +
                     "  const descuento = parseFloat(document.getElementById('inputDescuento').value) || 0;\n" +
                     "  const neto = saldo - descuento;\n" +
                     "  const target = document.getElementById('inputSaldoNeto');\n" +
                     "  if(target) target.value = neto.toFixed(2);\n" +
+                    "  validateRealTime();\n" +
+                    "}\n" +
+                    "function validateRealTime() {\n" +
+                    "  const saldo = parseFloat(document.getElementById('inputSaldo').value) || 0;\n" +
+                    "  const descuento = parseFloat(document.getElementById('inputDescuento').value) || 0;\n" +
+                    "  const inputD = document.getElementById('inputDescuento');\n" +
+                    "  if(descuento > saldo) {\n" +
+                    "    inputD.style.borderColor = '#f85149';\n" +
+                    "    inputD.style.boxShadow = '0 0 8px rgba(248, 81, 73, 0.5)';\n" +
+                    "    showToast('El descuento no puede ser mayor al saldo', 'error');\n" +
+                    "  } else {\n" +
+                    "    inputD.style.borderColor = '';\n" +
+                    "    inputD.style.boxShadow = '';\n" +
+                    "  }\n" +
                     "}\n" +
                     "function validateForm(e) {\n" +
                     "  const actionEl = document.getElementById('modalAction');\n" +
@@ -78,13 +110,12 @@ public class ReglasPage extends DashboardBasePage {
                     "  const saldo = parseFloat(document.getElementById('inputSaldo').value) || 0;\n" +
                     "  const descuento = parseFloat(document.getElementById('inputDescuento').value) || 0;\n" +
                     "  if(descuento > saldo) {\n" +
-                    "    alert('Error: El descuento no puede ser mayor al saldo');\n" +
+                    "    showToast('Error: El descuento no puede ser mayor al saldo', 'error');\n" +
                     "    if(e) e.preventDefault();\n" +
                     "    return false;\n" +
                     "  }\n" +
                     "  return true;\n" +
                     "}\n" +
-                    "// We need to wait for the DOM to be ready or ensure elements exist\n" +
                     "setTimeout(() => {\n" +
                     "  const s = document.getElementById('inputSaldo');\n" +
                     "  const d = document.getElementById('inputDescuento');\n" +
@@ -128,7 +159,12 @@ public class ReglasPage extends DashboardBasePage {
         form.add(groupSaldoNeto = new FormGroup()).add(new Label("sn", "Saldo Neto")).add(inputSaldoNeto = new TextBox("text", "saldoNeto").setId("inputSaldoNeto"));
         
         // Saldo Neto is always readonly because it's computed
-        inputSaldoNeto.setReadonly(true).setStyle("background-color", "var(--jettra-bg-muted)").setStyle("cursor", "not-allowed").setStyle("color", "var(--jettra-text-muted)");
+        inputSaldoNeto.setReadonly(true)
+                .setStyle("background-color", "rgba(48, 54, 61, 0.5)") // Specific dark glass background
+                .setStyle("cursor", "not-allowed")
+                .setStyle("color", "#ffffff") // High contrast white
+                .setStyle("font-weight", "bold")
+                .setStyle("border", "1px solid rgba(255, 255, 255, 0.1)");
 
         deleteMsg = new Paragraph("¿Está seguro de eliminar este registro?").setStyle("color", "#f85149").setStyle("display", "none");
         form.add(deleteMsg);
@@ -137,6 +173,22 @@ public class ReglasPage extends DashboardBasePage {
         actions.add(new Button("Cancelar").setType("button").setOnclick("document.getElementById('crudModal').style.display='none'; return false;"));
         actions.add(modalSubmitBtn = new Button("Guardar").setType("submit").setBackgroundColor("#238636"));
         crudModal.add(new Header(3, "Operación")).add(form.add(actions));
+    }
+
+    private void setupReportViewer() {
+        Report report = new Report("Listado de Reglas de Descuento");
+        report.setData(ReglasRepository.findAll());
+        
+        Report.Table table = new Report.Table();
+        table.addColumn(new Report.Column("ID", "id", 100));
+        table.addColumn(new Report.Column("Saldo", "saldo", 120));
+        table.addColumn(new Report.Column("Descuento", "descuento", 120));
+        table.addColumn(new Report.Column("Saldo Neto", "saldoNeto", 120));
+        
+        report.getDetail().addElement(table);
+        report.getViewerOptions().setAllowPrint(true).setAllowPdf(true).setAllowExcel(true);
+        
+        this.reportViewer = report.createViewer("reglas_list");
     }
 
     @Override

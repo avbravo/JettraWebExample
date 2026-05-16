@@ -12,6 +12,7 @@ import com.jettra.server.JettraServer;
 import com.jettra.server.config.JettraConfigProperty;
 import com.jettra.server.config.ConfigInjector;
 import com.jettra.example.pages.*;
+import com.jettra.example.pages.cruview.*;
 import com.jettra.example.dashboard.*;
 
 public class WebExampleMain {
@@ -141,6 +142,7 @@ public class WebExampleMain {
         server.addHandler("/reglasview", ReglasViewCrudPage.class);
         server.addHandler("/reglaspage", ReglasPage.class);
         server.addHandler("/reglasviewcrudpage", ReglasViewCrudPage.class);
+        server.addHandler("/datatableeditablecrud", DatatableEditableCrudView.class);
         server.addHandler("/hidden", HiddenPage.class);
         server.addHandler("/noeditable", NoEditablePage.class);
         server.start();

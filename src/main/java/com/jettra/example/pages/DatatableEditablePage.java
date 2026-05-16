@@ -189,7 +189,7 @@ public class DatatableEditablePage extends DashboardBasePage {
         container.add(sumContainer);
 
         // Javascript for dynamic interactions
-        String scriptContent = "<script>\n" +
+        String scriptContent = 
             "function updateCategory(index) {\n" +
             "    const catEl = document.getElementById('cat_' + index);\n" +
             "    const priceEl = document.getElementById('price_' + index);\n" +
@@ -225,18 +225,15 @@ public class DatatableEditablePage extends DashboardBasePage {
             "}\n" +
             "function calculateGrandTotal() {\n" +
             "    let grandTotal = 0;\n" +
-            "    for (let i = 0; i < " + articles.length + "; i++) {\n" +
-            "        const totalEl = document.getElementById('total_' + i);\n" +
-            "        if (totalEl) {\n" +
-            "            grandTotal += parseFloat(totalEl.innerText) || 0;\n" +
-            "        }\n" +
-            "    }\n" +
+            "    const rows = document.querySelectorAll('[id^=\"total_\"]');\n" +
+            "    rows.forEach(row => {\n" +
+            "        grandTotal += parseFloat(row.innerText) || 0;\n" +
+            "    });\n" +
             "    const gtEl = document.getElementById('gran_total');\n" +
-            "    if (gtEl) gtEl.innerText = grandTotal.toFixed(2);\n" +
+            "    if (gtEl) gtEl.innerText = grandTotal.toLocaleString('en-US', {minimumFractionDigits: 2});\n" +
             "}\n" +
             "// Run once on load to initialize Grand Total\n" +
-            "document.addEventListener('DOMContentLoaded', calculateGrandTotal);\n" +
-            "</script>";
+            "document.addEventListener('DOMContentLoaded', calculateGrandTotal);";
             
         io.jettra.wui.components.Script js = new io.jettra.wui.components.Script(scriptContent);
         container.add(js);

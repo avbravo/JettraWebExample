@@ -10,6 +10,7 @@ import io.jettra.wui.validations.NotNull;
 @JettraViewModel
 public class ReglasModel {
     @NotNull
+    @io.jettra.wui.core.annotations.Hidden
     @PropertiesLabel(value = "reglas.id", label = "ID")
     private String id;
 
