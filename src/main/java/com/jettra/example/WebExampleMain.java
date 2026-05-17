@@ -142,7 +142,7 @@ public class WebExampleMain {
         server.addHandler("/reglasview", ReglasViewCrudPage.class);
         server.addHandler("/reglaspage", ReglasPage.class);
         server.addHandler("/reglasviewcrudpage", ReglasViewCrudPage.class);
-        server.addHandler("/datatableeditablecrud", DatatableEditableCrudView.class);
+        server.addHandler("/datatableeditablecrudview", DatatableEditableCrudViewPage.class);
         server.addHandler("/hidden", HiddenPage.class);
         server.addHandler("/noeditable", NoEditablePage.class);
         server.start();
