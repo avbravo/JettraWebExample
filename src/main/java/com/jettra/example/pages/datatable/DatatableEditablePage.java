@@ -57,6 +57,15 @@ public class DatatableEditablePage extends DashboardBasePage {
     }
 
     @Override
+    protected void onGet(Map<String, String> params) {
+        if ("report".equals(params.get("action"))) {
+            String format = params.get("format");
+            if (format == null) format = "pdf";
+            io.jettra.wui.mvc.JettraMVC.generateReport(this, ArticuloModel.class, ArticuloRepository.class, format, false);
+        }
+    }
+
+    @Override
     protected void initCenter(Center center, String username) {
         Div container = new Div();
         container.setStyle("padding", "30px");
