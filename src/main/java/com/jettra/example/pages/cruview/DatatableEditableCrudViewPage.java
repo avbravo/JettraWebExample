@@ -9,12 +9,12 @@ import java.util.Properties;
 import io.jettra.wui.complex.Center;
 
 @JettraPageSincronized(SyncType.ALL)
-@CrudView(model = com.jettra.example.model.ReglasModel.class, 
-          repository = com.jettra.example.repository.ReglasRepository.class,
+@CrudView(model = com.jettra.example.model.ArticuloModel.class, 
+          repository = com.jettra.example.repository.ArticuloRepository.class,
           editable = true,
           report = true,
           reportOrientation = "PORTRAIT",
-          reportTitle = "REPORTE DATATABLE EDITABLE",
+          reportTitle = "REPORTE DATATABLE EDITABLE @CrudView",
           reportHeaderColor = "#28a745")
 public class DatatableEditableCrudViewPage extends DashboardBasePage {
 
