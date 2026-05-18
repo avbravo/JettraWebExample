@@ -260,7 +260,7 @@ public class DatatableEditablePage extends DashboardBasePage {
         modalTitle.setStyle("margin-top", "0").setStyle("color", "var(--jettra-accent)");
         crudDialog.add(modalTitle);
         
-        Form crudForm = new Form(JettraServer.resolvePath("/datatableeditable"), "POST").setId("crud-form");
+        Form crudForm = new Form("crud-form", JettraServer.resolvePath("/datatableeditable"));
         
         TextBox hiddenAction = new TextBox("hidden", "action");
         hiddenAction.setId("modal-action");
