@@ -380,7 +380,7 @@ public class WebDesignerPage extends DashboardBasePage {
         // Feedback
         addPaletteCategory(palette, "Feedback", new String[]{"ProgressBar", "Spinner", "Loading", "Alert", "Notification", "Clock", "TrafficLight"});
         // Media & Files
-        addPaletteCategory(palette, "Media", new String[]{"Downloader", "PDFViewer", "ViewMedia", "BarCode", "Draw"});
+        addPaletteCategory(palette, "Media", new String[]{"Downloader", "PDFViewer", "ViewMedia", "BarCode", "QRReader", "Draw"});
         // Charts
         addPaletteCategory(palette, "Charts", new String[]{"ChartsBar", "ChartsDoughnut", "ChartsLine", "ChartsPie", "ChartsRadar"});
         // Layout & Display
@@ -531,6 +531,11 @@ public class WebDesignerPage extends DashboardBasePage {
                 display: none;
             }
             .mobile-designer-frame .mobile-notch { display: block; }
+            @keyframes scan-line-anim {
+                0% { top: 10px; }
+                50% { top: 170px; }
+                100% { top: 10px; }
+            }
         """);
         
         StringBuilder sb = new StringBuilder();
@@ -795,6 +800,7 @@ public class WebDesignerPage extends DashboardBasePage {
                     case 'PDFViewer': content = '<div style="border:1px solid #aaa; background:#eee; color:#333; height:200px; display:flex; align-items:center; justify-content:center; border-radius:4px;"><span>PDF Document Preview</span></div>'; break;
                     case 'ViewMedia': content = '<div style="background:#000; color:#fff; height:200px; display:flex; align-items:center; justify-content:center; border-radius:4px;"><span>\u25B6 Media Player</span></div>'; break;
                     case 'BarCode': content = '<div class="j-component" style="padding:10px; text-align:center; border:1px dashed #fff;"><span style="font-family:monospace; font-size:24px; letter-spacing:2px">||| | || |||</span><br><span>BarCode</span></div>'; break;
+                    case 'QRReader': content = '<div style="width:300px; display:flex; flex-direction:column; align-items:center; gap:10px; padding:15px; border-radius:12px; background:rgba(30,41,59,0.9); border:1px solid rgba(0,255,255,0.4); box-shadow:0 4px 20px rgba(0,0,0,0.5);"><div style="width:100%; display:flex; justify-content:space-between; align-items:center; font-size:10px; color:#0ff; font-weight:bold;"><span>QR SCANNER</span><select disabled style="background:#0f172a; color:#fff; border:1px solid rgba(0,255,255,0.2); font-size:8px; padding:2px; border-radius:4px;"><option>Mock Camera</option></select></div><div style="width:100%; height:180px; position:relative; overflow:hidden; border-radius:8px; border:1px solid rgba(0,255,255,0.3); background:#000; display:flex; align-items:center; justify-content:center;"><div style="font-size:24px; color:rgba(255,255,255,0.4);">📷</div><div style="position:absolute; left:0; right:0; height:2px; background:#ff0055; box-shadow:0 0 8px 1px #ff0055; animation:scan-line-anim 3s infinite linear;"></div></div><button disabled style="width:100%; padding:6px; background:#0284c7; color:#fff; border:none; border-radius:6px; font-weight:bold; font-size:11px;">Start Scanning</button></div>'; break;
                     case 'Carousel': content = '<div style="display:flex; gap:10px; overflow:hidden; padding:10px; background:rgba(0,0,0,0.2); border-radius:8px;"><div style="width:150px; height:80px; background:rgba(0,255,255,0.1); border:1px solid rgba(0,255,255,0.3); border-radius:8px; display:flex; align-items:center; justify-content:center;"><span>Slide 1</span></div></div>'; break;
                     case 'TabView': content = '<div style="border:1px solid rgba(0,255,255,0.2); border-radius:8px; overflow:hidden;"><div style="display:flex; background:rgba(0,0,0,0.3); border-bottom:1px solid rgba(0,255,255,0.2);" class="tab-headers"><span style="padding:10px; color:#aaa; font-size:11px;">[Tab Headers]</span></div><div class="canvas-container" style="padding:10px; min-height:100px; background:rgba(0,255,255,0.02);"></div></div>'; break;
                     case 'Tab': content = '<div class="canvas-container" style="border:1px dashed var(--jettra-accent); min-height:80px; padding:10px; position:relative; background:rgba(0,0,0,0.4); margin-bottom:10px;"><span style="position:absolute; top:-12px; left:10px; background:var(--jettra-accent); color:#000; padding:2px 8px; border-radius:4px; font-size:10px; font-weight:bold;">Tab Title</span></div>'; break;
@@ -1124,6 +1130,14 @@ public class WebDesignerPage extends DashboardBasePage {
                         <div class="inspector-row"><span class="inspector-label">Text</span><input type="text" class="inspector-input" value="${props.text || '123456789012'}" onchange="updateProp('text', this.value)"></div>
                         <div class="inspector-row"><span class="inspector-label">Format</span><input type="text" class="inspector-input" value="${props.format || 'CODE128'}" onchange="updateProp('format', this.value)"></div>
                         <div class="inspector-row"><span class="inspector-label">Line Color</span><input type="color" class="inspector-input" value="${props.lineColor || '#000000'}" onchange="updateProp('lineColor', this.value)"></div>
+                    `;
+                }
+
+                if (type === 'QRReader') {
+                    html += `
+                        <div class="inspector-row"><span class="inspector-label">Width</span><input type="text" class="inspector-input" value="${props.width || '350px'}" onchange="updateProp('width', this.value)"></div>
+                        <div class="inspector-row"><span class="inspector-label">Height</span><input type="text" class="inspector-input" value="${props.height || '300px'}" onchange="updateProp('height', this.value)"></div>
+                        <div class="inspector-row"><span class="inspector-label">OnScan Callback</span><input type="text" class="inspector-input" value="${props.onScan || 'function(code) { console.log(code); }'}" onchange="updateProp('onScan', this.value)"></div>
                     `;
                 }
 
@@ -2063,6 +2077,13 @@ public class WebDesignerPage extends DashboardBasePage {
                         }
 
                         switch(type) {
+                            case 'QRReader':
+                                out += `        ${container}.add(new QRReader("${v}")${chainProps()}`;
+                                if (props.width) out += `\\n            .setWidth("${props.width}")`;
+                                if (props.height) out += `\\n            .setHeight("${props.height}")`;
+                                if (props.onScan) out += `\\n            .setOnScan("${props.onScan.replace(/"/g, '\\\\"')}")`;
+                                out += `);\\n`;
+                                break;
                             case 'Button': 
                                 out += `        ${container}.add(new Button("${props.text}")${chainProps()}`;
                                 if (props.btnStyle) out += `.setStyle(Button.Style.${props.btnStyle})`;

@@ -133,6 +133,7 @@ public class WebExampleMain {
         server.addHandler("/chartsline", ChartsLinePage.class);
         server.addHandler("/schedulecontrol", ScheduleControlPage.class);
         server.addHandler("/qr", QRPage.class);
+        server.addHandler("/qrreader", QRReaderPage.class);
         server.addHandler("/otpvalidator", OTPValidatorPage.class);
         server.addHandler("/trafficlight", TrafficLightPage.class);
         server.addHandler("/planeta", PlanetaPage.class);

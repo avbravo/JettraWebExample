@@ -52,7 +52,7 @@ public abstract class DashboardBasePage extends JettraDashboardPage {
         addCategory(es ? "Navegación" : "Navigation", new String[]{"Link", "Menu", "MenuBar", "Navigation"}, compIcon);
         addCategory(es ? "Retroalimentación" : "Feedback", new String[]{"Alert", "Modal", "Notification", "SessionTimeout", "Feedback", "TrafficLight"}, compIcon);
         addCategory(es ? "Diseño de Página" : "Layout", new String[]{"Avatar", "AvatarGroup", "Board", "Card", "Carousel", "Div", "Divide", "Draw", "FileUpload", "FolderSelector", "Grid", "Icon", "Image", "LayoutDisplay", "Loading", "LoginAdvanced", "Panel", "ProgressBar", "TabView"}, compIcon);
-        addCategory(es ? "Multimedia" : "Media", new String[]{"BarCode", "Downloader", "PDFViewer", "QR", "ViewMedia"}, compIcon);
+        addCategory(es ? "Multimedia" : "Media", new String[]{"BarCode", "Downloader", "PDFViewer", "QR", "QRReader", "ViewMedia"}, compIcon);
         addCategory(es ? "Charts" : "Charts", new String[]{"ChartsBar", "ChartsDoughnut", "ChartsLine", "ChartsPie", "ChartsRadar"}, compIcon);
         addCategory(es ? "Maps" : "Maps", new String[]{ "Map"}, compIcon);
         menuHtmlBuilder.append("<div style='margin-top:20px;'></div>");
