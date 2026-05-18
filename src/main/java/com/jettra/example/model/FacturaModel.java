@@ -1,77 +1,125 @@
 package com.jettra.example.model;
 
-import io.jettra.rules.annotations.Compute;
-import io.jettra.rules.annotations.Rules;
-import io.jettra.rules.enums.OperationType;
-import io.jettra.wui.core.annotations.*;
+import io.jettra.wui.core.annotations.JettraViewModel;
+import io.jettra.wui.core.annotations.PropertiesLabel;
+import io.jettra.wui.core.annotations.ViewDataTable;
+import io.jettra.wui.core.annotations.ViewSelectOne;
 import io.jettra.wui.validations.NotNull;
 import java.time.LocalDate;
+import java.util.List;
 
 @JettraViewModel
 public class FacturaModel {
     @NotNull
-    @Hidden
-    @PropertiesLabel(value = "factura.id", label = "ID")
-    private String id;
+    @PropertiesLabel(value = "factura.id", label = "ID Factura")
+    private Long idFactura;
+
 
     @NotNull
-    @NoEditable
-    @PropertiesLabel(value = "articulo.nombre", label = "Artículo")
-    private String nombre;
-
+    @ViewSelectOne(label = "nombre", source = "ClienteRepository", method = "findAll")
+    @PropertiesLabel(value = "factura.cliente", label = "Cliente")
+    private ClienteModel clienteModel;
+    
+    
     @NotNull
-    @ViewSelectOne(label = "nombre", source = "CategoriaRepository", method = "findAll")
-    @PropertiesLabel(value = "articulo.categoria", label = "Categoría")
-    private String categoria;
+    @PropertiesLabel(value = "factura.fechaEmision", label = "Fecha de Emisión")
+    private LocalDate fechaEmision;
 
-    @NotNull
-    @Rules(apply="greaterorequals", than="0", message="El precio unitario debe ser mayor o igual a 0")
-    @PropertiesLabel(value = "articulo.precio", label = "Precio Unit. ($)")
-    private Double precio;
+    @ViewDataTable(row="productoId, precio, cantidad, total", editablerow="productoId, cantidad", source="FacturaRepository", method="getLineas")
+    @PropertiesLabel(value = "factura.lineas", label = "Detalle de Líneas")
+    private List<LineaFacturaModel> lineaFacturaModel;
 
-    @NotNull
-    @Rules(apply="greater", than="0", message="La cantidad debe ser mayor a 0")
-    @PropertiesLabel(value = "articulo.cantidad", label = "Cantidad")
-    private Integer cantidad;
+    @PropertiesLabel(value = "factura.porcentajeImpuesto", label = "Porcentaje Impuesto (%)")
+    private Double porcentajeImpuesto;
 
-    @NotNull
-    @PropertiesLabel(value = "articulo.fechaEntrega", label = "Fecha de Entrega")
-    private LocalDate fechaEntrega;
+    @PropertiesLabel(value = "factura.subtotal", label = "Subtotal")
+    private Double subtotal;
 
-    @Compute(operation=OperationType.MULT, fields={"precio", "cantidad"}, editable=false)
-    @PropertiesLabel(value = "articulo.total", label = "Total por Fila ($)")
+    @PropertiesLabel(value = "factura.descuento", label = "Descuento")
+    private Double descuento;
+
+    @PropertiesLabel(value = "factura.total", label = "Total")
     private Double total;
 
     public FacturaModel() {}
 
-    public FacturaModel(String id, String nombre, String categoria, Double precio, Integer cantidad, LocalDate fechaEntrega, Double total) {
-        this.id = id;
-        this.nombre = nombre;
-        this.categoria = categoria;
-        this.precio = precio;
-        this.cantidad = cantidad;
-        this.fechaEntrega = fechaEntrega;
+    public FacturaModel(Long idFactura, ClienteModel clienteModel, LocalDate fechaEmision, List<LineaFacturaModel> lineaFacturaModel, Double porcentajeImpuesto, Double subtotal, Double descuento, Double total) {
+        this.idFactura = idFactura;
+        this.clienteModel = clienteModel;
+        this.fechaEmision = fechaEmision;
+        this.lineaFacturaModel = lineaFacturaModel;
+        this.porcentajeImpuesto = porcentajeImpuesto;
+        this.subtotal = subtotal;
+        this.descuento = descuento;
         this.total = total;
     }
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public Long getIdFactura() {
+        return idFactura;
+    }
 
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
+    public void setIdFactura(Long idFactura) {
+        this.idFactura = idFactura;
+    }
 
-    public String getCategoria() { return categoria; }
-    public void setCategoria(String categoria) { this.categoria = categoria; }
+    public ClienteModel getClienteModel() {
+        return clienteModel;
+    }
 
-    public Double getPrecio() { return precio; }
-    public void setPrecio(Double precio) { this.precio = precio; }
+    public void setClienteModel(ClienteModel clienteModel) {
+        this.clienteModel = clienteModel;
+    }
 
-    public Integer getCantidad() { return cantidad; }
-    public void setCantidad(Integer cantidad) { this.cantidad = cantidad; }
+    public LocalDate getFechaEmision() {
+        return fechaEmision;
+    }
 
-    public LocalDate getFechaEntrega() { return fechaEntrega; }
-    public void setFechaEntrega(LocalDate fechaEntrega) { this.fechaEntrega = fechaEntrega; }
+    public void setFechaEmision(LocalDate fechaEmision) {
+        this.fechaEmision = fechaEmision;
+    }
 
-    public Double getTotal() { return total; }
-    public void setTotal(Double total) { this.total = total; }
+    public List<LineaFacturaModel> getLineaFacturaModel() {
+        return lineaFacturaModel;
+    }
+
+    public void setLineaFacturaModel(List<LineaFacturaModel> lineaFacturaModel) {
+        this.lineaFacturaModel = lineaFacturaModel;
+    }
+
+    public Double getPorcentajeImpuesto() {
+        return porcentajeImpuesto;
+    }
+
+    public void setPorcentajeImpuesto(Double porcentajeImpuesto) {
+        this.porcentajeImpuesto = porcentajeImpuesto;
+    }
+
+    public Double getSubtotal() {
+        return subtotal;
+    }
+
+    public void setSubtotal(Double subtotal) {
+        this.subtotal = subtotal;
+    }
+
+    public Double getDescuento() {
+        return descuento;
+    }
+
+    public void setDescuento(Double descuento) {
+        this.descuento = descuento;
+    }
+
+    public Double getTotal() {
+        return total;
+    }
+
+    public void setTotal(Double total) {
+        this.total = total;
+    }
+
+    
+
+    
+    
 }

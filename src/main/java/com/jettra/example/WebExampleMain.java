@@ -3,6 +3,7 @@ package com.jettra.example;
 import com.jettra.example.pages.datatable.DatatableEditableCrudViewPage;
 import com.jettra.example.pages.datatable.DatatableEditablePage;
 import com.jettra.example.pages.datatable.DataTablePage;
+import com.jettra.example.pages.datatable.ViewDataTablePage;
 import com.jettra.example.pages.crud.PaisPage;
 import com.jettra.example.pages.crud.DeportePage;
 import com.jettra.example.pages.crud.PersonaPage;
@@ -149,6 +150,7 @@ public class WebExampleMain {
         server.addHandler("/datatableeditablecrudview", DatatableEditableCrudViewPage.class);
         server.addHandler("/hidden", HiddenPage.class);
         server.addHandler("/noeditable", NoEditablePage.class);
+        server.addHandler("/viewdatatable", ViewDataTablePage.class);
         server.start();
     }
 }

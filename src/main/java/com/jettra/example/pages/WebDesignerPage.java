@@ -384,7 +384,7 @@ public class WebDesignerPage extends DashboardBasePage {
         // Charts
         addPaletteCategory(palette, "Charts", new String[]{"ChartsBar", "ChartsDoughnut", "ChartsLine", "ChartsPie", "ChartsRadar"});
         // Layout & Display
-        addPaletteCategory(palette, "Layout", new String[]{"Grid", "Panel", "Board", "Card", "Avatar", "Carousel", "Datatable", "TabView", "Tab", "Modal", "Tree", "TreeItem", "Div", "LayoutDisplay", "Map"});
+        addPaletteCategory(palette, "Layout", new String[]{"Grid", "Panel", "Board", "Card", "Avatar", "Carousel", "Datatable", "ViewDataTable", "TabView", "Tab", "Modal", "Tree", "TreeItem", "Div", "LayoutDisplay", "Map"});
 
         return palette;
     }
@@ -833,6 +833,9 @@ public class WebDesignerPage extends DashboardBasePage {
                     case 'Card':
                         content = '<div class="j-component j-card" style="padding:0; border:1px solid var(--jettra-accent); border-radius:8px; background:rgba(0,0,0,0.4); display:flex; flex-direction:column; gap:10px;"><div style="padding:15px; border-bottom:1px solid rgba(255,255,255,0.1);"><h3 style="margin:0;color:var(--jettra-accent);" class="card-title-mock">Card Title</h3><p style="margin:0;font-size:12px;color:#aaa" class="card-subtitle-mock"></p><p style="margin:5px 0 0;font-size:13px;color:rgba(255,255,255,0.8)" class="card-content-mock"></p></div><div class="canvas-container" style="flex:1; border:0; min-height:50px; padding:15px; background:transparent;"></div></div>';
                         break;
+                    case 'ViewDataTable':
+                        content = '<div style="border:1px dashed var(--jettra-accent); padding:10px; min-height:80px; border-radius:8px; background:rgba(0,0,0,0.2);"><label style="font-size:11px; color:var(--jettra-accent); margin-bottom:5px; display:block; text-transform:uppercase;">@ViewDataTable Details</label><table style="width:100%; border-collapse:collapse; color:#fff; font-size:10px;"><thead><tr><th style="border-bottom:1px solid rgba(255,255,255,0.1); padding:4px;">Col 1</th><th style="border-bottom:1px solid rgba(255,255,255,0.1); padding:4px;">Col 2</th><th style="border-bottom:1px solid rgba(255,255,255,0.1); padding:4px;">Actions</th></tr></thead><tbody><tr><td>[ Data ]</td><td><input type="text" style="width:100%; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.1); color:#fff; font-size:10px; padding:2px;"></td><td><button style="background:transparent; border:none; color:#f85149;">🗑️</button></td></tr></tbody></table><button style="margin-top:10px; background:#1f6feb; border:none; color:#fff; border-radius:4px; font-size:10px; padding:4px 8px;">➕ Add Line</button></div>';
+                        break;
                     case 'Datatable':
                         content = '<div class="j-datatable-container j-component" style="padding:0; border-radius:12px; overflow:hidden; border:1px solid rgba(0,255,255,0.1);"><table style="width:100%; border-collapse:collapse; text-align:left; font-size:0.9rem;"><thead style="background:rgba(0,255,255,0.05); border-bottom:1px solid var(--jettra-accent);"><tr><th style="padding:12px; color:var(--jettra-text);">Col 1</th><th style="padding:12px; color:var(--jettra-text);">Col 2</th></tr></thead><tbody><tr style="border-bottom:1px solid var(--jettra-border);"><td class="canvas-container" style="padding:10px; color:var(--jettra-text); border-left:1px dashed rgba(255,255,255,0.1); min-height:40px;"></td><td class="canvas-container" style="padding:10px; color:var(--jettra-text); border-left:1px dashed rgba(255,255,255,0.1); min-height:40px;"></td></tr></tbody></table></div>';
                         break;
@@ -1171,6 +1174,15 @@ public class WebDesignerPage extends DashboardBasePage {
                     html += `
                         <div class="inspector-row"><span class="inspector-label">Form Action</span><input type="text" class="inspector-input" value="${props.formAction || ''}" onchange="updateProp('formAction', this.value)"></div>
                         <div class="inspector-row"><span class="inspector-label">Submit Text</span><input type="text" class="inspector-input" value="${props.submitText || 'Pay Now'}" onchange="updateProp('submitText', this.value)"></div>
+                    `;
+                }
+
+                if (type === 'ViewDataTable') {
+                    html += `
+                        <div class="inspector-row"><span class="inspector-label">Columns (comma separated)</span><input type="text" class="inspector-input" value="${props.columnsList || 'col1, col2'}" onchange="updateProp('columnsList', this.value)"></div>
+                        <div class="inspector-row"><span class="inspector-label">Editable Columns (comma separated)</span><input type="text" class="inspector-input" value="${props.editableCols || 'col1'}" onchange="updateProp('editableCols', this.value)"></div>
+                        <div class="inspector-row"><span class="inspector-label">Source</span><input type="text" class="inspector-input" value="${props.source || 'Repository'}" onchange="updateProp('source', this.value)"></div>
+                        <div class="inspector-row"><span class="inspector-label">Method</span><input type="text" class="inspector-input" value="${props.method || 'getAll'}" onchange="updateProp('method', this.value)"></div>
                     `;
                 }
 
@@ -2149,7 +2161,9 @@ public class WebDesignerPage extends DashboardBasePage {
                             case 'Board':
                             case 'Div':
                             case 'TabView':
-                            case 'Datatable': {
+                            case 'Datatable':
+                            case 'ViewDataTable': {
+                                if (type === 'ViewDataTable') type = 'Div'; // Fallback to Div in UI code
                                 out += `        ${type} ${v} = new ${type}()${chainProps()};\\n`;
                                 if (type === 'TabView' && props.orientation) {
                                     out += `        ${v}.setOrientation(TabView.Orientation.${props.orientation});\\n`;
