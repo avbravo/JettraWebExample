@@ -1,4 +1,4 @@
-    package com.jettra.example.pages;
+    package com.jettra.example.pages.datatable;
 
 import com.jettra.example.dashboard.DashboardBasePage;
 import io.jettra.wui.complex.Center;
