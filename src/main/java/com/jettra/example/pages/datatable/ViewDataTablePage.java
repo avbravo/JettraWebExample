@@ -6,10 +6,12 @@ import io.jettra.wui.components.Button;
 import io.jettra.wui.components.Div;
 import io.jettra.wui.components.Header;
 import io.jettra.wui.core.UIComponent;
+import io.jettra.wui.core.annotations.CrudView;
 
 /**
  * Example page showing the usage of @ViewDataTable annotation.
  */
+@CrudView(model = com.jettra.example.model.FacturaModel.class, repository = com.jettra.example.repository.FacturaRepository.class, editable = true, autoRender = false)
 public class ViewDataTablePage extends DashboardBasePage {
 
     public ViewDataTablePage() {
