@@ -1,7 +1,7 @@
 package com.jettra.example.model;
 
 import io.jettra.wui.core.annotations.JettraViewModel;
-import io.jettra.wui.core.annotations.ModelReportLabel;
+import com.jettra.report.annotations.ModelReportLabel;
 import io.jettra.wui.core.annotations.PropertiesLabel;
 import io.jettra.wui.core.annotations.ViewDataTable;
 import io.jettra.wui.core.annotations.ViewSelectOne;
@@ -33,13 +33,15 @@ public class FacturaModel {
     private List<LineaFacturaModel> lineaFacturaModel;
 
     @PropertiesLabel(value = "factura.porcentajeImpuesto", label = "Porcentaje Impuesto (%)")
+    @ModelReportLabel(label = "Porcentaje Impuesto (%)", section = ModelReportLabel.Section.LASTPAGE, orientation = ModelReportLabel.Orientation.RIGHT)
     private Double porcentajeImpuesto;
 
     @PropertiesLabel(value = "factura.subtotal", label = "Subtotal")
+     @ModelReportLabel(label = "Sub Total", section = ModelReportLabel.Section.LASTPAGE, orientation = ModelReportLabel.Orientation.RIGHT)
     private Double subtotal;
 
     @PropertiesLabel(value = "factura.descuento", label = "Descuento")
-    @ModelReportLabel(label = "Descuento Aplicado", section = ModelReportLabel.Section.LASTPAGE, orientation = ModelReportLabel.Orientation.CENTER)
+    @ModelReportLabel(label = "Descuento Aplicado", section = ModelReportLabel.Section.LASTPAGE, orientation = ModelReportLabel.Orientation.RIGHT)
     private Double descuento;
 
     @PropertiesLabel(value = "factura.total", label = "Total")
