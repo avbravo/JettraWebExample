@@ -1,6 +1,7 @@
 package com.jettra.example.model;
 
 import io.jettra.wui.core.annotations.JettraViewModel;
+import io.jettra.wui.core.annotations.ModelReportLabel;
 import io.jettra.wui.core.annotations.PropertiesLabel;
 import io.jettra.wui.core.annotations.ViewDataTable;
 import io.jettra.wui.core.annotations.ViewSelectOne;
@@ -12,12 +13,14 @@ import java.util.List;
 public class FacturaModel {
     @NotNull
     @PropertiesLabel(value = "factura.id", label = "ID Factura")
+    @ModelReportLabel(label = "Factura ID", section = ModelReportLabel.Section.HEADER, orientation = ModelReportLabel.Orientation.LEFT)
     private Long idFactura;
 
 
     @NotNull
     @ViewSelectOne(label = "nombre", fieldOnlyMasterTable = "nombre", source = "ClienteRepository", method = "findAll")
     @PropertiesLabel(value = "factura.cliente", label = "Cliente")
+    @ModelReportLabel(label = "Cliente Beneficiario", section = ModelReportLabel.Section.HEADER, orientation = ModelReportLabel.Orientation.LEFT)
     private ClienteModel clienteModel;
     
     
@@ -36,9 +39,11 @@ public class FacturaModel {
     private Double subtotal;
 
     @PropertiesLabel(value = "factura.descuento", label = "Descuento")
+    @ModelReportLabel(label = "Descuento Aplicado", section = ModelReportLabel.Section.LASTPAGE, orientation = ModelReportLabel.Orientation.CENTER)
     private Double descuento;
 
     @PropertiesLabel(value = "factura.total", label = "Total")
+    @ModelReportLabel(label = "Gran Total Factura", section = ModelReportLabel.Section.LASTPAGE, orientation = ModelReportLabel.Orientation.RIGHT)
     private Double total;
 
     public FacturaModel() {}
