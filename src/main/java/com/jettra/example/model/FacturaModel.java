@@ -16,7 +16,7 @@ public class FacturaModel {
 
 
     @NotNull
-    @ViewSelectOne(label = "nombre", source = "ClienteRepository", method = "findAll")
+    @ViewSelectOne(label = "nombre", fieldOnlyMasterTable = "nombre", source = "ClienteRepository", method = "findAll")
     @PropertiesLabel(value = "factura.cliente", label = "Cliente")
     private ClienteModel clienteModel;
     

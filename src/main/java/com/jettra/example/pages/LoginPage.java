@@ -25,6 +25,7 @@ public class LoginPage extends Page {
         }
 
         loginForm = new Login(JettraServer.resolvePath("/login"));
+        loginForm.setApplicationName("Jettra Web Example");
         add(loginForm);
 
         if (params.containsKey("error")) {
