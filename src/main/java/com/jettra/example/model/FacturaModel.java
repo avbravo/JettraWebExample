@@ -25,7 +25,7 @@ public class FacturaModel {
     @PropertiesLabel(value = "factura.fechaEmision", label = "Fecha de Emisión")
     private LocalDate fechaEmision;
 
-    @ViewDataTable(row="productoId, precio, cantidad, total", editablerow="productoId, cantidad", source="FacturaRepository", method="getLineas")
+    @ViewDataTable(editableRowMaster = false,showRowInMasterTable = false,row="productoId, precio, cantidad, total", editablerow="productoId, cantidad", source="FacturaRepository", method="getLineas")
     @PropertiesLabel(value = "factura.lineas", label = "Detalle de Líneas")
     private List<LineaFacturaModel> lineaFacturaModel;
 
