@@ -13,14 +13,14 @@ import java.util.List;
 public class FacturaModel {
     @NotNull
     @PropertiesLabel(value = "factura.id", label = "ID Factura")
-    @ModelReportLabel(label = "Factura ID", section = ModelReportLabel.Section.HEADER, orientation = ModelReportLabel.Orientation.LEFT)
+    @ModelReportLabel(label = "Factura ID", section = ModelReportLabel.Section.HEADER, orientation = ModelReportLabel.Orientation.LEFT, textColor = "#0000FF", style = {ModelReportLabel.Style.BOLD, ModelReportLabel.Style.SUBLINE})
     private Long idFactura;
 
 
     @NotNull
     @ViewSelectOne(label = "nombre", fieldOnlyMasterTable = "nombre", source = "ClienteRepository", method = "findAll")
     @PropertiesLabel(value = "factura.cliente", label = "Cliente")
-    @ModelReportLabel(label = "Cliente Beneficiario", section = ModelReportLabel.Section.HEADER, orientation = ModelReportLabel.Orientation.LEFT)
+    @ModelReportLabel(label = "Cliente Beneficiario", section = ModelReportLabel.Section.HEADER, orientation = ModelReportLabel.Orientation.LEFT, font = "Helvetica", size = 12, style = {ModelReportLabel.Style.ITALIC})
     private ClienteModel clienteModel;
     
     
@@ -41,11 +41,11 @@ public class FacturaModel {
     private Double subtotal;
 
     @PropertiesLabel(value = "factura.descuento", label = "Descuento")
-    @ModelReportLabel(label = "Descuento Aplicado", section = ModelReportLabel.Section.LASTPAGE, orientation = ModelReportLabel.Orientation.RIGHT)
+    @ModelReportLabel(label = "Descuento Aplicado", section = ModelReportLabel.Section.LASTPAGE, orientation = ModelReportLabel.Orientation.RIGHT, textColor = "#FF0000", style = {ModelReportLabel.Style.STRIKETHROUGH})
     private Double descuento;
 
     @PropertiesLabel(value = "factura.total", label = "Total")
-    @ModelReportLabel(label = "Gran Total Factura", section = ModelReportLabel.Section.LASTPAGE, orientation = ModelReportLabel.Orientation.RIGHT)
+    @ModelReportLabel(label = "Gran Total Factura", section = ModelReportLabel.Section.LASTPAGE, orientation = ModelReportLabel.Orientation.RIGHT, size = 14, style = {ModelReportLabel.Style.BOLD, ModelReportLabel.Style.SUBLINE})
     private Double total;
 
     public FacturaModel() {}
