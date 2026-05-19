@@ -11,7 +11,7 @@ import io.jettra.wui.core.annotations.CrudView;
 /**
  * Example page showing the usage of @ViewDataTable annotation.
  */
-@CrudView(model = com.jettra.example.model.FacturaModel.class, repository = com.jettra.example.repository.FacturaRepository.class, editable = true, autoRender = false)
+@CrudView(model = com.jettra.example.model.FacturaModel.class, repository = com.jettra.example.repository.FacturaRepository.class, editable = true, autoRender = false, report = true, reportShowViewer = true, reportAllowPrint = true, reportAllowPdf = true, reportAllowExcel = true, reportAllowCsv = true)
 public class ViewDataTablePage extends DashboardBasePage {
 
     public ViewDataTablePage() {
@@ -41,6 +41,12 @@ public class ViewDataTablePage extends DashboardBasePage {
         // Render CrudView for Factura (which contains @ViewDataTable)
         io.jettra.wui.complex.CrudView crudComponent = new io.jettra.wui.complex.CrudView(com.jettra.example.model.FacturaModel.class, com.jettra.example.repository.FacturaRepository.class, null);
         crudComponent.setEditable(true);
+        crudComponent.setReportEnabled(true);
+        crudComponent.setReportShowViewer(true);
+        crudComponent.setReportAllowPrint(true);
+        crudComponent.setReportAllowPdf(true);
+        crudComponent.setReportAllowExcel(true);
+        crudComponent.setReportAllowCsv(true);
         crudComponent.build();
         container.add(crudComponent);
         
