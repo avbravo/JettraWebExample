@@ -7,10 +7,12 @@ import io.jettra.wui.components.Div;
 import io.jettra.wui.components.Header;
 import io.jettra.wui.core.UIComponent;
 import io.jettra.wui.core.annotations.CrudView;
+import com.jettra.report.annotations.ModelReportDisabledHeader;
 
 /**
  * Example page showing the usage of @ViewDataTable annotation.
  */
+@ModelReportDisabledHeader
 @CrudView(model = com.jettra.example.model.FacturaModel.class, repository = com.jettra.example.repository.FacturaRepository.class, editable = true, autoRender = false, report = true, reportShowViewer = true, reportAllowPrint = true, reportAllowPdf = true, reportAllowExcel = true, reportAllowCsv = true)
 public class ViewDataTablePage extends DashboardBasePage {
 

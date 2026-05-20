@@ -2,6 +2,9 @@ package com.jettra.example.model;
 
 import io.jettra.wui.core.annotations.JettraViewModel;
 import com.jettra.report.annotations.ModelReportLabel;
+import com.jettra.report.annotations.ModelReportDisabledHeader;
+import com.jettra.report.annotations.ModelReportHeader;
+import com.jettra.report.annotations.ModelReportFooter;
 import io.jettra.wui.core.annotations.PropertiesLabel;
 import io.jettra.wui.core.annotations.ViewDataTable;
 import io.jettra.wui.core.annotations.ViewSelectOne;
@@ -10,6 +13,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 @JettraViewModel
+@ModelReportDisabledHeader
+@ModelReportHeader(value = "REPORTE DE FACTURAS DE VENTAS (MASTER)", type = ModelReportHeader.ReportType.MASTER, orientation = ModelReportHeader.Orientation.CENTER, size = 16, textColor = "#1f6feb", style = {ModelReportHeader.Style.BOLD})
+@ModelReportHeader(value = "DETALLES COMPLEMENTARIOS DE FACTURAS", type = ModelReportHeader.ReportType.DETAILS, orientation = ModelReportHeader.Orientation.LEFT, size = 12, textColor = "#ff5500", style = {ModelReportHeader.Style.ITALIC})
+@ModelReportFooter(value = "Página generada por el motor de reportes nativo JettraReport", type = ModelReportFooter.ReportType.MASTER, orientation = ModelReportFooter.Orientation.CENTER, size = 8, textColor = "#555555")
+@ModelReportFooter(value = "Confidencial - Solo para uso interno", type = ModelReportFooter.ReportType.DETAILS, orientation = ModelReportFooter.Orientation.RIGHT, size = 8, textColor = "#ff0000", style = {ModelReportFooter.Style.BOLD})
 public class FacturaModel {
     @NotNull
     @PropertiesLabel(value = "factura.id", label = "ID Factura")
