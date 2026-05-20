@@ -1,5 +1,8 @@
 # Empleando una imagen ligera orientada a un runtime óptimo y moderno
 # Usando BellSoft Liberica JRE con Alpaquita Linux para menor tamaño y mayor rendimiento
+
+#FROM bellsoft/alpaquita-linux-base:stream-musl
+
 FROM bellsoft/liberica-runtime-container:jre-25-alpaquita
 
 LABEL maintainer="Jettra Development Team"
