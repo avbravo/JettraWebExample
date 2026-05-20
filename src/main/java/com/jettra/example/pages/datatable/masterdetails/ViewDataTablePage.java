@@ -13,7 +13,7 @@ import com.jettra.report.annotations.ModelReportDisabledHeader;
  * Example page showing the usage of @ViewDataTable annotation.
  */
 @ModelReportDisabledHeader
-@CrudView(model = com.jettra.example.model.FacturaModel.class, repository = com.jettra.example.repository.FacturaRepository.class, editable = true, autoRender = false, report = true, reportShowViewer = true, reportAllowPrint = true, reportAllowPdf = true, reportAllowExcel = true, reportAllowCsv = true)
+@CrudView(model = com.jettra.example.model.FacturaModel.class, repository = com.jettra.example.repository.FacturaRepository.class, editable = true, autoRender = false, report = true, reportShowViewer = true, reportAllowPrint = true, reportAllowPdf = true, reportAllowExcel = true, reportAllowCsv = true, reportAllowWord = true)
 public class ViewDataTablePage extends DashboardBasePage {
 
     public ViewDataTablePage() {
@@ -49,6 +49,7 @@ public class ViewDataTablePage extends DashboardBasePage {
         crudComponent.setReportAllowPdf(true);
         crudComponent.setReportAllowExcel(true);
         crudComponent.setReportAllowCsv(true);
+        crudComponent.setReportAllowWord(true);
         crudComponent.build();
         container.add(crudComponent);
         
