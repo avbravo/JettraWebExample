@@ -1,5 +1,6 @@
 package com.jettra.example;
 
+import com.jettra.example.pages.LayoutDisplayPage;
 import com.jettra.example.pages.datatable.DatatableEditableCrudViewPage;
 import com.jettra.example.pages.datatable.DatatableEditablePage;
 import com.jettra.example.pages.datatable.DataTablePage;
