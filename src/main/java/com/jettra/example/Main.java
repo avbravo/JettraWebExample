@@ -19,7 +19,7 @@ import com.jettra.example.pages.*;
 import com.jettra.example.pages.cruview.*;
 import com.jettra.example.dashboard.*;
 
-public class WebExampleMain {
+public class Main {
 
     @JettraConfigProperty(name = "app.title")
     private String appTitle;
@@ -34,7 +34,7 @@ public class WebExampleMain {
     }
 
     public static void main(String[] args) {
-        WebExampleMain app = new WebExampleMain();
+        Main app = new Main();
         app.initUI();
 
         // Configurar la ruta de redirección en ErrorPage, usando contextpath (y el puerto implícitamente por el host)
