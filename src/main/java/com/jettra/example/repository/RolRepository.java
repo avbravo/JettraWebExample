@@ -8,6 +8,11 @@ import java.util.Optional;
 public class RolRepository {
     private static final List<RolModel> list = new ArrayList<>();
 
+    static {
+        list.add(new RolModel("ADMIN", "LEER_USUARIOS,ESCRIBIR_USUARIOS,LEER_ROLES,ESCRIBIR_ROLES"));
+        list.add(new RolModel("USER", "LEER_USUARIOS"));
+    }
+
     public static List<RolModel> findAll() {
         return list;
     }

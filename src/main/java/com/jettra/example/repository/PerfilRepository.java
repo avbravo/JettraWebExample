@@ -8,6 +8,11 @@ import java.util.Optional;
 public class PerfilRepository {
     private static final List<PerfilModel> list = new ArrayList<>();
 
+    static {
+        list.add(new PerfilModel("Aristides Villarreal", "/images/avatar1.png", "America/Panama"));
+        list.add(new PerfilModel("Demo User", "/images/avatar2.png", "UTC"));
+    }
+
     public static List<PerfilModel> findAll() {
         return list;
     }

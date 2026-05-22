@@ -9,6 +9,11 @@ import java.util.UUID;
 public class UsuarioRepository {
     private static final List<UsuarioModel> list = new ArrayList<>();
 
+    static {
+        list.add(new UsuarioModel(UUID.randomUUID().toString(), "admin", "Administrador del Sistema", "admin@jettra.com", true, "Aristides Villarreal", "ADMIN"));
+        list.add(new UsuarioModel(UUID.randomUUID().toString(), "demo", "Usuario de Demostración", "demo@jettra.com", true, "Demo User", "USER"));
+    }
+
     public static List<UsuarioModel> findAll() {
         return list;
     }
