@@ -1,0 +1,29 @@
+package com.jettra.example.repository;
+
+import com.jettra.example.model.PerfilModel;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+public class PerfilRepository {
+    private static final List<PerfilModel> list = new ArrayList<>();
+
+    public static List<PerfilModel> findAll() {
+        return list;
+    }
+
+    public static Optional<PerfilModel> findById(String nombreCompleto) {
+        return list.stream().filter(x -> x.getNombreCompleto() != null && x.getNombreCompleto().equals(nombreCompleto)).findFirst();
+    }
+
+    public static void save(PerfilModel model) {
+        if (model.getNombreCompleto() != null) {
+            delete(model.getNombreCompleto());
+            list.add(model);
+        }
+    }
+
+    public static void delete(String nombreCompleto) {
+        list.removeIf(x -> x.getNombreCompleto() != null && x.getNombreCompleto().equals(nombreCompleto));
+    }
+}

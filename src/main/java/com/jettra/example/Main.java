@@ -19,6 +19,10 @@ import com.jettra.server.config.ConfigInjector;
 import com.jettra.example.pages.*;
 import com.jettra.example.pages.cruview.*;
 import com.jettra.example.dashboard.*;
+import com.jettra.example.pages.admin.PermisoPage;
+import com.jettra.example.pages.admin.RolPage;
+import com.jettra.example.pages.admin.PerfilPage;
+import com.jettra.example.pages.admin.UsuarioPage;
 
 public class Main {
 
@@ -152,6 +156,10 @@ public class Main {
         server.addHandler("/hidden", HiddenPage.class);
         server.addHandler("/noeditable", NoEditablePage.class);
         server.addHandler("/viewdatatable", ViewDataTablePage.class);
+        server.addHandler("/permiso", PermisoPage.class);
+        server.addHandler("/rol", RolPage.class);
+        server.addHandler("/perfil", PerfilPage.class);
+        server.addHandler("/usuario", UsuarioPage.class);
         server.start();
     }
 }
