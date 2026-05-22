@@ -7,7 +7,7 @@ import io.jettra.wui.core.JettraDashboardPage;
  * Simplified DashboardBasePage leveraging JettraWUI integration. Most logic was
  * moved to JettraDashboardPage in io.jettra.wui.core.
  */
-public abstract class DashboardBasePage extends JettraDashboardPage {
+        public abstract class DashboardBasePage extends JettraDashboardPage {
 
     public DashboardBasePage(String title) {
         super(title);
