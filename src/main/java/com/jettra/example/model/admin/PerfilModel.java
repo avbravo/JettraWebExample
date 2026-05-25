@@ -1,4 +1,4 @@
-package com.jettra.example.model;
+package com.jettra.example.model.admin;
 
 import io.jettra.wui.core.annotations.JettraViewModel;
 import io.jettra.wui.core.annotations.PropertiesLabel;

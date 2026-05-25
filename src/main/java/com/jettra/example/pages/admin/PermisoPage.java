@@ -9,7 +9,7 @@ import java.util.Properties;
 import io.jettra.wui.complex.Center;
 
 @JettraPageSincronized(SyncType.ALL)
-@CrudView(model = com.jettra.example.model.PermisoModel.class, repository = com.jettra.example.repository.PermisoRepository.class,
+@CrudView(model = com.jettra.example.model.admin.PermisoModel.class, repository = com.jettra.example.repository.admin.PermisoRepository.class,
        report = true,
        reportOrientation = "LANDSCAPE",
        reportTitle = "REPORTE DE PERMISOS",

@@ -1,4 +1,4 @@
-package com.jettra.example.entity;
+package com.jettra.example.entity.admin;
 
 public record Permiso(
     String nombre,

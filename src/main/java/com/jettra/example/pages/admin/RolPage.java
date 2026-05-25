@@ -9,7 +9,7 @@ import java.util.Properties;
 import io.jettra.wui.complex.Center;
 
 @JettraPageSincronized(SyncType.ALL)
-@CrudView(model = com.jettra.example.model.RolModel.class, repository = com.jettra.example.repository.RolRepository.class,
+@CrudView(model = com.jettra.example.model.admin.RolModel.class, repository = com.jettra.example.repository.admin.RolRepository.class,
        report = true,
        reportOrientation = "LANDSCAPE",
        reportTitle = "REPORTE DE ROLES",

@@ -1,4 +1,4 @@
-package com.jettra.example.entity;
+package com.jettra.example.entity.admin;
 
 public record Perfil(String nombreCompleto, String avatarUrl, String zonaHoraria) {
     public Perfil(String nombreCompleto) {

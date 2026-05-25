@@ -1,6 +1,6 @@
-package com.jettra.example.repository;
+package com.jettra.example.repository.admin;
 
-import com.jettra.example.model.RolModel;
+import com.jettra.example.model.admin.RolModel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

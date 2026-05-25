@@ -1,6 +1,6 @@
-package com.jettra.example.repository;
+package com.jettra.example.repository.admin;
 
-import com.jettra.example.model.UsuarioModel;
+import com.jettra.example.model.admin.UsuarioModel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
