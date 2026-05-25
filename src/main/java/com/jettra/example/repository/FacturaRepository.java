@@ -1,8 +1,8 @@
 package com.jettra.example.repository;
 
-import com.jettra.example.model.ClienteModel;
-import com.jettra.example.model.FacturaModel;
-import com.jettra.example.model.LineaFacturaModel;
+import com.jettra.example.model.factura.ClienteModel;
+import com.jettra.example.model.factura.FacturaModel;
+import com.jettra.example.model.factura.LineaFacturaModel;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;

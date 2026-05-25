@@ -1,6 +1,6 @@
 package com.jettra.example.repository;
 
-import com.jettra.example.model.ClienteModel;
+import com.jettra.example.model.factura.ClienteModel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
