@@ -1,4 +1,4 @@
-package com.jettra.example.repository;
+package com.jettra.example.repository.factura;
 
 import com.jettra.example.model.factura.ClienteModel;
 import com.jettra.example.model.factura.FacturaModel;
