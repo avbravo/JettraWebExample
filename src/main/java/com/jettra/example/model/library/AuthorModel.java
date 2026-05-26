@@ -6,7 +6,7 @@ import io.jettra.wui.core.annotations.PropertiesInRecord;
 import io.jettra.wui.core.annotations.JettraViewModel;
 
 @JettraViewModel
-@ModelToRecordConversor(goal = Author.class)
+ @ModelToRecordConversor(goal = Author.class)
 public class AuthorModel {
     @PropertiesInRecord
     private String id;
