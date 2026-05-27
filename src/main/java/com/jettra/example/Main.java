@@ -18,12 +18,15 @@ import com.jettra.server.JettraServer;
 import com.jettra.server.config.JettraConfigProperty;
 import com.jettra.server.config.ConfigInjector;
 import com.jettra.example.pages.*;
-import com.jettra.example.pages.cruview.*;
 import com.jettra.example.dashboard.*;
 import com.jettra.example.pages.admin.PermisoPage;
 import com.jettra.example.pages.admin.RolPage;
 import com.jettra.example.pages.admin.PerfilPage;
 import com.jettra.example.pages.admin.UsuarioPage;
+import com.jettra.example.pages.library.AuthorPage;
+import com.jettra.example.pages.library.BookPage;
+import com.jettra.example.pages.library.PublisherPage;
+import com.jettra.example.pages.library.ReaderPage;
 
 public class Main {
 
@@ -63,10 +66,12 @@ public class Main {
         server.addHandler("/error", io.jettra.wui.complex.ErrorPage.class);
         server.addHandler("/", LoginPage.class);
         server.addHandler("/alert", AlertPage.class);
+        server.addHandler("/author", AuthorPage.class);
         server.addHandler("/avatar", AvatarPage.class);
         server.addHandler("/avatargroup", AvatarGroupPage.class);
         server.addHandler("/barcode", BarCodePage.class);
         server.addHandler("/board", BoardPage.class);
+        server.addHandler("/book", BookPage.class);
         server.addHandler("/button", ButtonPage.class);
         server.addHandler("/calendar", CalendarPage.class);
         server.addHandler("/card", CardPage.class);
@@ -97,6 +102,8 @@ public class Main {
         server.addHandler("/organigram", OrganigramPage.class);
         server.addHandler("/paragraph", ParagraphPage.class);
         server.addHandler("/radiobutton", RadioButtonPage.class);
+        server.addHandler("/reader", ReaderPage.class);
+        
         server.addHandler("/selectone", SelectOnePage.class);
         server.addHandler("/selectmany", SelectManyPage.class);
         server.addHandler("/schedule", SchedulePage.class);
@@ -108,6 +115,7 @@ public class Main {
         server.addHandler("/notification", NotificationPage.class);
         server.addHandler("/menubar", MenuBarPage.class);
         server.addHandler("/persona", PersonaPage.class);
+        server.addHandler("/publisher", PublisherPage.class);
         server.addHandler("/selectoneicon", SelectOneIconPage.class);
         server.addHandler("/grid", GridPage.class);
         server.addHandler("/sessiontimeout", SessionTimeoutDialogPage.class);

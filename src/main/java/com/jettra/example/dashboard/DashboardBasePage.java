@@ -7,7 +7,7 @@ import io.jettra.wui.core.JettraDashboardPage;
  * Simplified DashboardBasePage leveraging JettraWUI integration. Most logic was
  * moved to JettraDashboardPage in io.jettra.wui.core.
  */
-        public abstract class DashboardBasePage extends JettraDashboardPage {
+public abstract class DashboardBasePage extends JettraDashboardPage {
 
     public DashboardBasePage(String title) {
         super(title);
@@ -47,8 +47,9 @@ import io.jettra.wui.core.JettraDashboardPage;
         addCategory(es ? "@Rules" : "@Rules", new String[]{"Reglas", "ReglasViewCrud"}, compIcon);
         addCategory(es ? "Crud" : "Crud", new String[]{"Persona", "Pais", "Deporte"}, compIcon);
         addCategory(es ? "@CrudView" : "@CrudView", new String[]{"Grupo", "SubGrupo", "Planeta", "DatatableEditableCrudView"}, compIcon);
+        addCategory(es ? "Library" : "Library", new String[]{"Author", "Book", "Publisher","Reader"}, compIcon);
         addCategory(es ? "DataTable" : "DataTable", new String[]{"DataTable", "DatatableEditable"}, compIcon);
-        addCategory(es ? "Master-Details" : "Master-Details", new String[]{ "ViewDataTable"}, compIcon);
+        addCategory(es ? "Master-Details" : "Master-Details", new String[]{"ViewDataTable"}, compIcon);
         addCategory(es ? "Tipografía" : "Typography", new String[]{"Header", "Paragraph", "Span", "Label", "Separator", "Icon", "Typography"}, compIcon);
         addCategory(es ? "Formularios" : "Forms", new String[]{"Button", "Catcha", "CheckBox", "CheckBoxGroup", "CreditCard", "Form", "FormGroup", "Forms", "Hidden", "NoEditable", "OTPValidator", "RadioButton", "RadioGroupButton", "ScheduleControl", "Spinner", "TextBox", "TextArea", "ToggleSwitch", "Tree"}, compIcon);
         addCategory(es ? "Select" : "Select", new String[]{"SelectOne", "SelectMany", "SelectOneIcon"}, compIcon);
@@ -59,7 +60,7 @@ import io.jettra.wui.core.JettraDashboardPage;
         addCategory(es ? "Diseño de Página" : "Layout", new String[]{"Avatar", "AvatarGroup", "Board", "Card", "Carousel", "Div", "Divide", "Draw", "FileUpload", "FolderSelector", "Grid", "Icon", "Image", "LayoutDisplay", "Loading", "LoginAdvanced", "Panel", "ProgressBar", "TabView"}, compIcon);
         addCategory(es ? "Multimedia" : "Media", new String[]{"BarCode", "Downloader", "PDFViewer", "QR", "QRReader", "ViewMedia"}, compIcon);
         addCategory(es ? "Charts" : "Charts", new String[]{"ChartsBar", "ChartsDoughnut", "ChartsLine", "ChartsPie", "ChartsRadar"}, compIcon);
-        addCategory(es ? "Maps" : "Maps", new String[]{ "Map"}, compIcon);
+        addCategory(es ? "Maps" : "Maps", new String[]{"Map"}, compIcon);
         menuHtmlBuilder.append("<div style='margin-top:20px;'></div>");
         appendMenuItem(es ? "Cerrar Sesión" : "Logout", "/logout", "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'></path><polyline points='16 17 21 12 16 7'></polyline></svg>");
 
