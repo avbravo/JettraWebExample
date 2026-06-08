@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
  */
-package com.jettra.example.restclient.library.interfaces;
+package com.jettra.example.restclient.library;
 
 import com.jettra.example.entity.library.Reader;
 import com.jettra.rest.annotations.DELETE;
