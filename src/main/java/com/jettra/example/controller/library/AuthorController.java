@@ -8,6 +8,11 @@ import com.jettra.rest.core.Response;
 
 import java.util.List;
 
+import com.jettra.server.openapi.annotations.OpenApi;
+import com.jettra.server.openapi.annotations.Operation;
+import com.jettra.server.openapi.annotations.ApiResponse;
+
+@OpenApi(title = "Library API", version = "v1.0", description = "API for Library management")
 @Path("/api/library/authors")
 public class AuthorController {
 

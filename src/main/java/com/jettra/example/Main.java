@@ -28,6 +28,15 @@ import com.jettra.example.pages.library.BookPage;
 import com.jettra.example.pages.library.PublisherPage;
 import com.jettra.example.pages.library.ReaderPage;
 
+import com.jettra.server.openapi.OpenApiHandler;
+import com.jettra.server.openapi.SwaggerUIHandler;
+import com.jettra.example.controller.library.AuthorController;
+import com.jettra.example.controller.library.BookController;
+import com.jettra.example.controller.library.PublisherController;
+import com.jettra.example.controller.library.ReaderController;
+import java.util.List;
+
+
 public class Main {
 
     @JettraConfigProperty(name = "app.title")
@@ -169,6 +178,21 @@ public class Main {
         server.addHandler("/rol", RolPage.class);
         server.addHandler("/perfil", PerfilPage.class);
         server.addHandler("/usuario", UsuarioPage.class);
+
+        // Define la lista de controladores REST que deseas documentar
+        List<Class<?>> controllers = List.of(
+            AuthorController.class,
+            BookController.class,
+            PublisherController.class,
+            ReaderController.class
+        );
+        
+        // Exponer el JSON de OpenAPI
+        server.addHandler("/openapi.json", new OpenApiHandler(controllers));
+        
+        // Exponer la interfaz Swagger UI
+        server.addHandler("/swagger-ui", new SwaggerUIHandler("/openapi.json"));
+
         server.start();
     }
 }
