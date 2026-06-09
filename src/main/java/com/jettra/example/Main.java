@@ -34,6 +34,7 @@ import com.jettra.example.controller.library.AuthorController;
 import com.jettra.example.controller.library.BookController;
 import com.jettra.example.controller.library.PublisherController;
 import com.jettra.example.controller.library.ReaderController;
+
 import java.util.List;
 
 
@@ -103,6 +104,7 @@ public class Main {
         server.addHandler("/login", LoginPage.class);
         server.addHandler("/logout", LoginPage.class);
         server.addHandler("/loading", LoadingPage.class);
+        server.addHandler("/console", ConsolePage.class);
         server.addHandler("/datepicker", DatePickerPage.class);
         server.addHandler("/datatable", DataTablePage.class);
         server.addHandler("/datatableeditable", DatatableEditablePage.class);
@@ -114,8 +116,10 @@ public class Main {
         server.addHandler("/reader", ReaderPage.class);
         
         server.addHandler("/selectone", SelectOnePage.class);
-        server.addHandler("/selectmany", SelectManyPage.class);
+        server.addHandler("/selectmany", SelectManyPage.class);       
         server.addHandler("/schedule", SchedulePage.class);
+        server.addHandler("/swagger-ui", SwaggerUIPage.class);
+        
         server.addHandler("/textbox", TextBoxPage.class);
         server.addHandler("/time", TimePage.class);
         server.addHandler("/timeline", TimelinePage.class);
