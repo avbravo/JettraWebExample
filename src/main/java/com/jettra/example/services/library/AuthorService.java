@@ -14,26 +14,25 @@ public class AuthorService {
     private static final AuthorRecordModelConverter converter = new AuthorRecordModelConverter();
     private static final IAuthorRestClient client = new AuthorRestClient();
 
-    public static List<AuthorModel> findAll() {
+    public static List<Author> findAll() {
         Console.addMessage("miConsola", "AuthorService.findAll()..", "info");
         System.out.println("...> paso f-1 AuthorService.findAll()");
         List<Author> records = client.findAll();
          System.out.println("...> paso f-2 ");
         if (records == null) return List.of();
-        return records.stream()
-                .map(converter::toModel)
-                .collect(Collectors.toList());
+        return records;
     }
 
-    public static void save(AuthorModel model) {
+    public static void save(Author record) {
+        Console.addMessage("miConsola", "AuthorService.save()..", "info");
         System.out.println("...> paso 1 AuthorService.save()");
-        Author record = converter.toRecord(model);
         System.out.println("...> paso 2");
         client.save(record);
         System.out.println("...> paso 3");
     }
 
     public static void delete(String id) {
+        Console.addMessage("miConsola", "AuthorService.delete(" + id + ")..", "info");
         client.delete(id);
     }
 }

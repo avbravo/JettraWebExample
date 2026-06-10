@@ -13,16 +13,13 @@ public class ReaderService {
     private static final ReaderRecordModelConverter converter = new ReaderRecordModelConverter();
     private static final IReaderRestClient client = new ReaderRestClient();
 
-    public static List<ReaderModel> findAll() {
+    public static List<Reader> findAll() {
         List<Reader> records = client.findAll();
         if (records == null) return List.of();
-        return records.stream()
-                .map(converter::toModel)
-                .collect(Collectors.toList());
+        return records;
     }
 
-    public static void save(ReaderModel model) {
-        Reader record = converter.toRecord(model);
+    public static void save(Reader record) {
         client.save(record);
     }
 

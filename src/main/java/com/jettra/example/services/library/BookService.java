@@ -13,16 +13,13 @@ public class BookService {
     private static final BookRecordModelConverter converter = new BookRecordModelConverter();
     private static final IBookRestClient client = new BookRestClient();
 
-    public static List<BookModel> findAll() {
+    public static List<Book> findAll() {
         List<Book> records = client.findAll();
         if (records == null) return List.of();
-        return records.stream()
-                .map(converter::toModel)
-                .collect(Collectors.toList());
+        return records;
     }
 
-    public static void save(BookModel model) {
-        Book record = converter.toRecord(model);
+    public static void save(Book record) {
         client.save(record);
     }
 

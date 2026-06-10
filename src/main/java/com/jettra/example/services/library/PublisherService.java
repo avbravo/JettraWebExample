@@ -13,16 +13,13 @@ public class PublisherService {
     private static final PublisherRecordModelConverter converter = new PublisherRecordModelConverter();
     private static final IPublisherRestClient client = new PublisherRestClient();
 
-    public static List<PublisherModel> findAll() {
+    public static List<Publisher> findAll() {
         List<Publisher> records = client.findAll();
         if (records == null) return List.of();
-        return records.stream()
-                .map(converter::toModel)
-                .collect(Collectors.toList());
+        return records;
     }
 
-    public static void save(PublisherModel model) {
-        Publisher record = converter.toRecord(model);
+    public static void save(Publisher record) {
         client.save(record);
     }
 

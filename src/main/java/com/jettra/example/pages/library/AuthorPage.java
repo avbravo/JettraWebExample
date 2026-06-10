@@ -33,11 +33,11 @@ public class AuthorPage extends DashboardBasePage {
         super("Gestión de Autores");
     }
     
-      @Override
+    @Override
     protected void initCenter(Center center, String username) {
         // center is initialized but @CrudView will add its content automatically via JettraMVC.processCrudView
         // If we want to add extra content we can do it here.
+        io.jettra.wui.components.Console console = new io.jettra.wui.components.Console("miConsola");
+        center.add(console);
     }
 }
-
-
