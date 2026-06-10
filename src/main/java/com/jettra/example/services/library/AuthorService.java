@@ -25,7 +25,7 @@ public class AuthorService {
 
     public static void save(Author record) {
         Console.addMessage("miConsola", "AuthorService.save()..", "info");
-        System.out.println("...> paso 1 AuthorService.save()");
+        System.out.println("...> paso 1 AuthorService.save()"); 
         System.out.println("...> paso 2");
         client.save(record);
         System.out.println("...> paso 3");
