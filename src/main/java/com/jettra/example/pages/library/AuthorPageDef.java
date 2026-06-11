@@ -23,20 +23,9 @@ import java.util.Properties;
         report = true,
         reportOrientation = "LANDSCAPE",
         reportTitle = "INFORME GLOBAL DE PLANETAS",
-        reportHeaderColor = "#007BFF")
+        reportHeaderColor = "#007BFF", expublic interface AuthorPageDef {
 
-
-public class AuthorPage extends DashboardBasePage {
-@InjectProperties(name = "messages")
-    private Properties msg;
-    public AuthorPage() {
-        super("Gestión de Autores");
-    }
-    
-    @Override
-    protected void initCenter(Center center, String username) {
-        // center is initialized but @CrudView will add its content automatically via JettraMVC.processCrudView
-        // If we want to add extra content we can do it here.
+    default void afterInitCenter(io.jettra.wui.complex.Center center, String username) {
         io.jettra.wui.components.Console console = new io.jettra.wui.components.Console("miConsola");
         center.add(console);
     }

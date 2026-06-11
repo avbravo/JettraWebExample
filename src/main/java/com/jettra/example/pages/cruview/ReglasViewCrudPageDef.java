@@ -14,18 +14,5 @@ import io.jettra.wui.complex.Center;
           report = true,
           reportOrientation = "PORTRAIT",
           reportTitle = "REPORTE DE REGLAS Y COMPUTOS",
-          reportHeaderColor = "#28a745")
-public class ReglasViewCrudPage extends DashboardBasePage {
-
-    @InjectProperties(name = "messages")
-    private Properties msg;
-
-    public ReglasViewCrudPage() {
-        super("CRUD con Reglas y Cómputos (@CrudView)");
-    }
-
-    @Override
-    protected void initCenter(Center center, String username) {
-        // CrudView is added automatically
-    }
+          reportHeaderColor = "#28a745", public interface ReglasViewCrudPageDef {
 }

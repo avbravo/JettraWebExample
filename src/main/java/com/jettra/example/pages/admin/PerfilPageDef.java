@@ -13,16 +13,5 @@ import io.jettra.wui.complex.Center;
        report = true,
        reportOrientation = "LANDSCAPE",
        reportTitle = "REPORTE DE PERFILES",
-       reportHeaderColor = "#007BFF")
-public class PerfilPage extends DashboardBasePage {
-    @InjectProperties(name = "messages")
-    private Properties msg;
-
-    public PerfilPage() {
-        super("Mantenimiento de Perfiles");
-    }
-
-    @Override
-    protected void initCenter(Center center, String username) {
-    }
+       reportHeaderColor = "#007BFF", public interface PerfilPageDef {
 }

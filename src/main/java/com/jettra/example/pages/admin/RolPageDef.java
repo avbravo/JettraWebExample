@@ -13,16 +13,5 @@ import io.jettra.wui.complex.Center;
        report = true,
        reportOrientation = "LANDSCAPE",
        reportTitle = "REPORTE DE ROLES",
-       reportHeaderColor = "#007BFF")
-public class RolPage extends DashboardBasePage {
-    @InjectProperties(name = "messages")
-    private Properties msg;
-
-    public RolPage() {
-        super("Mantenimiento de Roles");
-    }
-
-    @Override
-    protected void initCenter(Center center, String username) {
-    }
+       reportHeaderColor = "#007BFF", public interface RolPageDef {
 }

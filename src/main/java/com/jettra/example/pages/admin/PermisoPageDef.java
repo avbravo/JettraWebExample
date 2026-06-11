@@ -13,16 +13,5 @@ import io.jettra.wui.complex.Center;
        report = true,
        reportOrientation = "LANDSCAPE",
        reportTitle = "REPORTE DE PERMISOS",
-       reportHeaderColor = "#007BFF")
-public class PermisoPage extends DashboardBasePage {
-    @InjectProperties(name = "messages")
-    private Properties msg;
-
-    public PermisoPage() {
-        super("Mantenimiento de Permisos");
-    }
-
-    @Override
-    protected void initCenter(Center center, String username) {
-    }
+       reportHeaderColor = "#007BFF", public interface PermisoPageDef {
 }

@@ -15,18 +15,5 @@ import io.jettra.wui.complex.Center;
           report = true,
           reportOrientation = "PORTRAIT",
           reportTitle = "REPORTE DATATABLE EDITABLE @CrudView",
-          reportHeaderColor = "#28a745")
-public class DatatableEditableCrudViewPage extends DashboardBasePage {
-
-    @InjectProperties(name = "messages")
-    private Properties msg;
-
-    public DatatableEditableCrudViewPage() {
-        super("Datatable Editable (@CrudView)");
-    }
-
-    @Override
-    protected void initCenter(Center center, String username) {
-        // CrudView is added automatically
-    }
+          reportHeaderColor = "#28a745", public interface DatatableEditableCrudViewPageDef {
 }
