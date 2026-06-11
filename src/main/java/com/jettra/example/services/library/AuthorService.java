@@ -1,13 +1,11 @@
 package com.jettra.example.services.library;
 
 import com.jettra.example.entity.library.Author;
-import com.jettra.example.model.library.AuthorModel;
 import com.jettra.example.model.library.AuthorRecordModelConverter;
 import com.jettra.example.restclient.library.AuthorRestClient;
 import com.jettra.example.restclient.library.IAuthorRestClient;
 import io.jettra.wui.components.Console;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class AuthorService {
     
