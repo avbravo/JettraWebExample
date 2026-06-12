@@ -1,6 +1,7 @@
 package com.jettra.example.controller.library;
 
 import com.jettra.example.entity.library.Author;
+import com.jettra.example.repository.PaisRepository;
 import com.jettra.example.repository.library.AuthorRepository;
 import com.jettra.rest.annotations.*;
 import com.jettra.rest.core.Response;
@@ -13,17 +14,20 @@ import com.jettra.server.openapi.annotations.OpenApi;
 @Path("/api/library/authors")
 public class AuthorController {
 
+    @io.jettra.wui.core.annotations.Inject
+    private AuthorRepository authorRepository;
+
     @GET
     @Produces("application/json")
     public List<Author> findAll() {
-        return AuthorRepository.findAll();
+        return authorRepository.findAll();
     }
 
     @POST
     @Consumes("application/json")
     @Produces("application/json")
     public Response save(Author author) {
-        AuthorRepository.save(author);
+        authorRepository.save(author);
         return Response.ok("Saved successfully").build();
     }
 
@@ -31,7 +35,7 @@ public class AuthorController {
     @Path("/{id}")
     @Produces("application/json")
     public Response delete(@PathParam("id") String id) {
-        AuthorRepository.delete(id);
+        authorRepository.delete(id);
         return Response.ok("Deleted successfully").build();
     }
 }

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class AuthorRepository {
+public class AuthorRepository implements IAuthorRepository{
     private static final List<Author> db = new ArrayList<>();
    // private static final AuthorRecordModelConverter converter = new AuthorRecordModelConverter();
 
@@ -14,14 +14,14 @@ public class AuthorRepository {
         db.add(new Author("2", "J.K. Rowling", "UK"));
     }
 
-    public static List<Author> findAll() {
+    public  List<Author> findAll() {
         return new ArrayList<>(db);
     }
 //    public static List<Author> findAll() {
 //        return new ArrayList<>(db);
 //    }
 
-    public static void save(Author record) {
+    public  void save(Author record) {
         if (record.id() == null || record.id().isEmpty()) {
             record = new Author(String.valueOf(db.size() + 1), record.name(), record.country());
         }
@@ -29,11 +29,11 @@ public class AuthorRepository {
         db.add(record);
     }
 
-    public static void delete(String id) {
+    public  void delete(String id) {
         db.removeIf(r -> r.id().equals(id));
     }
     
-    public static Optional<Author> findById(String id) {
+    public  Optional<Author> findById(String id) {
         return db.stream().filter(r -> r.id().equals(id)).findFirst();
     }
 }

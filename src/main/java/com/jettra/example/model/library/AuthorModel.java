@@ -4,18 +4,29 @@ import com.jettra.example.entity.library.Author;
 import io.jettra.wui.core.annotations.ModelToRecordConversor;
 import io.jettra.wui.core.annotations.PropertiesInRecord;
 import io.jettra.wui.core.annotations.JettraViewModel;
+import io.jettra.wui.core.annotations.PropertiesLabel;
+import io.jettra.wui.validations.NotNull;
+import io.jettra.wui.validations.Size;
 
 @JettraViewModel
 @ModelToRecordConversor(goal = Author.class)
 public class AuthorModel {
 
+    @NotNull
+    @Size(min = 2, max = 5)
+    @PropertiesLabel(value = "lbl.id", label = "ID")
     @PropertiesInRecord
     private String id;
 
     @PropertiesInRecord
+    @NotNull
+    @Size(min = 2)
+    @PropertiesLabel(value = "lbl.name", label = "Name")
     private String name;
 
     @PropertiesInRecord
+    @Size(min = 3)
+    @PropertiesLabel(value = "lbl.name", label = "Name")
     private String country;
 
     public AuthorModel() {

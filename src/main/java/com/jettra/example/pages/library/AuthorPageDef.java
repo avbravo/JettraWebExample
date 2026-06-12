@@ -12,12 +12,6 @@ import io.jettra.wui.sync.SyncType;
 import java.util.Properties;
 
 @JettraPageSincronized(SyncType.ALL)
-//@CrudView(model = AuthorModel.class, 
-//        repository = AuthorRepository.class, editable = true,
-//        report = true,
-//        reportOrientation = "LANDSCAPE",
-//        reportTitle = "INFORME GLOBAL DE PLANETAS",
-//        reportHeaderColor = "#007BFF")
 @CrudView(extendsClass = DashboardBasePage.class, model = AuthorModel.class, 
         controller = AuthorService.class, editable = true,
         report = true,
