@@ -9,9 +9,10 @@ import java.util.Properties;
 import io.jettra.wui.complex.Center;
 
 @JettraPageSincronized(SyncType.ALL)
-@CrudView(model = com.jettra.example.model.PlanetaModel.class, repository = com.jettra.example.repository.PlanetaRepository.class,
+@CrudView(extendsClass = DashboardBasePage.class, model = com.jettra.example.model.PlanetaModel.class, repository = com.jettra.example.repository.PlanetaRepository.class,
        report = true,
        reportOrientation = "LANDSCAPE",
        reportTitle = "INFORME GLOBAL DE PLANETAS",
-       reportHeaderColor = "#007BFF", public interface PlanetaPageDef {
+       reportHeaderColor = "#007BFF")
+public interface PlanetaPageDef {
 }

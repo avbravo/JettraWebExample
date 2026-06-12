@@ -9,9 +9,10 @@ import java.util.Properties;
 import io.jettra.wui.complex.Center;
 
 @JettraPageSincronized(SyncType.ALL)
-@CrudView(model = com.jettra.example.model.admin.PerfilModel.class, repository = com.jettra.example.repository.admin.PerfilRepository.class,
+@CrudView(extendsClass = DashboardBasePage.class, model = com.jettra.example.model.admin.PerfilModel.class, repository = com.jettra.example.repository.admin.PerfilRepository.class,
        report = true,
        reportOrientation = "LANDSCAPE",
        reportTitle = "REPORTE DE PERFILES",
-       reportHeaderColor = "#007BFF", public interface PerfilPageDef {
+       reportHeaderColor = "#007BFF")
+public interface PerfilPageDef {
 }

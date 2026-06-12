@@ -9,9 +9,10 @@ import java.util.Properties;
 import io.jettra.wui.complex.Center;
 
 @JettraPageSincronized(SyncType.ALL)
-@CrudView(model = com.jettra.example.model.admin.PermisoModel.class, repository = com.jettra.example.repository.admin.PermisoRepository.class,
+@CrudView(extendsClass = DashboardBasePage.class, model = com.jettra.example.model.admin.PermisoModel.class, repository = com.jettra.example.repository.admin.PermisoRepository.class,
        report = true,
        reportOrientation = "LANDSCAPE",
        reportTitle = "REPORTE DE PERMISOS",
-       reportHeaderColor = "#007BFF", public interface PermisoPageDef {
+       reportHeaderColor = "#007BFF")
+public interface PermisoPageDef {
 }

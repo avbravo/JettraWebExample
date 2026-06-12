@@ -6,5 +6,6 @@ import com.jettra.example.services.library.ReaderService;
 import io.jettra.wui.complex.Center;
 import io.jettra.wui.core.annotations.CrudView;
 
-@CrudView(model = ReaderModel.class, controller = ReaderService.class, editable = true, report = true, public interface ReaderPageDef {
+@CrudView(extendsClass = DashboardBasePage.class, model = ReaderModel.class, controller = ReaderService.class, editable = true, report = true)
+public interface ReaderPageDef {
 }

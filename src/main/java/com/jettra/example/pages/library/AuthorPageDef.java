@@ -18,12 +18,13 @@ import java.util.Properties;
 //        reportOrientation = "LANDSCAPE",
 //        reportTitle = "INFORME GLOBAL DE PLANETAS",
 //        reportHeaderColor = "#007BFF")
-@CrudView(model = AuthorModel.class, 
+@CrudView(extendsClass = DashboardBasePage.class, model = AuthorModel.class, 
         controller = AuthorService.class, editable = true,
         report = true,
         reportOrientation = "LANDSCAPE",
         reportTitle = "INFORME GLOBAL DE PLANETAS",
-        reportHeaderColor = "#007BFF", expublic interface AuthorPageDef {
+        reportHeaderColor = "#007BFF")
+public interface AuthorPageDef {
 
     default void afterInitCenter(io.jettra.wui.complex.Center center, String username) {
         io.jettra.wui.components.Console console = new io.jettra.wui.components.Console("miConsola");

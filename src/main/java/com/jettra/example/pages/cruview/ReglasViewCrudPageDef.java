@@ -9,10 +9,11 @@ import java.util.Properties;
 import io.jettra.wui.complex.Center;
 
 @JettraPageSincronized(SyncType.ALL)
-@CrudView(model = com.jettra.example.model.ReglasModel.class, 
+@CrudView(extendsClass = DashboardBasePage.class, model = com.jettra.example.model.ReglasModel.class, 
           repository = com.jettra.example.repository.ReglasRepository.class,
           report = true,
           reportOrientation = "PORTRAIT",
           reportTitle = "REPORTE DE REGLAS Y COMPUTOS",
-          reportHeaderColor = "#28a745", public interface ReglasViewCrudPageDef {
+          reportHeaderColor = "#28a745")
+public interface ReglasViewCrudPageDef {
 }

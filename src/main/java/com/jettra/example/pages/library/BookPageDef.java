@@ -7,5 +7,6 @@ import io.jettra.wui.complex.Center;
 import io.jettra.wui.core.Page;
 import io.jettra.wui.core.annotations.CrudView;
 
-@CrudView(model = BookModel.class, controller = BookService.class, editable = true, report = true, public interface BookPageDef {
+@CrudView(extendsClass = DashboardBasePage.class, model = BookModel.class, controller = BookService.class, editable = true, report = true)
+public interface BookPageDef {
 }
