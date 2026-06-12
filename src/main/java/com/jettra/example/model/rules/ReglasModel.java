@@ -1,4 +1,4 @@
-package com.jettra.example.model;
+package com.jettra.example.model.rules;
 
 import io.jettra.rules.annotations.Compute;
 import io.jettra.rules.annotations.Rules;

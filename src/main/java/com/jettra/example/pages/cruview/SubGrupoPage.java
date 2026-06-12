@@ -1,12 +1,12 @@
 package com.jettra.example.pages.cruview;
 
 import com.jettra.example.dashboard.DashboardBasePage;
-import com.jettra.example.model.DeporteModel;
-import com.jettra.example.model.GrupoModel;
-import com.jettra.example.model.SubGrupoModel;
+import com.jettra.example.model.crud.DeporteModel;
+import com.jettra.example.model.crudview.GrupoModel;
+import com.jettra.example.model.crudview.SubGrupoModel;
 import com.jettra.example.repository.DeporteRepository;
-import com.jettra.example.repository.GrupoRepository;
-import com.jettra.example.repository.SubGrupoRepository;
+import com.jettra.example.repository.crud.GrupoRepository;
+import com.jettra.example.repository.crud.SubGrupoRepository;
 import io.jettra.wui.complex.Center;
 import io.jettra.wui.complex.CrudView;
 import io.jettra.wui.core.annotations.InjectProperties;

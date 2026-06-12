@@ -1,5 +1,5 @@
 
-package com.jettra.example.model;
+package com.jettra.example.model.crud;
 
 import io.jettra.wui.core.annotations.JettraViewModel;
 import io.jettra.wui.validations.NotNull;

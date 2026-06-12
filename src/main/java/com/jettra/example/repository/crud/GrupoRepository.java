@@ -1,6 +1,6 @@
-package com.jettra.example.repository;
+package com.jettra.example.repository.crud;
 
-import com.jettra.example.model.GrupoModel;
+import com.jettra.example.model.crudview.GrupoModel;
 import java.util.ArrayList;
 import java.util.List;
 

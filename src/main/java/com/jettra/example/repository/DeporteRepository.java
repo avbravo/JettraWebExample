@@ -1,6 +1,6 @@
 package com.jettra.example.repository;
 
-import com.jettra.example.model.DeporteModel;
+import com.jettra.example.model.crud.DeporteModel;
 import java.util.ArrayList;
 import java.util.List;
 

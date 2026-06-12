@@ -1,7 +1,7 @@
 package com.jettra.example.pages.crud;
 
 import com.jettra.example.dashboard.DashboardBasePage;
-import com.jettra.example.model.PersonaModel;
+import com.jettra.example.model.crud.PersonaModel;
 import com.jettra.example.repository.PersonaRepository;
 import io.jettra.wui.complex.*;
 import io.jettra.wui.components.*;

@@ -1,6 +1,6 @@
 package com.jettra.example.repository;
 
-import com.jettra.example.model.PaisModel;
+import com.jettra.example.model.crud.PaisModel;
 import java.util.ArrayList;
 import java.util.List;
 

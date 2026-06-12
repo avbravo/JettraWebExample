@@ -1,6 +1,6 @@
-package com.jettra.example.repository;
+package com.jettra.example.repository.crud;
 
-import com.jettra.example.model.PlanetaModel;
+import com.jettra.example.model.crudview.PlanetaModel;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,5 +1,5 @@
 
-package com.jettra.example.model;
+package com.jettra.example.model.crudview;
 
 import io.jettra.wui.core.annotations.JettraViewModel;
 import io.jettra.wui.core.annotations.PropertiesLabel;

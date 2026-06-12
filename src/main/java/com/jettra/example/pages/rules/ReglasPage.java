@@ -1,8 +1,8 @@
-package com.jettra.example.pages.crud;
+package com.jettra.example.pages.rules;
 
 import com.jettra.example.dashboard.DashboardBasePage;
-import com.jettra.example.model.ReglasModel;
-import com.jettra.example.repository.ReglasRepository;
+import com.jettra.example.model.rules.ReglasModel;
+import com.jettra.example.repository.crud.ReglasRepository;
 import io.jettra.wui.complex.*;
 import io.jettra.wui.components.*;
 import io.jettra.wui.core.annotations.InjectProperties;

@@ -9,8 +9,8 @@ import java.util.Properties;
 import io.jettra.wui.complex.Center;
 
 @JettraPageSincronized(SyncType.ALL)
-@CrudView(extendsClass = DashboardBasePage.class, model = com.jettra.example.model.ReglasModel.class, 
-          repository = com.jettra.example.repository.ReglasRepository.class,
+@CrudView(extendsClass = DashboardBasePage.class, model = com.jettra.example.model.rules.ReglasModel.class, 
+          repository = com.jettra.example.repository.crud.ReglasRepository.class,
           report = true,
           reportOrientation = "PORTRAIT",
           reportTitle = "REPORTE DE REGLAS Y COMPUTOS",

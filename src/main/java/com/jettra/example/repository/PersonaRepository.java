@@ -1,6 +1,6 @@
 package com.jettra.example.repository;
 
-import com.jettra.example.model.PersonaModel;
+import com.jettra.example.model.crud.PersonaModel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

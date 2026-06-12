@@ -1,7 +1,7 @@
 package com.jettra.example.pages.crud;
 
 import com.jettra.example.dashboard.DashboardBasePage;
-import com.jettra.example.model.DeporteModel;
+import com.jettra.example.model.crud.DeporteModel;
 import com.jettra.example.repository.DeporteRepository;
 import io.jettra.wui.complex.*;
 import io.jettra.wui.components.*;

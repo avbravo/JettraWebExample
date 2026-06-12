@@ -9,7 +9,7 @@ import java.util.Properties;
 import io.jettra.wui.complex.Center;
 
 @JettraPageSincronized(SyncType.ALL)
-@CrudView(extendsClass = DashboardBasePage.class, model = com.jettra.example.model.PlanetaModel.class, repository = com.jettra.example.repository.PlanetaRepository.class,
+@CrudView(extendsClass = DashboardBasePage.class, model = com.jettra.example.model.crudview.PlanetaModel.class, repository = com.jettra.example.repository.crud.PlanetaRepository.class,
        report = true,
        reportOrientation = "LANDSCAPE",
        reportTitle = "INFORME GLOBAL DE PLANETAS",
