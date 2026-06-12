@@ -192,6 +192,12 @@ public interface CancionPageDef {
 
 ---
 
+
+# Vista generada
+
+
+![](image/cancioncrudview.png)
+
 ## 4. Clases Generadas por JettraStack
 
 A partir de la definición de `CancionPageDef` y sus anotaciones, JettraStack genera automáticamente clases subyacentes durante el proceso de compilación (generalmente en `target/generated-sources/annotations`). Estas clases son las encargadas de construir la interfaz web real y enlazar los eventos del CRUD a tu repositorio.
