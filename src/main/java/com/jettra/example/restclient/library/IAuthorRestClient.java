@@ -10,6 +10,7 @@ import com.jettra.rest.annotations.GET;
 import com.jettra.rest.annotations.POST;
 import com.jettra.rest.annotations.Path;
 import com.jettra.rest.annotations.PathParam;
+import com.jettra.rest.annotations.HeaderParam;
 import com.jettra.rest.client.RestClient;
 import java.util.List;
 
@@ -21,12 +22,12 @@ import java.util.List;
 public interface IAuthorRestClient {
 
     @GET
-    List<Author> findAll();
+    List<Author> findAll(@HeaderParam("Authorization") String token);
 
     @POST
-    void save(Author model);
+    void save(@HeaderParam("Authorization") String token, Author model);
 
     @DELETE
     @Path("/{id}")
-    void delete(@PathParam("id") String id);
+    void delete(@HeaderParam("Authorization") String token, @PathParam("id") String id);
 }

@@ -199,6 +199,11 @@ public class Main {
         // Exponer la interfaz Swagger UI
         server.addHandler("/swagger-ui", new SwaggerUIHandler("/openapi.json"));
 
+        com.jettra.rest.server.JettraRestServer.register(server, AuthorController.class);
+        com.jettra.rest.server.JettraRestServer.register(server, BookController.class);
+        com.jettra.rest.server.JettraRestServer.register(server, PublisherController.class);
+        com.jettra.rest.server.JettraRestServer.register(server, ReaderController.class);
+
         server.start();
     }
 }

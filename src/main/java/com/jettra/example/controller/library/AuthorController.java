@@ -10,12 +10,12 @@ import java.util.List;
 
 import com.jettra.server.openapi.annotations.OpenApi;
 
+@Secured
 @OpenApi(title = "Library API", version = "v1.0", description = "API for Library management")
-@Path("/api/library/authors")
+@Path("/library/authors")
 public class AuthorController {
 
-    @io.jettra.wui.core.annotations.Inject
-    private AuthorRepository authorRepository;
+    private AuthorRepository authorRepository = new AuthorRepository();
 
     @GET
     @Produces("application/json")

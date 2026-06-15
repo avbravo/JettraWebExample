@@ -7,7 +7,7 @@ import com.jettra.rest.core.Response;
 
 import java.util.List;
 
-@Path("/api/library/readers")
+@Path("/library/readers")
 public class ReaderController {
 
     @GET

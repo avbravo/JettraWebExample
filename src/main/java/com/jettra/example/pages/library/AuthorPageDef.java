@@ -4,12 +4,9 @@ import com.jettra.example.dashboard.DashboardBasePage;
 import com.jettra.example.model.library.AuthorModel;
 import com.jettra.example.repository.library.AuthorRepository;
 import com.jettra.example.services.library.AuthorService;
-import io.jettra.wui.complex.Center;
 import io.jettra.wui.core.annotations.CrudView;
-import io.jettra.wui.core.annotations.InjectProperties;
 import io.jettra.wui.sync.JettraPageSincronized;
 import io.jettra.wui.sync.SyncType;
-import java.util.Properties;
 
 @JettraPageSincronized(SyncType.ALL)
 @CrudView(extendsClass = DashboardBasePage.class, model = AuthorModel.class, 

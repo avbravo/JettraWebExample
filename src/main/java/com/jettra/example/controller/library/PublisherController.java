@@ -8,7 +8,7 @@ import com.jettra.rest.core.Response;
 
 import java.util.List;
 
-@Path("/api/library/publishers")
+@Path("/library/publishers")
 public class PublisherController {
 
     @GET

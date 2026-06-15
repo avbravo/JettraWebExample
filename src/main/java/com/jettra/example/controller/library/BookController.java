@@ -7,7 +7,7 @@ import com.jettra.rest.core.Response;
 
 import java.util.List;
 
-@Path("/api/library/books")
+@Path("/library/books")
 public class BookController {
 
     @GET

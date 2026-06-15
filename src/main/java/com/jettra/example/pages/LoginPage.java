@@ -51,6 +51,7 @@ public class LoginPage extends Page {
             // In a real Jettra app, we might use JettraContext for session management, 
             // but for this example we'll stick to the cookie approach as requested.
             setSessionCookie(user, cPath);
+            com.jettra.server.core.JettraContext.getCurrent().set(com.jettra.server.core.JettraContext.Scope.SESSION, "username", user);
             
             try {
                 redirect(currentExchange, JettraServer.resolvePath("/dashboard"));

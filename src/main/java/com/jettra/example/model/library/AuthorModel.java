@@ -26,7 +26,7 @@ public class AuthorModel {
 
     @PropertiesInRecord
     @Size(min = 3)
-    @PropertiesLabel(value = "lbl.name", label = "Name")
+    @PropertiesLabel(value = "lbl.country", label = "Country")
     private String country;
 
     public AuthorModel() {
