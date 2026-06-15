@@ -1,4 +1,4 @@
-package com.jettra.example.pages;
+package com.jettra.example.pages.login;
 
 import java.io.IOException;
 import java.util.Map;

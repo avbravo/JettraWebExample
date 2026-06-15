@@ -106,62 +106,34 @@ if (isValidUser(user, pass)) {
 
 Si deseas consumir el servicio REST fuera de la UI de Jettra o Swagger (por ejemplo desde una aplicación móvil u otro servidor), puedes enviar el token de la siguiente forma:
 
-### 5.1. Generar un JWT válido desde consola
+### 5.1. Obtener un JWT válido desde consola usando el endpoint Auth
 
-Para generar un JWT y obtener el token por consola de una manera reutilizable y cómoda, puedes compilar y ejecutar una clase utilitaria apoyándote en Maven.
+Con la nueva API `POST /api/auth/login`, puedes autenticarte y obtener tu JWT de manera rápida enviando un Payload JSON con tu usuario y contraseña.
 
-Crea un archivo en tu proyecto llamado `GenerateToken.java` (por ejemplo, en el paquete `com.jettra.example.util`):
-
-```java
-// GenerateToken.java
-package com.jettra.example.util;
-
-import java.util.HashMap;
-import java.util.Scanner;
-import com.jettra.jwt.JettraJWT;
-
-public class GenerateToken {
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        
-        System.out.print("Ingrese username: ");
-        String username = scanner.nextLine();
-        
-        System.out.print("Ingrese password: ");
-        String password = scanner.nextLine();
-        
-        // Aquí podrías validar contra una base de datos o lógica real.
-        // Para el ejemplo, generamos el JWT si envía información válida.
-        if (username.trim().isEmpty() || password.trim().isEmpty()) {
-            System.err.println("Error: Credenciales inválidas.");
-            System.exit(1);
-        }
-
-        String secret = "default_secret_key_jettra_rest_2026";
-        long expiration = 3600000; // 1 hora
-
-        JettraJWT jwt = new JettraJWT(secret, expiration);
-        String token = jwt.generateToken(new HashMap<>(), username);
-
-        System.out.println("\n[JWT Generado Exitosamente]");
-        System.out.println("Bearer " + token);
-    }
-}
+```bash
+# Obtener el token realizando una petición POST al endpoint de autenticación
+curl -X POST "http://localhost:8080/jettrawebexample/api/auth/login" \
+     -H "Content-Type: application/json" \
+     -d '{"username":"admin", "password":"spassword123"}'
 ```
 
-Compílalo y ejecútalo (asegúrate de incluir las dependencias de Jettra en el `-cp`):
-```bash
-# Ejemplo si usas Maven exec:java para correr un main temporal
-mvn exec:java -Dexec.mainClass="com.jettra.example.util.GenerateToken"
+La respuesta devolverá un objeto JSON que contendrá tu token:
+
+```json
+{
+  "token": "Bearer eyJhbGciOiJIUzI1NiJ9..."
+}
 ```
 
 ### 5.2. Consumir la API protegida
 
-Una vez obtenido el token que empieza por `Bearer ...`:
+Una vez obtenido el token que empieza por `Bearer ...`, inclúyelo en la cabecera `Authorization` de tus llamadas a los microservicios:
 
 ```bash
-# Exportar el token 
-export TOKEN="Bearer eyJhbGciOiJIUz..."
+# Exportar el token (sustituye con el valor exacto de la respuesta anterior)
+export TOKEN="Bearer eyJhbGciOiJIUzI1NiJ9..."
+
+export TOKEN="Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTc4MTU1NDUzNSwiaWF0IjoxNzgxNTUwOTM1fQ.r67kGwcZutonu-HvgRVV3ZG5ubN9kGJWvKyIpZnUVKM"
 
 # Hacer la petición pasando el header
 curl -X GET "http://localhost:8080/jettrawebexample/api/library/authors" \
