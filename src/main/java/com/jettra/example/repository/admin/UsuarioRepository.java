@@ -1,4 +1,4 @@
-package com.jettra.example.repository.admin;
+    package com.jettra.example.repository.admin;
 
 import com.jettra.example.model.admin.UsuarioModel;
 import java.util.ArrayList;
