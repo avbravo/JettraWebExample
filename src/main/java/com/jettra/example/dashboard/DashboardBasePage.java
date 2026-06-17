@@ -14,6 +14,49 @@ public abstract class DashboardBasePage extends JettraDashboardPage {
     }
 
     @Override
+    protected void onInit(java.util.Map<String, String> params) {
+        super.onInit(params);
+        String loggedUser = getLoggedUser(currentExchange);
+        if ("Guest".equals(loggedUser) || loggedUser.isEmpty()) return; // Already handled by super
+
+        // Skip validation for dashboard itself
+        if (this.getClass().getSimpleName().equals("DashboardPage") || this.getClass().getSimpleName().equals("ConsolePage")) {
+            return; 
+        }
+
+        String pageName = this.getClass().getSimpleName(); 
+        String feature = pageName.replace("Page", "").toUpperCase();
+
+        com.jettra.plugin.entity.autentification.User u = com.jettra.plugin.services.autentification.UserService.findAll().stream()
+            .filter(x -> x.firstName() != null && x.firstName().equalsIgnoreCase(loggedUser))
+            .findFirst().orElse(null);
+
+        if (u != null) {
+            boolean hasPerm = false;
+            if (u.roles() != null) {
+                for (com.jettra.plugin.entity.autentification.Role r : u.roles()) {
+                    if (r.permissions() != null) {
+                        for (com.jettra.plugin.entity.autentification.Permission p : r.permissions()) {
+                            if (p.name().equals(feature + "_ALL") || p.name().equals(feature + "_QUERY") || p.name().equals("ALL_ALL")) {
+                                hasPerm = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (hasPerm) break;
+                }
+            }
+            if (!hasPerm) {
+                this.children.clear();
+                try {
+                    redirect(currentExchange, com.jettra.server.JettraServer.resolvePath("/dashboard?error=unauthorized"));
+                } catch (Exception e) {}
+                return;
+            }
+        }
+    }
+
+    @Override
     protected void setupLeft(Left left, String username) {
         initMenuBuilder();
 

@@ -8,6 +8,8 @@ import io.jettra.wui.core.annotations.PropertiesLabel;
 import io.jettra.wui.validations.NotNull;
 import java.util.UUID;
 import java.time.Instant;
+import com.jettra.plugin.entity.autentification.User;
+import io.jettra.wui.core.annotations.ViewSelectOne;
 
 @JettraViewModel
 @ModelToRecordConversor(goal = Credential.class)
@@ -18,8 +20,9 @@ public class CredentialModel {
     private UUID id;
 
     @PropertiesInRecord
-    @PropertiesLabel(value = "credential.userId", label = "User ID")
-    private UUID userId;
+    @PropertiesLabel(value = "credential.user", label = "User")
+    @ViewSelectOne(label = "firstName", source = "com.jettra.plugin.services.autentification.UserService", method = "findAll")
+    private User user;
 
     @NotNull
     @PropertiesInRecord
@@ -49,12 +52,12 @@ public class CredentialModel {
         this.id = id;
     }
 
-    public UUID getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(UUID userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getUsername() {

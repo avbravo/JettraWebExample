@@ -7,13 +7,33 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.Set;
+import java.util.HashSet;
+import java.util.stream.Collectors;
 
 public class RoleRepository {
     private static final List<Role> db = new ArrayList<>();
 
     static {
-        db.add(new Role(UUID.fromString("44444444-4444-4444-4444-444444444444"), "ADMIN", Set.of()));
-        db.add(new Role(UUID.fromString("55555555-5555-5555-5555-555555555555"), "MANAGER", Set.of()));
+        List<Permission> allPerms = PermissionRepository.findAll();
+        Set<Permission> adminPerms = new HashSet<>(allPerms);
+        Set<Permission> managerPerms = new HashSet<>(allPerms);
+
+        // DEMO perms: NOT associated with ADMINISTRATION or CREDENTIALS, and only QUERY permissions
+        Set<Permission> demoPerms = allPerms.stream()
+            .filter(p -> {
+                String path = p.resourcePath();
+                boolean isAdminPath = path.equals("/permiso") || path.equals("/rol") || path.equals("/perfil") 
+                                   || path.equals("/usuario") || path.equals("/webdesigner") || path.equals("/kanban") 
+                                   || path.equals("/swagger-ui");
+                boolean isCredPath = path.equals("/credential") || path.equals("/permission") || path.equals("/role") 
+                                  || path.equals("/department") || path.equals("/user");
+                return !isAdminPath && !isCredPath && p.name().endsWith("_QUERY");
+            })
+            .collect(Collectors.toSet());
+
+        db.add(new Role(UUID.nameUUIDFromBytes("ADMIN".getBytes()), "ADMIN", adminPerms));
+        db.add(new Role(UUID.nameUUIDFromBytes("MANAGER".getBytes()), "MANAGER", managerPerms));
+        db.add(new Role(UUID.nameUUIDFromBytes("DEMO".getBytes()), "DEMO", demoPerms));
     }
 
     public static List<Role> findAll() {

@@ -5,7 +5,7 @@ import java.util.UUID;
 
 public record Credential(
     UUID id,
-    UUID userId,
+    User user,
     String username,
     String passwordHash,
     Boolean active,

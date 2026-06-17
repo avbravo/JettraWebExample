@@ -1,6 +1,7 @@
 package com.jettra.plugin.repository.autentification;
 
 import com.jettra.plugin.entity.autentification.Credential;
+import com.jettra.plugin.entity.autentification.User;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -11,7 +12,25 @@ public class CredentialRepository {
     private static final List<Credential> db = new ArrayList<>();
 
     static {
-        db.add(new Credential(UUID.fromString("99999999-9999-9999-9999-999999999999"), UUID.fromString("88888888-8888-8888-8888-888888888888"), "johndoe", "hashedpassword", true, Instant.now()));
+        User adminUser = UserRepository.findAll().stream().filter(u -> u.firstName().equals("Admin")).findFirst().orElse(null);
+        db.add(new Credential(
+            UUID.nameUUIDFromBytes("admin-cred-id".getBytes()),
+            adminUser,
+            "admin",
+            "admin",
+            true,
+            Instant.now()
+        ));
+
+        User demoUser = UserRepository.findAll().stream().filter(u -> u.firstName().equals("Demo")).findFirst().orElse(null);
+        db.add(new Credential(
+            UUID.nameUUIDFromBytes("demo-cred-id".getBytes()),
+            demoUser,
+            "demo",
+            "demo",
+            true,
+            Instant.now()
+        ));
     }
 
     public static List<Credential> findAll() {
@@ -20,7 +39,7 @@ public class CredentialRepository {
 
     public static void save(Credential record) {
         if (record.id() == null) {
-            record = new Credential(UUID.randomUUID(), record.userId(), record.username(), record.passwordHash(), record.active(), record.lastLogin());
+            record = new Credential(UUID.randomUUID(), record.user(), record.username(), record.passwordHash(), record.active(), record.lastLogin());
         }
         delete(record.id().toString());
         db.add(record);
