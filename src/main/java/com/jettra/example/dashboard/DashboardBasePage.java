@@ -48,6 +48,7 @@ public abstract class DashboardBasePage extends JettraDashboardPage {
         addCategory(es ? "@Rules" : "@Rules", new String[]{"Reglas", "ReglasViewCrud"}, compIcon);
         addCategory(es ? "Crud" : "Crud", new String[]{"Persona", "Pais", "Deporte"}, compIcon);
         addCategory(es ? "@CrudView" : "@CrudView", new String[]{"Grupo", "SubGrupo", "Planeta", "DatatableEditableCrudView","Cancion"}, compIcon);
+        addCategory(es ? "Credentials" : "Credentials", new String[]{"Credential", "Permission", "Role", "Department", "User"}, compIcon);
         addCategory(es ? "Library" : "Library", new String[]{"Author", "Book", "Publisher","Reader"}, compIcon);
         addCategory(es ? "DataTable" : "DataTable", new String[]{"DataTable", "DatatableEditable"}, compIcon);
         addCategory(es ? "Master-Details" : "Master-Details", new String[]{"ViewDataTable"}, compIcon);

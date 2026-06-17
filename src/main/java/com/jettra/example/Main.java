@@ -56,7 +56,8 @@ public class Main {
         System.out.println("Iniciando aplicación Web: " + appTitle);
     }
 
-    public static void main(String[] args) {
+//    public static void main(String[] args) {
+    void main() {
         Main app = new Main();
         app.initUI();
 
@@ -188,13 +189,25 @@ public class Main {
         server.addHandler("/perfil", PerfilPage.class);
         server.addHandler("/usuario", UsuarioPage.class);
 
+        // Registered authentication/credentials plugin handlers
+        server.addHandler("/credential", com.jettra.plugin.pages.autentification.CredentialPage.class);
+        server.addHandler("/permission", com.jettra.plugin.pages.autentification.PermissionPage.class);
+        server.addHandler("/role", com.jettra.plugin.pages.autentification.RolePage.class);
+        server.addHandler("/department", com.jettra.plugin.pages.autentification.DepartmentPage.class);
+        server.addHandler("/user", com.jettra.plugin.pages.autentification.UserPage.class);
+
         // Define la lista de controladores REST que deseas documentar
         List<Class<?>> controllers = List.of(
             AuthController.class,
             AuthorController.class,
             BookController.class,
             PublisherController.class,
-            ReaderController.class
+            ReaderController.class,
+            com.jettra.plugin.controller.autentification.CredentialController.class,
+            com.jettra.plugin.controller.autentification.PermissionController.class,
+            com.jettra.plugin.controller.autentification.RoleController.class,
+            com.jettra.plugin.controller.autentification.DepartmentController.class,
+            com.jettra.plugin.controller.autentification.UserController.class
         );
         
         // Exponer el JSON de OpenAPI
@@ -208,6 +221,11 @@ public class Main {
         com.jettra.rest.server.JettraRestServer.register(server, BookController.class);
         com.jettra.rest.server.JettraRestServer.register(server, PublisherController.class);
         com.jettra.rest.server.JettraRestServer.register(server, ReaderController.class);
+        com.jettra.rest.server.JettraRestServer.register(server, com.jettra.plugin.controller.autentification.CredentialController.class);
+        com.jettra.rest.server.JettraRestServer.register(server, com.jettra.plugin.controller.autentification.PermissionController.class);
+        com.jettra.rest.server.JettraRestServer.register(server, com.jettra.plugin.controller.autentification.RoleController.class);
+        com.jettra.rest.server.JettraRestServer.register(server, com.jettra.plugin.controller.autentification.DepartmentController.class);
+        com.jettra.rest.server.JettraRestServer.register(server, com.jettra.plugin.controller.autentification.UserController.class);
 
         server.start();
     }
