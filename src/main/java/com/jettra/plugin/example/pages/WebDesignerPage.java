@@ -384,7 +384,7 @@ public class WebDesignerPage extends DashboardBasePage {
         // Charts
         addPaletteCategory(palette, "Charts", new String[]{"ChartsBar", "ChartsDoughnut", "ChartsLine", "ChartsPie", "ChartsRadar"});
         // Layout & Display
-        addPaletteCategory(palette, "Layout", new String[]{"Grid", "Panel", "Board", "Card", "Avatar", "Carousel", "Datatable", "ViewDataTable", "TabView", "Tab", "Modal", "Tree", "TreeItem", "Div", "LayoutDisplay", "Map"});
+        addPaletteCategory(palette, "Layout", new String[]{"Grid", "Panel", "Board", "Card", "Avatar", "Carousel", "Datatable", "ViewDataTable", "TabView", "Tab", "Modal", "Tree", "TreeItem", "Div", "LayoutDisplay", "Map", "LoginUI"});
 
         return palette;
     }
@@ -844,6 +844,9 @@ public class WebDesignerPage extends DashboardBasePage {
                         break;
                     case 'Avatar':
                         content = '<div class="j-avatar j-avatar-circle j-avatar-md" style="background:var(--jettra-accent); color:#000; display:flex; align-items:center; justify-content:center; font-weight:bold">AV</div>';
+                        break;
+                    case 'LoginUI':
+                        content = '<div class="j-loginui" style="background:rgba(20, 30, 50, 0.85); padding:20px; border-radius:10px; border:1px solid cyan; text-align:center;"><h3 style="color:cyan; margin-top:0;">Login UI Component</h3><div style="background:#0f172a; padding:10px; margin-bottom:10px; color:white;">Username</div><div style="background:#0f172a; padding:10px; margin-bottom:10px; color:white;">Password</div><div style="background:cyan; padding:10px; color:#0f172a; font-weight:bold; border-radius:5px;">Login</div></div>';
                         break;
                     case 'ProgressBar':
                         content = '<div class="j-progressbar-container" style="width:100%; height:12px; background:rgba(255,255,255,0.05); border-radius:6px; overflow:hidden; border:1px solid var(--jettra-border)">' +
@@ -2111,6 +2114,9 @@ public class WebDesignerPage extends DashboardBasePage {
                                 if (props.text) out += `.setText("${props.text}")`;
                                 if (props.icon) out += `.setIcon("${props.icon}")`;
                                 out += `);\\n`;
+                                break;
+                            case 'LoginUI':
+                                out += `        ${container}.add(new LoginUI()${chainProps()});\\n`;
                                 break;
                             case 'SelectOne':
                             case 'SelectMany':

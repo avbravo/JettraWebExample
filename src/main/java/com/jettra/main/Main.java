@@ -3,6 +3,7 @@ package com.jettra.main;
 import com.jettra.main.dashboard.DashboardPage;
 import com.jettra.main.login.LoginAdvancedPage;
 import com.jettra.main.login.LoginPage;
+import com.jettra.plugin.example.pages.LoginUIPage;
 import com.jettra.plugin.example.pages.TreePage;
 import com.jettra.plugin.example.pages.MenuPage;
 import com.jettra.plugin.example.pages.SelectOnePage;
@@ -176,6 +177,7 @@ public class Main {
         server.addHandler("/image", ImagePage.class);
         server.addHandler("/layoutdisplay", LayoutDisplayPage.class);
         server.addHandler("/login", LoginPage.class);
+        server.addHandler("/loginui", LoginUIPage.class);
         server.addHandler("/logout", LoginPage.class);
         server.addHandler("/loading", LoadingPage.class);
         server.addHandler("/console", ConsolePage.class);
