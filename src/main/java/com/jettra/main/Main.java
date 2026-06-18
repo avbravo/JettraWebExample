@@ -188,11 +188,9 @@ public class Main {
         server.addHandler("/paragraph", ParagraphPage.class);
         server.addHandler("/radiobutton", RadioButtonPage.class);
         server.addHandler("/reader", ReaderPage.class);
-
         server.addHandler("/selectone", SelectOnePage.class);
         server.addHandler("/selectmany", SelectManyPage.class);
         server.addHandler("/schedule", SchedulePage.class);
-
         server.addHandler("/textbox", TextBoxPage.class);
         server.addHandler("/time", TimePage.class);
         server.addHandler("/timeline", TimelinePage.class);
