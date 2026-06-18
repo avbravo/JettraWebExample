@@ -8,7 +8,7 @@ import io.jettra.wui.sync.JettraPageSincronized;
 import io.jettra.wui.sync.SyncType;
 
 @JettraPageSincronized(SyncType.ALL)
-@CrudView(extendsClass = DashboardBasePage.class, model = PermissionModel.class,
+@CrudView(extendsClass = DashboardBasePage.class, model = PermissionModel.class,        
         controller = PermissionService.class, editable = true,
         report = true,
         reportOrientation = "LANDSCAPE",

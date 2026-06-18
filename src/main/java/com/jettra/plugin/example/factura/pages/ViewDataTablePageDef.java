@@ -1,4 +1,4 @@
-package com.jettra.plugin.example.masterdetails.pages.datatable;
+package com.jettra.plugin.example.factura.pages;
 
 import com.jettra.main.dashboard.DashboardBasePage;
 import io.jettra.wui.complex.Center;
