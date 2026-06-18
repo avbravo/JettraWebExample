@@ -25,7 +25,6 @@ import com.jettra.plugin.example.pages.ButtonPage;
 import com.jettra.plugin.example.pages.MenuBarPage;
 import com.jettra.plugin.example.pages.OrganigramPage;
 import com.jettra.plugin.example.pages.SessionTimeoutDialogPage;
-import com.jettra.main.swagger.SwaggerUIPage;
 import com.jettra.plugin.example.pages.ChartsPiePage;
 import com.jettra.plugin.example.pages.ViewMediaPage;
 import com.jettra.plugin.example.pages.ImagePage;
@@ -87,6 +86,7 @@ import com.jettra.plugin.example.datatable.pages.DataTablePage;
 import com.jettra.plugin.example.crud.pages.PaisPage;
 import com.jettra.plugin.example.crud.pages.DeportePage;
 import com.jettra.plugin.example.crud.pages.PersonaPage;
+import com.jettra.plugin.example.library.pages.*;
 import com.jettra.plugin.example.cruview.pages.CancionPage;
 import com.jettra.plugin.example.cruview.pages.SubGrupoPage;
 import com.jettra.plugin.example.cruview.pages.GrupoPage;
@@ -97,25 +97,15 @@ import com.jettra.plugin.example.rules.pages.ReglasPage;
 import com.jettra.server.JettraServer;
 import com.jettra.server.config.JettraConfigProperty;
 import com.jettra.server.config.ConfigInjector;
-
+import com.jettra.plugin.example.factura.pages.*;
 import com.jettra.server.openapi.OpenApiHandler;
-import com.jettra.server.openapi.SwaggerUIHandler;
 import com.jettra.plugin.example.library.controller.AuthController;
 import com.jettra.plugin.example.library.controller.AuthorController;
 import com.jettra.plugin.example.library.controller.BookController;
 import com.jettra.plugin.example.library.controller.PublisherController;
 import com.jettra.plugin.example.library.controller.ReaderController;
-import com.jettra.plugin.example.library.pages.BookPage;
-import com.jettra.plugin.example.library.pages.PublisherPage;
-import com.jettra.plugin.example.library.pages.ReaderPage;
-
 import com.jettra.plugin.example.admin.pages.*;
-import com.jettra.plugin.example.factura.pages.ViewDataTablePage;
-
-import com.jettra.plugin.example.library.pages.AuthorPage;
-
 import java.util.List;
-
 
 public class Main {
 
@@ -154,7 +144,10 @@ public class Main {
         // Formularios.
         // Register pages as classes to ensure a fresh, isolated instance per request
         server.addHandler("/error", io.jettra.wui.complex.ErrorPage.class);
+        server.addHandler("/swagger-ui", io.jettra.wui.complex.SwaggerUIPage.class);
         server.addHandler("/", LoginPage.class);
+
+        //Pages
         server.addHandler("/alert", AlertPage.class);
         server.addHandler("/author", AuthorPage.class);
         server.addHandler("/avatar", AvatarPage.class);
@@ -195,12 +188,11 @@ public class Main {
         server.addHandler("/paragraph", ParagraphPage.class);
         server.addHandler("/radiobutton", RadioButtonPage.class);
         server.addHandler("/reader", ReaderPage.class);
-        
+
         server.addHandler("/selectone", SelectOnePage.class);
-        server.addHandler("/selectmany", SelectManyPage.class);       
+        server.addHandler("/selectmany", SelectManyPage.class);
         server.addHandler("/schedule", SchedulePage.class);
-        server.addHandler("/swagger-ui", SwaggerUIPage.class);
-        
+
         server.addHandler("/textbox", TextBoxPage.class);
         server.addHandler("/time", TimePage.class);
         server.addHandler("/timeline", TimelinePage.class);
@@ -273,24 +265,23 @@ public class Main {
 
         // Define la lista de controladores REST que deseas documentar
         List<Class<?>> controllers = List.of(
-            AuthController.class,
-            AuthorController.class,
-            BookController.class,
-            PublisherController.class,
-            ReaderController.class,
-            com.jettra.plugin.autentification.controller.CredentialController.class,
-            com.jettra.plugin.autentification.controller.PermissionController.class,
-            com.jettra.plugin.autentification.controller.RoleController.class,
-            com.jettra.plugin.autentification.controller.DepartmentController.class,
-            com.jettra.plugin.autentification.controller.UserController.class
+                AuthController.class,
+                AuthorController.class,
+                BookController.class,
+                PublisherController.class,
+                ReaderController.class,
+                com.jettra.plugin.autentification.controller.CredentialController.class,
+                com.jettra.plugin.autentification.controller.PermissionController.class,
+                com.jettra.plugin.autentification.controller.RoleController.class,
+                com.jettra.plugin.autentification.controller.DepartmentController.class,
+                com.jettra.plugin.autentification.controller.UserController.class
         );
-        
+
         // Exponer el JSON de OpenAPI
         server.addHandler("/openapi.json", new OpenApiHandler(controllers));
-        
-        // Exponer la interfaz Swagger UI
-        server.addHandler("/swagger-ui", new SwaggerUIHandler("/openapi.json"));
 
+        // Exponer la interfaz Swagger UI a través del componente de JettraWUI
+        // server.addHandler("/swagger-ui", new SwaggerUIHandler("/openapi.json"));
         com.jettra.rest.server.JettraRestServer.register(server, AuthController.class);
         com.jettra.rest.server.JettraRestServer.register(server, AuthorController.class);
         com.jettra.rest.server.JettraRestServer.register(server, BookController.class);

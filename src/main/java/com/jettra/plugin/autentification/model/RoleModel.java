@@ -27,7 +27,7 @@ public class RoleModel {
 
     @PropertiesInRecord
     @PropertiesLabel(value = "role.permissions", label = "Permissions")
-    @ViewSelectMany(label = "name", source = "com.jettra.plugin.services.autentification.PermissionService", method = "findAll")
+    @ViewSelectMany(label = "name", source = "com.jettra.plugin.autentification.services.PermissionService", method = "findAll")
     @TableColumnField(field = "name")
     private Set<Permission> permissions;
 
