@@ -2,7 +2,7 @@ package com.jettra.example.test;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.jettra.example.entity.library.Author;
+import com.jettra.plugin.example.library.entity.Author;
 import java.lang.reflect.Type;
 import java.util.List;
 
