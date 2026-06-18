@@ -25,7 +25,7 @@ import com.jettra.plugin.example.pages.ButtonPage;
 import com.jettra.plugin.example.pages.MenuBarPage;
 import com.jettra.plugin.example.pages.OrganigramPage;
 import com.jettra.plugin.example.pages.SessionTimeoutDialogPage;
-import com.jettra.plugin.example.pages.SwaggerUIPage;
+import com.jettra.main.swagger.SwaggerUIPage;
 import com.jettra.plugin.example.pages.ChartsPiePage;
 import com.jettra.plugin.example.pages.ViewMediaPage;
 import com.jettra.plugin.example.pages.ImagePage;
@@ -108,8 +108,9 @@ import com.jettra.plugin.example.library.controller.ReaderController;
 import com.jettra.plugin.example.library.pages.BookPage;
 import com.jettra.plugin.example.library.pages.PublisherPage;
 import com.jettra.plugin.example.library.pages.ReaderPage;
-import com.jettra.plugin.example.masterdetails.pages.datatable.ViewDataTablePage;
+
 import com.jettra.plugin.example.admin.pages.*;
+import com.jettra.plugin.example.factura.pages.ViewDataTablePage;
 
 import com.jettra.plugin.example.library.pages.AuthorPage;
 

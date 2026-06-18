@@ -1,4 +1,4 @@
-package com.jettra.plugin.example.pages;
+package com.jettra.main.swagger;
 
 import com.jettra.main.dashboard.DashboardBasePage;
 import io.jettra.wui.complex.Center;
