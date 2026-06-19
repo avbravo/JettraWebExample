@@ -1,7 +1,7 @@
-package com.jettra.plugin.example.library.controller;
+package com.jettra.main;
 
-import com.jettra.plugin.example.library.model.LoginRequest;
-import com.jettra.plugin.example.library.model.LoginResponse;
+import com.jettra.main.jwt.LoginRequest;
+import com.jettra.main.jwt.LoginResponse;
 import com.jettra.jwt.JettraJWT;
 import com.jettra.rest.annotations.Consumes;
 import com.jettra.rest.annotations.POST;

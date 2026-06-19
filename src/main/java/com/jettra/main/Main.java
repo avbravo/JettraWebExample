@@ -100,7 +100,6 @@ import com.jettra.server.config.JettraConfigProperty;
 import com.jettra.server.config.ConfigInjector;
 import com.jettra.plugin.example.factura.pages.*;
 import com.jettra.server.openapi.OpenApiHandler;
-import com.jettra.plugin.example.library.controller.AuthController;
 import com.jettra.plugin.example.library.controller.AuthorController;
 import com.jettra.plugin.example.library.controller.BookController;
 import com.jettra.plugin.example.library.controller.PublisherController;

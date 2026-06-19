@@ -1,4 +1,4 @@
-package com.jettra.plugin.example.library.model;
+package com.jettra.main.jwt;
 
 import com.jettra.server.openapi.annotations.Schema;
 
