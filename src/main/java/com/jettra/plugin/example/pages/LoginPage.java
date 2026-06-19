@@ -10,9 +10,9 @@ import io.jettra.wui.components.LoginUI;
 /**
  * Showcase page for the LoginUI component.
  */
-public class LoginUIPage extends DashboardBasePage {
+public class LoginPage extends DashboardBasePage {
 
-    public LoginUIPage() {
+    public LoginPage() {
         super("LoginUI Showcase");
     }
 
@@ -75,9 +75,9 @@ public class LoginUIPage extends DashboardBasePage {
         Div modalActions = new Div();
         modalActions.setStyle("display", "flex").setStyle("justify-content", "flex-end").setStyle("gap", "10px");
         
-        io.jettra.wui.components.Button copyBtn = new io.jettra.wui.components.Button("Copiar código");
+        io.jettra.wui.components.Button copyBtn = new io.jettra.wui.components.Button("Copy code");
         copyBtn.addClass("j-btn");
-        copyBtn.setProperty("onclick", "navigator.clipboard.writeText(document.getElementById('loginui-java-code').innerText).then(() => { this.innerText='Copied!'; setTimeout(() => this.innerText='Copiar código', 2000); })");
+        copyBtn.setProperty("onclick", "navigator.clipboard.writeText(document.getElementById('loginui-java-code').innerText).then(() => { this.innerText='Copied!'; setTimeout(() => this.innerText='Copy code', 2000); })");
         
         io.jettra.wui.components.Button closeBtn = new io.jettra.wui.components.Button("Close");
         closeBtn.addClass("j-btn");
