@@ -5,7 +5,7 @@ import com.jettra.plugin.example.crud.model.PaisModel;
 import com.jettra.plugin.example.repository.PaisRepository;
 import io.jettra.wui.complex.*;
 import io.jettra.wui.components.*;
-import io.jettra.wui.core.annotations.InjectProperties;
+import com.jettra.core.inject.annotation.InjectProperties;
 import io.jettra.wui.sync.*;
 import com.jettra.server.JettraServer;
 import java.util.*;
@@ -15,7 +15,7 @@ public class PaisPage extends DashboardBasePage {
     @InjectProperties(name = "messages")
     private Properties msg;
     
-    @io.jettra.wui.core.annotations.Inject
+    @com.jettra.core.inject.annotation.Inject
     private PaisRepository paisRepository;
 
     private int pageNumber = 1;

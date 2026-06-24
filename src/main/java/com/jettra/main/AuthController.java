@@ -1,8 +1,8 @@
 package com.jettra.main;
 
-import com.jettra.main.jwt.LoginRequest;
-import com.jettra.main.jwt.LoginResponse;
 import com.jettra.jwt.JettraJWT;
+import com.jettra.jwt.request.LoginRequest;
+import com.jettra.jwt.request.LoginResponse;
 import com.jettra.rest.annotations.Consumes;
 import com.jettra.rest.annotations.POST;
 import com.jettra.rest.annotations.Path;

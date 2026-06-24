@@ -2,7 +2,7 @@ package com.jettra.plugin.example.datatable.pages;
 
 import com.jettra.main.dashboard.DashboardBasePage;
 import io.jettra.wui.core.annotations.CrudView;
-import io.jettra.wui.core.annotations.InjectProperties;
+import com.jettra.core.inject.annotation.InjectProperties;
 import io.jettra.wui.sync.JettraPageSincronized;
 import io.jettra.wui.sync.SyncType;
 import java.util.Properties;
