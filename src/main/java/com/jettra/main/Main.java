@@ -121,8 +121,12 @@ public class Main {
         System.out.println("Iniciando aplicación Web: " + appTitle);
     }
 
-//    public static void main(String[] args) {
-    void main() {
+    public static void main(String[] args) {
+        if (args != null && args.length > 0 && args[0].equals("-console")) {
+            com.jettra.server.autentification.SecurityCLI.main(args);
+            return;
+        }
+
         Main app = new Main();
         app.initUI();
 
