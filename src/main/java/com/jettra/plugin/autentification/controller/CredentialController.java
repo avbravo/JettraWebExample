@@ -1,9 +1,16 @@
 package com.jettra.plugin.autentification.controller;
 
+
 import com.jettra.plugin.autentification.entity.Credential;
 import com.jettra.plugin.autentification.repository.CredentialRepository;
-import com.jettra.rest.annotations.*;
-import com.jettra.rest.core.Response;
+import io.jettra.rest.annotations.Consumes;
+import io.jettra.rest.annotations.DELETE;
+import io.jettra.rest.annotations.GET;
+import io.jettra.rest.annotations.POST;
+import io.jettra.rest.annotations.Path;
+import io.jettra.rest.annotations.PathParam;
+import io.jettra.rest.annotations.Produces;
+import io.jettra.rest2.core.Response;
 import java.util.List;
 
 @Path("/autentification/credentials")

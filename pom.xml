@@ -12,40 +12,53 @@
         <maven.compiler.source>25</maven.compiler.source>
         <maven.compiler.target>25</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jettra.annotation.version>1.0-SNAPSHOT</jettra.annotation.version>
+        <jettra.jwt.version>1.0-SNAPSHOT</jettra.jwt.version>
+        <jettra.gprc.version>1.0-SNAPSHOT</jettra.gprc.version>
+        <jettra.rules.version>1.0-SNAPSHOT</jettra.rules.version>
+        <jettra.appserver.version>1.0-SNAPSHOT</jettra.appserver.version>
+        <jettra.wui.version>1.0-SNAPSHOT</jettra.wui.version>
+        <jettra.report.version>1.0-SNAPSHOT</jettra.report.version>
+        <jettra.rest.version>1.0-SNAPSHOT</jettra.rest.version>
     </properties>
 
     <dependencies>
         <!-- Servidor backend subyacente -->
         <dependency>
             <groupId>com.jettra</groupId>
-            <artifactId>JettraServer</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <artifactId>JettraAppServer</artifactId>
+            <version>${jettra.appserver.version}</version>
         </dependency>
         
         <dependency>
             <groupId>io.jettra.wui</groupId>
             <artifactId>JettraWUI</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>${jettra.wui.version}</version>
         </dependency>
         <dependency>
             <groupId>com.jettra</groupId>
             <artifactId>JettraReport</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${jettra.report.version}</version>
         </dependency>
         <dependency>
             <groupId>io.jettra</groupId>
             <artifactId>JettraRules</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${jettra.rules.version}</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>io.jettra</groupId>
             <artifactId>JettraJWT</artifactId>
-            <version>${project.version}</version>
+            <version>${jettra.jwt.version}</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>io.jettra</groupId>
             <artifactId>JettraRest</artifactId>
-            <version>${project.version}</version>
+            <version>${jettra.rest.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jettra</groupId>
+            <artifactId>JettraAnnotation</artifactId>
+            <version>${jettra.annotation.version}</version>
         </dependency>
     </dependencies>
 

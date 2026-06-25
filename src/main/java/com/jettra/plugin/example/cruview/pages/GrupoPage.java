@@ -5,11 +5,11 @@ import com.jettra.plugin.example.crudview.model.GrupoModel;
 import com.jettra.plugin.example.crud.repository.GrupoRepository;
 import io.jettra.wui.complex.Center;
 import io.jettra.wui.complex.CrudView;
-import com.jettra.core.inject.annotation.InjectProperties;
 import io.jettra.wui.sync.JettraPageSincronized;
 import io.jettra.wui.sync.JettraSyncManager;
 import io.jettra.wui.sync.SyncType;
 import com.jettra.server.JettraServer;
+import io.jettra.core.inject.annotation.InjectProperties;
 import java.util.Map;
 import java.util.Properties;
 

@@ -2,9 +2,9 @@ package com.jettra.plugin.example.library.services;
 
 import com.jettra.plugin.example.library.entity.Author;
 import com.jettra.plugin.example.library.restclient.IAuthorRestClient;
-import com.jettra.jwt.JettraJWT;
 import com.jettra.plugin.example.library.model.AuthorRecordModelConverter;
 import com.jettra.plugin.example.library.restclient.AuthorRestClient;
+import io.jettra.jwt.JettraJWT;
 import io.jettra.wui.components.Console;
 import java.util.HashMap;
 import java.util.List;

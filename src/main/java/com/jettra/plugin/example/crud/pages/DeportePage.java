@@ -5,9 +5,9 @@ import com.jettra.plugin.example.crud.model.DeporteModel;
 import com.jettra.plugin.example.repository.DeporteRepository;
 import io.jettra.wui.complex.*;
 import io.jettra.wui.components.*;
-import com.jettra.core.inject.annotation.InjectProperties;
 import io.jettra.wui.sync.*;
 import com.jettra.server.JettraServer;
+import io.jettra.core.inject.annotation.InjectProperties;
 import java.util.*;
 
 @JettraPageSincronized(SyncType.ALL)

@@ -5,12 +5,12 @@
 package com.jettra.plugin.example.library.restclient;
 
 import com.jettra.plugin.example.library.entity.Publisher;
-import com.jettra.rest.annotations.DELETE;
-import com.jettra.rest.annotations.GET;
-import com.jettra.rest.annotations.POST;
-import com.jettra.rest.annotations.Path;
-import com.jettra.rest.annotations.PathParam;
-import com.jettra.rest.client.RestClient;
+import io.jettra.rest.annotations.DELETE;
+import io.jettra.rest.annotations.GET;
+import io.jettra.rest.annotations.POST;
+import io.jettra.rest.annotations.Path;
+import io.jettra.rest.annotations.PathParam;
+import io.jettra.rest.client.RestClient;
 import java.util.List;
 
 /**

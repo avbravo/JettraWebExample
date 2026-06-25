@@ -6,8 +6,8 @@ import io.jettra.wui.core.annotations.Hidden;
 import io.jettra.wui.core.annotations.JettraViewModel;
 import io.jettra.wui.core.annotations.PropertiesLabel;
 import io.jettra.wui.core.annotations.ViewSelectOne;
-import io.jettra.wui.validations.NotNull;
 import io.jettra.rules.annotations.Rules;
+import io.jettra.rules.validations.NotNull;
 
 @JettraViewModel
 public class LineaFacturaModel { 

@@ -2,13 +2,13 @@ package com.jettra.plugin.autentification.model;
 
 import com.jettra.plugin.autentification.entity.Role;
 import com.jettra.plugin.autentification.entity.Permission;
+import io.jettra.rules.validations.NotNull;
 import io.jettra.wui.core.annotations.JettraViewModel;
 import io.jettra.wui.core.annotations.ModelToRecordConversor;
 import io.jettra.wui.core.annotations.PropertiesInRecord;
 import io.jettra.wui.core.annotations.PropertiesLabel;
 import io.jettra.wui.core.annotations.ViewSelectMany;
 import io.jettra.wui.core.annotations.TableColumnField;
-import io.jettra.wui.validations.NotNull;
 import java.util.UUID;
 import java.util.Set;
 

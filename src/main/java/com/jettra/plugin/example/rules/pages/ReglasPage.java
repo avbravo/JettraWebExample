@@ -5,11 +5,12 @@ import com.jettra.plugin.example.rules.model.ReglasModel;
 import com.jettra.plugin.example.crud.repository.ReglasRepository;
 import io.jettra.wui.complex.*;
 import io.jettra.wui.components.*;
-import com.jettra.core.inject.annotation.InjectProperties;
+
 import io.jettra.wui.sync.*;
 import com.jettra.server.JettraServer;
 import com.jettra.report.Report;
 import com.jettra.report.ReportViewer;
+import io.jettra.core.inject.annotation.InjectProperties;
 import java.util.*;
 
 @JettraPageSincronized(SyncType.ALL)

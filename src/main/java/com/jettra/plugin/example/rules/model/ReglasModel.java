@@ -3,9 +3,9 @@ package com.jettra.plugin.example.rules.model;
 import io.jettra.rules.annotations.Compute;
 import io.jettra.rules.annotations.Rules;
 import io.jettra.rules.enums.OperationType;
+import io.jettra.rules.validations.NotNull;
 import io.jettra.wui.core.annotations.JettraViewModel;
 import io.jettra.wui.core.annotations.PropertiesLabel;
-import io.jettra.wui.validations.NotNull;
 
 @JettraViewModel
 public class ReglasModel {

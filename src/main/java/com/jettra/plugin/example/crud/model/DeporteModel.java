@@ -4,10 +4,10 @@
  */
 package com.jettra.plugin.example.crud.model;
 
+import io.jettra.rules.validations.NotNull;
+import io.jettra.rules.validations.Size;
 import io.jettra.wui.core.annotations.JettraViewModel;
 import io.jettra.wui.core.annotations.PropertiesLabel;
-import io.jettra.wui.validations.NotNull;
-import io.jettra.wui.validations.Size;
 
 /**
  *

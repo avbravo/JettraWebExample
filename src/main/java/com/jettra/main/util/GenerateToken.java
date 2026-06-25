@@ -2,7 +2,7 @@ package com.jettra.main.util;
 
 import java.util.HashMap;
 import java.util.Scanner;
-import com.jettra.jwt.JettraJWT;
+import io.jettra.jwt.JettraJWT;
 
 public class GenerateToken {
     public static void main(String[] args) {

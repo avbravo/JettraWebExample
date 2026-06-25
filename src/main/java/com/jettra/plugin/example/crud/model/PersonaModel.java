@@ -1,7 +1,7 @@
 package com.jettra.plugin.example.crud.model;
 
-import io.jettra.wui.validations.NotNull;
-import io.jettra.wui.validations.Size;
+import io.jettra.rules.validations.NotNull;
+import io.jettra.rules.validations.Size;
 
 public class PersonaModel {
     @io.jettra.wui.core.annotations.PropertiesLabel(value = "lbl.id", label = "ID")

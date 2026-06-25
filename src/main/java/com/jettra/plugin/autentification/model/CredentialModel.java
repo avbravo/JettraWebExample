@@ -5,10 +5,10 @@ import io.jettra.wui.core.annotations.JettraViewModel;
 import io.jettra.wui.core.annotations.ModelToRecordConversor;
 import io.jettra.wui.core.annotations.PropertiesInRecord;
 import io.jettra.wui.core.annotations.PropertiesLabel;
-import io.jettra.wui.validations.NotNull;
 import java.util.UUID;
 import java.time.Instant;
 import com.jettra.plugin.autentification.entity.User;
+import io.jettra.rules.validations.NotNull;
 import io.jettra.wui.core.annotations.ViewSelectOne;
 
 @JettraViewModel

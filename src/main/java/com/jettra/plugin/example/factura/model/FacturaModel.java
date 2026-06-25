@@ -5,10 +5,10 @@ import com.jettra.report.annotations.ModelReportLabel;
 import com.jettra.report.annotations.ModelReportDisabledHeader;
 import com.jettra.report.annotations.ModelReportHeader;
 import com.jettra.report.annotations.ModelReportFooter;
+import io.jettra.rules.validations.NotNull;
 import io.jettra.wui.core.annotations.PropertiesLabel;
 import io.jettra.wui.core.annotations.ViewDataTable;
 import io.jettra.wui.core.annotations.ViewSelectOne;
-import io.jettra.wui.validations.NotNull;
 import java.time.LocalDate;
 import java.util.List;
 

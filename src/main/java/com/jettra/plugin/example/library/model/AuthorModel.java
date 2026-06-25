@@ -1,12 +1,12 @@
 package com.jettra.plugin.example.library.model;
 
 import com.jettra.plugin.example.library.entity.Author;
+import io.jettra.rules.validations.NotNull;
+import io.jettra.rules.validations.Size;
 import io.jettra.wui.core.annotations.ModelToRecordConversor;
 import io.jettra.wui.core.annotations.PropertiesInRecord;
 import io.jettra.wui.core.annotations.JettraViewModel;
 import io.jettra.wui.core.annotations.PropertiesLabel;
-import io.jettra.wui.validations.NotNull;
-import io.jettra.wui.validations.Size;
 
 @JettraViewModel
 @ModelToRecordConversor(goal = Author.class)

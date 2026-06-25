@@ -1,14 +1,20 @@
 package com.jettra.plugin.example.library.controller;
 
 import com.jettra.plugin.example.library.entity.Author;
-import com.jettra.plugin.example.repository.PaisRepository;
 import com.jettra.plugin.example.library.repository.AuthorRepository;
-import com.jettra.rest.annotations.*;
-import com.jettra.rest.core.Response;
 
 import java.util.List;
 
 import com.jettra.server.openapi.annotations.OpenApi;
+import io.jettra.rest.annotations.Consumes;
+import io.jettra.rest.annotations.DELETE;
+import io.jettra.rest.annotations.GET;
+import io.jettra.rest.annotations.POST;
+import io.jettra.rest.annotations.Path;
+import io.jettra.rest.annotations.PathParam;
+import io.jettra.rest.annotations.Produces;
+import io.jettra.rest.annotations.Secured;
+import io.jettra.rest2.core.Response;
 
 @Secured
 @OpenApi(title = "Library API", version = "v1.0", description = "API for Library management")

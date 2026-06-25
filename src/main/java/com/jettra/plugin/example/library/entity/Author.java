@@ -1,8 +1,7 @@
 package com.jettra.plugin.example.library.entity;
 
-import io.jettra.wui.core.annotations.PropertiesLabel;
-import io.jettra.wui.validations.NotNull;
-import io.jettra.wui.validations.Size;
+import io.jettra.rules.validations.NotNull;
+import io.jettra.rules.validations.Size;
 
 public record Author(@NotNull
         @Size(min = 2, max = 5)
