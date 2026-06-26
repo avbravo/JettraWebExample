@@ -1,13 +1,12 @@
 package com.jettra.plugin.example.factura.pages;
 
 import com.jettra.main.dashboard.DashboardBasePage;
-import io.jettra.wui.complex.Center;
 import io.jettra.wui.components.Button;
 import io.jettra.wui.components.Div;
 import io.jettra.wui.components.Header;
 import io.jettra.wui.core.UIComponent;
 import io.jettra.wui.core.annotations.CrudView;
-import com.jettra.report.annotations.ModelReportDisabledHeader;
+import io.jettra.report.annotations.ModelReportDisabledHeader;
 
 /**
  * Example page showing the usage of @ViewDataTable annotation.

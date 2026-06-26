@@ -1,18 +1,18 @@
 package com.jettra.main;
 
-import com.jettra.jwt.request.LoginRequest;
-import com.jettra.jwt.request.LoginResponse;
-import com.jettra.server.openapi.annotations.OpenApi;
-import com.jettra.server.openapi.annotations.Operation;
-import com.jettra.server.openapi.annotations.RequestBody;
-import com.jettra.server.openapi.annotations.ApiResponse;
+import io.jettra.jwt.request.LoginRequest;
+import io.jettra.jwt.request.LoginResponse;
+import io.jettra.server.openapi.annotations.OpenApi;
+import io.jettra.server.openapi.annotations.Operation;
+import io.jettra.server.openapi.annotations.RequestBody;
+import io.jettra.server.openapi.annotations.ApiResponse;
 import io.jettra.jwt.JettraJWT;
 import io.jettra.rest.annotations.Consumes;
 import io.jettra.rest.annotations.POST;
 import io.jettra.rest.annotations.Path;
 import io.jettra.rest.annotations.PermitAll;
 import io.jettra.rest.annotations.Produces;
-import io.jettra.rest2.core.Response;
+import io.jettra.rest.core.Response;
 
 import java.util.HashMap;
 

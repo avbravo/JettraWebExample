@@ -1773,7 +1773,7 @@ public class WebDesignerPage extends DashboardBasePage {
                     "io.jettra.wui.sync.JettraPageSincronized",
                     "io.jettra.wui.sync.SyncType",
                     "io.jettra.wui.core.annotations.InjectProperties",
-                    "com.jettra.server.JettraServer",
+                    "io.jettra.server.JettraServer",
                     "java.io.IOException",
                     "java.util.List",
                     "java.util.Map",

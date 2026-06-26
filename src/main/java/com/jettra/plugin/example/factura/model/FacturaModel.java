@@ -1,10 +1,10 @@
 package com.jettra.plugin.example.factura.model;
 
 import io.jettra.wui.core.annotations.JettraViewModel;
-import com.jettra.report.annotations.ModelReportLabel;
-import com.jettra.report.annotations.ModelReportDisabledHeader;
-import com.jettra.report.annotations.ModelReportHeader;
-import com.jettra.report.annotations.ModelReportFooter;
+import io.jettra.report.annotations.ModelReportDisabledHeader;
+import io.jettra.report.annotations.ModelReportFooter;
+import io.jettra.report.annotations.ModelReportHeader;
+import io.jettra.report.annotations.ModelReportLabel;
 import io.jettra.rules.validations.NotNull;
 import io.jettra.wui.core.annotations.PropertiesLabel;
 import io.jettra.wui.core.annotations.ViewDataTable;

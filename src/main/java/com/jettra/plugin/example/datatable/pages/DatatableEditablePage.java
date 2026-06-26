@@ -3,7 +3,7 @@ package com.jettra.plugin.example.datatable.pages;
 import com.jettra.main.dashboard.DashboardBasePage;
 import com.jettra.plugin.example.model.ArticuloModel;
 import com.jettra.plugin.example.repository.ArticuloRepository;
-import com.jettra.server.JettraServer;
+import io.jettra.server.JettraServer;
 import io.jettra.wui.complex.Center;
 import io.jettra.wui.components.*;
 import io.jettra.wui.complex.Datatable;
@@ -307,15 +307,15 @@ public class DatatableEditablePage extends DashboardBasePage {
         container.add(crudDialog);
 
         // --- Native JettraReport Viewer Modal ---
-        com.jettra.report.Report report = new com.jettra.report.Report("Reporte Manual de Artículos");
+        io.jettra.report.Report report = new io.jettra.report.Report("Reporte Manual de Artículos");
         report.setData(dataList);
         
-        com.jettra.report.Report.Table repTable = new com.jettra.report.Report.Table();
-        repTable.addColumn(new com.jettra.report.Report.Column("Artículo", "nombre", 150));
-        repTable.addColumn(new com.jettra.report.Report.Column("Categoría", "categoria", 120));
-        repTable.addColumn(new com.jettra.report.Report.Column("Precio ($)", "precio", 100));
-        repTable.addColumn(new com.jettra.report.Report.Column("Cantidad", "cantidad", 80));
-        repTable.addColumn(new com.jettra.report.Report.Column("Total ($)", "total", 100));
+        io.jettra.report.Report.Table repTable = new io.jettra.report.Report.Table();
+        repTable.addColumn(new io.jettra.report.Report.Column("Artículo", "nombre", 150));
+        repTable.addColumn(new io.jettra.report.Report.Column("Categoría", "categoria", 120));
+        repTable.addColumn(new io.jettra.report.Report.Column("Precio ($)", "precio", 100));
+        repTable.addColumn(new io.jettra.report.Report.Column("Cantidad", "cantidad", 80));
+        repTable.addColumn(new io.jettra.report.Report.Column("Total ($)", "total", 100));
         
         report.getDetail().addElement(repTable);
         
@@ -325,7 +325,7 @@ public class DatatableEditablePage extends DashboardBasePage {
         report.getViewerOptions().setAllowExcel(true);
         report.getViewerOptions().setAllowCsv(true);
         
-        com.jettra.report.ReportViewer reportViewer = report.createViewer("datatable");
+        io.jettra.report.ReportViewer reportViewer = report.createViewer("datatable");
         container.add(reportViewer);
 
         // Javascript for dynamic interactions

@@ -7,10 +7,10 @@ import io.jettra.wui.complex.*;
 import io.jettra.wui.components.*;
 
 import io.jettra.wui.sync.*;
-import com.jettra.server.JettraServer;
-import com.jettra.report.Report;
-import com.jettra.report.ReportViewer;
+import io.jettra.server.JettraServer;
 import io.jettra.core.inject.annotation.InjectProperties;
+import io.jettra.report.Report;
+import io.jettra.report.ReportViewer;
 import java.util.*;
 
 @JettraPageSincronized(SyncType.ALL)

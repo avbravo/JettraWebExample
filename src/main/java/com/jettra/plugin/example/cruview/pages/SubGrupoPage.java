@@ -12,7 +12,7 @@ import io.jettra.wui.complex.CrudView;
 import io.jettra.wui.sync.JettraPageSincronized;
 import io.jettra.wui.sync.JettraSyncManager;
 import io.jettra.wui.sync.SyncType;
-import com.jettra.server.JettraServer;
+import io.jettra.server.JettraServer;
 import io.jettra.core.inject.annotation.InjectProperties;
 import java.util.ArrayList;
 import java.util.List;

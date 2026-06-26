@@ -3,7 +3,7 @@ package com.jettra.main.login;
 import java.io.IOException;
 import java.util.Map;
 
-import com.jettra.server.JettraServer;
+import io.jettra.server.JettraServer;
 import io.jettra.wui.components.Login;
 import io.jettra.wui.components.Notification;
 import io.jettra.wui.core.Page;
@@ -51,7 +51,7 @@ public class LoginPage extends Page {
             // In a real Jettra app, we might use JettraContext for session management, 
             // but for this example we'll stick to the cookie approach as requested.
             setSessionCookie(user, cPath);
-            com.jettra.server.core.JettraContext.getCurrent().set(com.jettra.server.core.JettraContext.Scope.SESSION, "username", user);
+            io.jettra.server.core.JettraContext.getCurrent().set(io.jettra.server.core.JettraContext.Scope.SESSION, "username", user);
             
             try {
                 redirect(currentExchange, JettraServer.resolvePath("/dashboard"));

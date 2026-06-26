@@ -95,11 +95,11 @@ import com.jettra.plugin.example.cruview.pages.PlanetaPage;
 import com.jettra.plugin.example.cruview.pages.ReglasViewCrudPage;
 import com.jettra.plugin.example.datatable.pages.DatatableEditableCrudViewPage;
 import com.jettra.plugin.example.rules.pages.ReglasPage;
-import com.jettra.server.JettraServer;
-import com.jettra.server.config.JettraConfigProperty;
-import com.jettra.server.config.ConfigInjector;
+import io.jettra.server.JettraServer;
+import io.jettra.server.config.JettraConfigProperty;
+import io.jettra.server.config.ConfigInjector;
 import com.jettra.plugin.example.factura.pages.*;
-import com.jettra.server.openapi.OpenApiHandler;
+import io.jettra.server.openapi.OpenApiHandler;
 import com.jettra.plugin.example.library.controller.AuthorController;
 import com.jettra.plugin.example.library.controller.BookController;
 import com.jettra.plugin.example.library.controller.PublisherController;
@@ -123,7 +123,7 @@ public class Main {
 
     public static void main(String[] args) {
         if (args != null && args.length > 0 && args[0].equals("-console")) {
-            com.jettra.server.autentification.SecurityCLI.main(args);
+            io.jettra.server.autentification.SecurityCLI.main(args);
             return;
         }
 

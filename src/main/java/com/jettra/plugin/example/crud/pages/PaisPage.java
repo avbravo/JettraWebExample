@@ -6,7 +6,7 @@ import com.jettra.plugin.example.repository.PaisRepository;
 import io.jettra.wui.complex.*;
 import io.jettra.wui.components.*;
 import io.jettra.wui.sync.*;
-import com.jettra.server.JettraServer;
+import io.jettra.server.JettraServer;
 import io.jettra.core.inject.annotation.Inject;
 import io.jettra.core.inject.annotation.InjectProperties;
 import java.util.*;
@@ -49,13 +49,13 @@ public class PaisPage extends DashboardBasePage {
                 .setBackgroundColor("#238636").setStyle("font-size", "12px")
                 .addClickListener(() -> openModal("save", new PaisModel("", "")));
 
-        com.jettra.report.Report reportConfig = new com.jettra.report.Report("Reporte de Países");
+        io.jettra.report.Report reportConfig = new io.jettra.report.Report("Reporte de Países");
         reportConfig.setData(paisRepository.findAll());
-        reportConfig.getHeader().addElement(new com.jettra.report.Report.TextElement("LISTADO DE PAÍSES"));
+        reportConfig.getHeader().addElement(new io.jettra.report.Report.TextElement("LISTADO DE PAÍSES"));
         
-        com.jettra.report.Report.Table rtable = new com.jettra.report.Report.Table();
-        rtable.addColumn(new com.jettra.report.Report.Column("CÓDIGO", "code", 100));
-        rtable.addColumn(new com.jettra.report.Report.Column("NOMBRE", "name", 300));
+        io.jettra.report.Report.Table rtable = new io.jettra.report.Report.Table();
+        rtable.addColumn(new io.jettra.report.Report.Column("CÓDIGO", "code", 100));
+        rtable.addColumn(new io.jettra.report.Report.Column("NOMBRE", "name", 300));
         reportConfig.getDetail().addElement(rtable);
 
         reportConfig.getViewerOptions()
@@ -103,16 +103,16 @@ public class PaisPage extends DashboardBasePage {
     private void imprimirReporte(String format) {
         try {
             List<PaisModel> data = paisRepository.findAll();
-            com.jettra.report.Report report = new com.jettra.report.Report("Reporte de Países");
+            io.jettra.report.Report report = new io.jettra.report.Report("Reporte de Países");
             report.setData(data);
 
             // Header
-            report.getHeader().addElement(new com.jettra.report.Report.TextElement("LISTADO DE PAÍSES"));
+            report.getHeader().addElement(new io.jettra.report.Report.TextElement("LISTADO DE PAÍSES"));
 
             // Table
-            com.jettra.report.Report.Table table = new com.jettra.report.Report.Table();
-            table.addColumn(new com.jettra.report.Report.Column("CÓDIGO", "code", 100));
-            table.addColumn(new com.jettra.report.Report.Column("NOMBRE", "name", 300));
+            io.jettra.report.Report.Table table = new io.jettra.report.Report.Table();
+            table.addColumn(new io.jettra.report.Report.Column("CÓDIGO", "code", 100));
+            table.addColumn(new io.jettra.report.Report.Column("NOMBRE", "name", 300));
             report.getDetail().addElement(table);
 
             // Export and Send

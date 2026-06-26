@@ -60,7 +60,7 @@ public class KanbanPage extends DashboardBasePage {
         if (changed) {
             JettraSyncManager.notifyChange("KanbanCard", syncType, loggedUser);
             try {
-                redirect(currentExchange, com.jettra.server.JettraServer.resolvePath("/kanban"));
+                redirect(currentExchange, io.jettra.server.JettraServer.resolvePath("/kanban"));
                 return;
             } catch (IOException e) {
                 e.printStackTrace();
@@ -272,7 +272,7 @@ public class KanbanPage extends DashboardBasePage {
         mh.setStyle("margin-top", "0").setStyle("color", "var(--jettra-accent)");
         modal.add(mh);
 
-        Form form = new Form("kanban-form", com.jettra.server.JettraServer.resolvePath("/kanban"));
+        Form form = new Form("kanban-form", io.jettra.server.JettraServer.resolvePath("/kanban"));
         form.add(new TextBox("hidden", "action").setProperty("id", "form-action"));
         form.add(new TextBox("hidden", "cardId").setProperty("id", "form-card-id"));
         form.add(new TextBox("hidden", "column").setProperty("id", "form-column"));
@@ -297,14 +297,14 @@ public class KanbanPage extends DashboardBasePage {
         center.add(modal);
 
         // Hidden move form
-        Form moveForm = new Form("move-form", com.jettra.server.JettraServer.resolvePath("/kanban"));
+        Form moveForm = new Form("move-form", io.jettra.server.JettraServer.resolvePath("/kanban"));
         moveForm.add(new TextBox("hidden", "action").setProperty("value", "move"));
         moveForm.add(new TextBox("hidden", "cardId").setProperty("id", "move-card-id"));
         moveForm.add(new TextBox("hidden", "targetCol").setProperty("id", "move-target-col"));
         center.add(moveForm);
         
         // Hidden remove form
-        Form removeForm = new Form("remove-form", com.jettra.server.JettraServer.resolvePath("/kanban"));
+        Form removeForm = new Form("remove-form", io.jettra.server.JettraServer.resolvePath("/kanban"));
         removeForm.add(new TextBox("hidden", "action").setProperty("value", "remove"));
         removeForm.add(new TextBox("hidden", "cardId").setProperty("id", "remove-card-id"));
         center.add(removeForm);

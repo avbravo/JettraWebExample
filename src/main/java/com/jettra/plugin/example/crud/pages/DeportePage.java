@@ -6,7 +6,7 @@ import com.jettra.plugin.example.repository.DeporteRepository;
 import io.jettra.wui.complex.*;
 import io.jettra.wui.components.*;
 import io.jettra.wui.sync.*;
-import com.jettra.server.JettraServer;
+import io.jettra.server.JettraServer;
 import io.jettra.core.inject.annotation.InjectProperties;
 import java.util.*;
 
@@ -45,13 +45,13 @@ public class DeportePage extends DashboardBasePage {
                 .setBackgroundColor("#238636").setStyle("font-size", "12px")
                 .addClickListener(() -> openModal("save", new DeporteModel("", "")));
 
-        com.jettra.report.Report reportConfig = new com.jettra.report.Report("Reporte de Deportes");
+        io.jettra.report.Report reportConfig = new io.jettra.report.Report("Reporte de Deportes");
         reportConfig.setData(DeporteRepository.findAll());
-        reportConfig.getHeader().addElement(new com.jettra.report.Report.TextElement("LISTADO DE DEPORTES"));
+        reportConfig.getHeader().addElement(new io.jettra.report.Report.TextElement("LISTADO DE DEPORTES"));
         
-        com.jettra.report.Report.Table rtable = new com.jettra.report.Report.Table();
-        rtable.addColumn(new com.jettra.report.Report.Column("CÓDIGO", "code", 100));
-        rtable.addColumn(new com.jettra.report.Report.Column("DEPORTE", "deporte", 300));
+        io.jettra.report.Report.Table rtable = new io.jettra.report.Report.Table();
+        rtable.addColumn(new io.jettra.report.Report.Column("CÓDIGO", "code", 100));
+        rtable.addColumn(new io.jettra.report.Report.Column("DEPORTE", "deporte", 300));
         reportConfig.getDetail().addElement(rtable);
 
         reportConfig.getViewerOptions()
@@ -99,14 +99,14 @@ public class DeportePage extends DashboardBasePage {
     private void imprimirReporte(String format) {
         try {
             List<DeporteModel> data = DeporteRepository.findAll();
-            com.jettra.report.Report report = new com.jettra.report.Report("Reporte de Deportes");
+            io.jettra.report.Report report = new io.jettra.report.Report("Reporte de Deportes");
             report.setData(data);
 
-            report.getHeader().addElement(new com.jettra.report.Report.TextElement("LISTADO DE DEPORTES"));
+            report.getHeader().addElement(new io.jettra.report.Report.TextElement("LISTADO DE DEPORTES"));
 
-            com.jettra.report.Report.Table table = new com.jettra.report.Report.Table();
-            table.addColumn(new com.jettra.report.Report.Column("CÓDIGO", "code", 100));
-            table.addColumn(new com.jettra.report.Report.Column("DEPORTE", "deporte", 300));
+            io.jettra.report.Report.Table table = new io.jettra.report.Report.Table();
+            table.addColumn(new io.jettra.report.Report.Column("CÓDIGO", "code", 100));
+            table.addColumn(new io.jettra.report.Report.Column("DEPORTE", "deporte", 300));
             report.getDetail().addElement(table);
 
             String fileName = "reporte_deportes_" + System.currentTimeMillis() + "." + format;

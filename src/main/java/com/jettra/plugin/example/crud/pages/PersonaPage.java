@@ -6,7 +6,7 @@ import com.jettra.plugin.example.repository.PersonaRepository;
 import io.jettra.wui.complex.*;
 import io.jettra.wui.components.*;
 import io.jettra.wui.sync.*;
-import com.jettra.server.JettraServer;
+import io.jettra.server.JettraServer;
 import io.jettra.core.inject.annotation.InjectProperties;
 import java.util.*;
 
@@ -44,16 +44,16 @@ public class PersonaPage extends DashboardBasePage {
                 .setBackgroundColor("#238636").setStyle("font-size", "12px")
                 .addClickListener(() -> openModal("save", new PersonaModel("", "", "")));
 
-        com.jettra.report.Report reportConfig = new com.jettra.report.Report("Reporte de Personas");
+        io.jettra.report.Report reportConfig = new io.jettra.report.Report("Reporte de Personas");
         reportConfig.setData(PersonaRepository.findAll());
-        reportConfig.getPageSettings().setOrientation(com.jettra.report.Report.PageSettings.Orientation.LANDSCAPE);
-        reportConfig.getHeader().addElement(new com.jettra.report.Report.TextElement("LISTADO DE PERSONAS"));
+        reportConfig.getPageSettings().setOrientation(io.jettra.report.Report.PageSettings.Orientation.LANDSCAPE);
+        reportConfig.getHeader().addElement(new io.jettra.report.Report.TextElement("LISTADO DE PERSONAS"));
         
-        com.jettra.report.Report.Table rtable = new com.jettra.report.Report.Table();
-        rtable.addColumn(new com.jettra.report.Report.Column("ID", "id", 80)
+        io.jettra.report.Report.Table rtable = new io.jettra.report.Report.Table();
+        rtable.addColumn(new io.jettra.report.Report.Column("ID", "id", 80)
             .setFontColor("#FF0000").setBold(true).setFontName("Arial").setFontSize(10));
-        rtable.addColumn(new com.jettra.report.Report.Column("NOMBRE", "nombre", 250));
-        rtable.addColumn(new com.jettra.report.Report.Column("DIRECCIÓN", "direccion", 350));
+        rtable.addColumn(new io.jettra.report.Report.Column("NOMBRE", "nombre", 250));
+        rtable.addColumn(new io.jettra.report.Report.Column("DIRECCIÓN", "direccion", 350));
         reportConfig.getDetail().addElement(rtable);
 
         reportConfig.getViewerOptions()
@@ -101,17 +101,17 @@ public class PersonaPage extends DashboardBasePage {
     private void imprimirReporte(String format) {
         try {
             List<PersonaModel> data = PersonaRepository.findAll();
-            com.jettra.report.Report report = new com.jettra.report.Report("Reporte de Personas");
+            io.jettra.report.Report report = new io.jettra.report.Report("Reporte de Personas");
             report.setData(data);
-            report.getPageSettings().setOrientation(com.jettra.report.Report.PageSettings.Orientation.LANDSCAPE);
+            report.getPageSettings().setOrientation(io.jettra.report.Report.PageSettings.Orientation.LANDSCAPE);
 
-            report.getHeader().addElement(new com.jettra.report.Report.TextElement("LISTADO DE PERSONAS"));
+            report.getHeader().addElement(new io.jettra.report.Report.TextElement("LISTADO DE PERSONAS"));
 
-            com.jettra.report.Report.Table table = new com.jettra.report.Report.Table();
-            table.addColumn(new com.jettra.report.Report.Column("ID", "id", 80)
+            io.jettra.report.Report.Table table = new io.jettra.report.Report.Table();
+            table.addColumn(new io.jettra.report.Report.Column("ID", "id", 80)
                 .setFontColor("#FF0000").setBold(true).setFontName("Arial").setFontSize(10));
-            table.addColumn(new com.jettra.report.Report.Column("NOMBRE", "nombre", 250));
-            table.addColumn(new com.jettra.report.Report.Column("DIRECCIÓN", "direccion", 350));
+            table.addColumn(new io.jettra.report.Report.Column("NOMBRE", "nombre", 250));
+            table.addColumn(new io.jettra.report.Report.Column("DIRECCIÓN", "direccion", 350));
             report.getDetail().addElement(table);
 
             String fileName = "reporte_personas_" + System.currentTimeMillis() + "." + format;

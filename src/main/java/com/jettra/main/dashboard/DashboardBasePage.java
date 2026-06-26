@@ -49,7 +49,7 @@ public abstract class DashboardBasePage extends JettraDashboardPage {
             if (!hasPerm) {
                 this.children.clear();
                 try {
-                    redirect(currentExchange, com.jettra.server.JettraServer.resolvePath("/dashboard?error=unauthorized"));
+                    redirect(currentExchange, io.jettra.server.JettraServer.resolvePath("/dashboard?error=unauthorized"));
                 } catch (Exception e) {}
                 return;
             }
@@ -62,7 +62,7 @@ public abstract class DashboardBasePage extends JettraDashboardPage {
 
         String compIcon = "<svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='#0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' style='opacity:0.7;'><path d='M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z'></path></svg>";
 
-        String lang = com.jettra.server.config.JettraConfig.getProperty("app.language");
+        String lang = io.jettra.server.config.JettraConfig.getProperty("app.language");
         boolean es = "es".equals(lang != null ? lang.trim() : "en");
 
         // --- Navigation ---

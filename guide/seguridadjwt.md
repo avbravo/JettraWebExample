@@ -46,8 +46,8 @@ Para mantener el flujo de seguridad, el servicio que interactúa entre la Web UI
 El `JettraContext` guarda los datos de la sesión del usuario cuando éste hace login en el `LoginPage`.
 
 ```java
-import com.jettra.server.core.JettraContext;
-import com.jettra.jwt.JettraJWT;
+import io.jettra.server.core.JettraContext;
+import io.jettra.jwt.JettraJWT;
 
 public class AuthorService {
 

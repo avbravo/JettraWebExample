@@ -16,8 +16,8 @@ public class AuthorService {
 
     private static String getJwtToken() {
         String user = "anonymous";
-        if (com.jettra.server.core.JettraContext.getCurrent() != null) {
-            Object sessionUser = com.jettra.server.core.JettraContext.getCurrent().get(com.jettra.server.core.JettraContext.Scope.SESSION, "username");
+        if (io.jettra.server.core.JettraContext.getCurrent() != null) {
+            Object sessionUser = io.jettra.server.core.JettraContext.getCurrent().get(io.jettra.server.core.JettraContext.Scope.SESSION, "username");
             if (sessionUser != null) {
                 user = sessionUser.toString();
             }
