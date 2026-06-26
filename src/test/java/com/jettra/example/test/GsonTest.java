@@ -1,7 +1,7 @@
 package com.jettra.example.test;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import io.jettra.json.JettraJson;
+import io.jettra.json.TypeToken;
 import com.jettra.plugin.example.library.entity.Author;
 import java.lang.reflect.Type;
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.List;
 public class GsonTest {
     public static void main(String[] args) throws Exception {
         String json = "[{\"id\":\"1\",\"name\":\"Gabriel Garcia Marquez\",\"country\":\"Colombia\"},{\"id\":\"2\",\"name\":\"J.K. Rowling\",\"country\":\"UK\"}]";
-        Gson gson = new Gson();
+        JettraJson gson = new JettraJson();
         
         // This is what RestClientProxy does:
         // Type genericReturnType = method.getGenericReturnType();

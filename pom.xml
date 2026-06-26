@@ -20,9 +20,17 @@
         <jettra.wui.version>1.0-SNAPSHOT</jettra.wui.version>
         <jettra.report.version>1.0-SNAPSHOT</jettra.report.version>
         <jettra.rest.version>1.0-SNAPSHOT</jettra.rest.version>
+         <jettra.json.version>1.0-SNAPSHOT</jettra.json.version>
     </properties>
 
     <dependencies>
+            <!-- JSON parsing -->
+        <dependency>
+            <groupId>io.jettra</groupId>
+            <artifactId>JettraJSON</artifactId>
+            <version>${jettra.json.version}</version>
+ 
+        </dependency>
         <!-- Servidor backend subyacente -->
         <dependency>
             <groupId>io.jettra</groupId>
