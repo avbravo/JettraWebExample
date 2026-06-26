@@ -72,7 +72,7 @@
                     <annotationProcessors>
                         <annotationProcessor>io.jettra.wui.core.processors.ModelToRecordProcessor</annotationProcessor>
                         <annotationProcessor>io.jettra.wui.core.processors.CrudViewProcessor</annotationProcessor>
-                        <annotationProcessor>com.jettra.rest.client.processor.RestClientProcessor</annotationProcessor>
+                        <annotationProcessor>io.jettra.rest.client.processor.RestClientProcessor</annotationProcessor>
                     </annotationProcessors>
                     <compilerArgs>
                         <arg>-XprintRounds</arg>
@@ -82,7 +82,7 @@
                         <path>
                             <groupId>io.jettra.wui</groupId>
                             <artifactId>JettraWUI</artifactId>
-                            <version>1.0.0-SNAPSHOT</version>
+                            <version>${jettra.wui.version}</version>
                         </path>
                         <path>
                             <groupId>com.google.auto.service</groupId>

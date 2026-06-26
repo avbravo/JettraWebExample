@@ -11,7 +11,7 @@ Para asegurar que un endpoint sólo pueda ser consumido por clientes autenticado
 Simplemente debes añadir `@Secured` a nivel de clase o de método en tu controlador REST. Cuando `JettraServer` reciba una solicitud a esta ruta, interceptará la petición y validará que la cabecera contenga un token **Bearer** válido.
 
 ```java
-import com.jettra.rest.annotations.*;
+import io.jettra.rest.annotations.*;
 
 @Path("/api/library/authors")
 @Secured // <- Asegura que todos los endpoints requieran JWT
@@ -31,7 +31,7 @@ Los microservicios son consumidos internamente mediante Rest Clients en la WUI. 
 ### Modificación del Cliente REST (`IAuthorRestClient`)
 
 ```java
-import com.jettra.rest.annotations.HeaderParam;
+import io.jettra.rest.annotations.HeaderParam;
 
 public interface IAuthorRestClient {
     // Es necesario indicar que todos los métodos recibirán un token

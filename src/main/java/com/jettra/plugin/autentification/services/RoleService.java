@@ -4,6 +4,7 @@ package com.jettra.plugin.autentification.services;
 import com.jettra.plugin.autentification.entity.Role;
 import com.jettra.plugin.autentification.model.RoleRecordModelConverter;
 import com.jettra.plugin.autentification.restclient.IRoleRestClient;
+import com.jettra.plugin.autentification.restclient.RoleRestClient;
 import java.util.List;
 
 public class RoleService {
