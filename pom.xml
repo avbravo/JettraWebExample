@@ -80,7 +80,7 @@
                     </compilerArgs>
                     <annotationProcessorPaths>
                         <path>
-                            <groupId>io.jettra.wui</groupId>
+                            <groupId>io.jettra</groupId>
                             <artifactId>JettraWUI</artifactId>
                             <version>${jettra.wui.version}</version>
                         </path>
@@ -90,9 +90,9 @@
                             <version>1.1.1</version>
                         </path>
                         <path>
-                            <groupId>${project.groupId}</groupId>
+                            <groupId>io.jettra</groupId>
                             <artifactId>JettraRest</artifactId>
-                            <version>${project.version}</version>
+                            <version>${jettra.rest.version}</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
