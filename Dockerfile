@@ -11,7 +11,7 @@ LABEL description="Contenedor de Demostración JettraWeb Example optimizado con 
 WORKDIR /app
 
 # Copia el JAR compilado desde target de su entorno en Host
-COPY target/JettraWebExample-1.0-SNAPSHOT.jar /app/JettraWebExample.jar
+COPY target/JettraWebExample-1.0.0-SNAPSHOT.jar /app/JettraWebExample.jar
 
 # Entrenar la JVM para generar el AOT Cache (AppCDS)
 # Ejecutamos la app por 10 segundos para cargar las clases y luego forzamos la salida guardando el archivo .jsa
