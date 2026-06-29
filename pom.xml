@@ -39,7 +39,7 @@
         </dependency>
         
         <dependency>
-            <groupId>io.jettra.wui</groupId>
+            <groupId>io.jettra</groupId>
             <artifactId>JettraWUI</artifactId>
             <version>${jettra.wui.version}</version>
         </dependency>
